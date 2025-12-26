@@ -1,0 +1,13 @@
+
+> casa-da-pampulha@1.0.0 dev
+> next dev
+
+ ⚠ Port 3000 is in use, trying 3001 instead.
+  ▲ Next.js 14.2.5
+  - Local:        http://localhost:3001
+  - Environments: .env
+
+ ✓ Starting...
+ ✓ Ready in 1175ms
+ ✓ Compiled /api/guests in 424ms (294 modules)
+ GET /api/guests 401 in 654ms

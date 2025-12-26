@@ -1,0 +1,572 @@
+ 'use client';
+
+import { useEffect, useState } from 'react';
+import {
+  PlusIcon,
+  PencilIcon,
+  TrashIcon,
+  XMarkIcon,
+  MagnifyingGlassIcon
+} from '@heroicons/react/24/outline';
+import toast from 'react-hot-toast';
+import { onlyDigits, formatCPF, validateCPF, formatPhone, validateEmail } from '../../../lib/helpers';
+
+interface Guest {
+  _id: string;
+  name: string;
+  email: string;
+  phone: string;
+  document: string;
+  documentType: string;
+  nationality: string;
+  birthDate: string;
+  address: string;
+  city: string;
+  state: string;
+  country: string;
+  checkInDate: string;
+  checkOutDate: string;
+  notes: string;
+  agreedToRules?: boolean;
+  isActive: boolean;
+  createdAt: string;
+}
+
+const emptyGuest: Omit<Guest, '_id' | 'createdAt'> = {
+  name: '',
+  email: '',
+  phone: '',
+  document: '',
+  documentType: 'CPF',
+  nationality: 'Brasileiro(a)',
+  birthDate: '',
+  address: '',
+  city: '',
+  state: '',
+  country: 'Brasil',
+  checkInDate: '',
+  checkOutDate: '',
+  notes: '',
+  agreedToRules: true,
+  isActive: true,
+};
+
+export default function AdminHospedesPage() {
+  const [guests, setGuests] = useState<Guest[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [editingGuest, setEditingGuest] = useState<Guest | null>(null);
+  const [formData, setFormData] = useState<Omit<Guest, '_id' | 'createdAt'>>(emptyGuest);
+  const [saving, setSaving] = useState(false);
+  const [errors, setErrors] = useState<Record<string, string>>({});
+  const [states, setStates] = useState<Array<{ id: number; sigla: string; nome: string }>>([]);
+  const [cities, setCities] = useState<Array<{ id: number; nome: string }>>([]);
+  const [loadingStates, setLoadingStates] = useState(false);
+  const [loadingCities, setLoadingCities] = useState(false);
+
+  // Helpers imported from src/lib/helpers.ts
+
+  useEffect(() => {
+    fetchGuests();
+    fetchStates();
+  }, []);
+
+  const fetchStates = async () => {
+    try {
+      setLoadingStates(true);
+      const res = await fetch('https://servicodados.ibge.gov.br/api/v1/localidades/estados?orderBy=nome');
+      const data = await res.json();
+      setStates(Array.isArray(data) ? data : []);
+    } catch (err) {
+      console.error('Erro ao carregar estados do IBGE', err);
+      toast.error('Erro ao carregar lista de estados');
+    } finally {
+      setLoadingStates(false);
+    }
+  };
+
+  const fetchCitiesForState = async (stateSigla: string) => {
+    try {
+      setLoadingCities(true);
+      const stateObj = states.find((s) => s.sigla === stateSigla);
+      if (!stateObj) {
+        setCities([]);
+        return;
+      }
+      const res = await fetch(`https://servicodados.ibge.gov.br/api/v1/localidades/estados/${stateObj.id}/municipios`);
+      const data = await res.json();
+      setCities(Array.isArray(data) ? data : []);
+    } catch (err) {
+      console.error('Erro ao carregar cidades do IBGE', err);
+      toast.error('Erro ao carregar cidades');
+      setCities([]);
+    } finally {
+      setLoadingCities(false);
+    }
+  };
+
+  const fetchGuests = async () => {
+    try {
+      const response = await fetch('/api/guests');
+      const data = await response.json();
+      setGuests(Array.isArray(data) ? data : []);
+    } catch (error) {
+      console.error('Erro ao carregar hóspedes:', error);
+      toast.error('Erro ao carregar hóspedes');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const openModal = async (guest?: Guest) => {
+    if (guest) {
+      setEditingGuest(guest);
+      setFormData({
+        name: guest.name,
+        email: guest.email,
+        phone: guest.phone ? formatPhone(guest.phone) : '',
+        document: guest.documentType === 'CPF' ? formatCPF(guest.document || '') : onlyDigits(guest.document || ''),
+        documentType: guest.documentType,
+        nationality: guest.nationality,
+        birthDate: guest.birthDate ? guest.birthDate.split('T')[0] : '',
+        address: guest.address,
+        city: guest.city,
+        state: guest.state,
+        country: guest.country,
+        checkInDate: guest.checkInDate ? guest.checkInDate.split('T')[0] : '',
+        checkOutDate: guest.checkOutDate ? guest.checkOutDate.split('T')[0] : '',
+        notes: guest.notes,
+        agreedToRules: guest.agreedToRules ?? false,
+        isActive: guest.isActive,
+      });
+      // If we have a state value, ensure cities are loaded for it
+      if (guest.state) {
+        if (states.length === 0) await fetchStates();
+        await fetchCitiesForState(guest.state);
+      }
+    } else {
+      setEditingGuest(null);
+      setFormData(emptyGuest);
+    }
+    setIsModalOpen(true);
+  };
+
+  const closeModal = () => {
+    setIsModalOpen(false);
+    setEditingGuest(null);
+    setFormData(emptyGuest);
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    // Front-end validation
+    const newErrors: Record<string, string> = {};
+    if (!formData.name || !formData.name.trim()) newErrors.name = 'Nome é obrigatório';
+    if (!formData.email || !formData.email.trim()) newErrors.email = 'Email é obrigatório';
+    if (!formData.phone || !formData.phone.trim()) newErrors.phone = 'Telefone é obrigatório';
+    if (!formData.checkInDate) newErrors.checkInDate = 'Data de check-in é obrigatória';
+    if (!formData.checkOutDate) newErrors.checkOutDate = 'Data de check-out é obrigatória';
+    if (formData.checkInDate && formData.checkOutDate) {
+      const inDate = new Date(formData.checkInDate);
+      const outDate = new Date(formData.checkOutDate);
+      if (outDate < inDate) newErrors.checkOutDate = 'Check-out deve ser igual ou posterior ao check-in';
+    }
+
+    if (Object.keys(newErrors).length > 0) {
+      setErrors(newErrors);
+      toast.error('Preencha os campos obrigatórios corretamente');
+      return;
+    }
+
+    setErrors({});
+    setSaving(true);
+
+    try {
+      const url = editingGuest
+        ? `/api/guests?id=${editingGuest._id}`
+        : '/api/guests';
+
+      // Build payload matching API expectations (`name`, `document`, `email`, `phone`, `agreedToRules`)
+      const base = editingGuest ? formData : { ...formData, agreedToRules: true };
+      const payload: any = {
+        name: base.name,
+        email: base.email,
+        phone: base.phone,
+        document: base.document,
+        documentType: base.documentType,
+        nationality: base.nationality,
+        birthDate: base.birthDate,
+        address: base.address,
+        city: base.city,
+        state: base.state,
+        country: base.country,
+        notes: base.notes,
+        agreedToRules: !!base.agreedToRules,
+        isActive: base.isActive,
+      };
+
+      // Only include dates if provided (avoid sending empty strings)
+      if (base.checkInDate) payload.checkInDate = base.checkInDate;
+      if (base.checkOutDate) payload.checkOutDate = base.checkOutDate;
+
+      const response = await fetch(url, {
+        method: editingGuest ? 'PUT' : 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      });
+
+      if (!response.ok) throw new Error('Erro ao salvar');
+
+      toast.success(editingGuest ? 'Hóspede atualizado!' : 'Hóspede cadastrado!');
+      closeModal();
+      fetchGuests();
+    } catch (error) {
+      toast.error('Erro ao salvar hóspede');
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const handleDelete = async (id: string) => {
+    if (!confirm('Tem certeza que deseja excluir este hóspede?')) return;
+
+    try {
+      const response = await fetch(`/api/guests?id=${id}`, {
+        method: 'DELETE',
+      });
+
+      if (!response.ok) throw new Error('Erro ao excluir');
+
+      toast.success('Hóspede excluído!');
+      fetchGuests();
+    } catch (error) {
+      toast.error('Erro ao excluir hóspede');
+    }
+  };
+
+  const filteredGuests = guests.filter((guest) =>
+    guest.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    guest.email?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    guest.phone?.includes(searchTerm)
+  );
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center h-64">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-amber-600"></div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="space-y-6">
+      <div className="flex justify-between items-center">
+        <h1 className="text-2xl font-bold text-gray-800">Hóspedes</h1>
+        <button
+          onClick={() => openModal()}
+          className="flex items-center gap-2 px-4 py-2 bg-amber-600 text-white rounded-lg hover:bg-amber-700"
+        >
+          <PlusIcon className="h-5 w-5" />
+          Novo Hóspede
+        </button>
+      </div>
+
+      {/* Busca */}
+      <div className="relative">
+        <MagnifyingGlassIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
+        <input
+          type="text"
+          placeholder="Buscar por nome, email ou telefone..."
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+          className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500"
+        />
+      </div>
+
+      {/* Lista de Hóspedes */}
+      <div className="bg-white rounded-xl shadow-sm overflow-hidden">
+        <table className="min-w-full divide-y divide-gray-200">
+          <thead className="bg-gray-50">
+            <tr>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Nome</th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Contato</th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Check-in</th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Check-out</th>
+              <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">Ações</th>
+            </tr>
+          </thead>
+          <tbody className="divide-y divide-gray-200">
+            {filteredGuests.length === 0 ? (
+              <tr>
+                <td colSpan={5} className="px-6 py-8 text-center text-gray-500">
+                  Nenhum hóspede encontrado
+                </td>
+              </tr>
+            ) : (
+              filteredGuests.map((guest) => (
+                <tr key={guest._id} className="hover:bg-gray-50">
+                  <td className="px-6 py-4">
+                    <div className="font-medium text-gray-900">{guest.name}</div>
+                    <div className="text-sm text-gray-500">{guest.document}</div>
+                  </td>
+                  <td className="px-6 py-4">
+                    <div className="text-sm text-gray-900">{guest.email}</div>
+                    <div className="text-sm text-gray-500">{guest.phone}</div>
+                  </td>
+                  <td className="px-6 py-4 text-sm text-gray-500">
+                    {guest.checkInDate ? new Date(guest.checkInDate).toLocaleDateString('pt-BR') : '-'}
+                  </td>
+                  <td className="px-6 py-4 text-sm text-gray-500">
+                    {guest.checkOutDate ? new Date(guest.checkOutDate).toLocaleDateString('pt-BR') : '-'}
+                  </td>
+                  <td className="px-6 py-4 text-right space-x-2">
+                    <button
+                      onClick={() => openModal(guest)}
+                      className="text-amber-600 hover:text-amber-800"
+                    >
+                      <PencilIcon className="h-5 w-5" />
+                    </button>
+                    <button
+                      onClick={() => handleDelete(guest._id)}
+                      className="text-red-600 hover:text-red-800"
+                    >
+                      <TrashIcon className="h-5 w-5" />
+                    </button>
+                  </td>
+                </tr>
+              ))
+            )}
+          </tbody>
+        </table>
+      </div>
+
+      {/* Modal */}
+      {isModalOpen && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-xl p-6 w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+            <div className="flex justify-between items-center mb-4">
+              <h2 className="text-xl font-bold">
+                {editingGuest ? 'Editar Hóspede' : 'Novo Hóspede'}
+              </h2>
+              <button onClick={closeModal}>
+                <XMarkIcon className="h-6 w-6 text-gray-500" />
+              </button>
+            </div>
+
+            <form onSubmit={handleSubmit} className="space-y-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Nome Completo</label>
+                  <input
+                    type="text"
+                    value={formData.name}
+                    onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500"
+                    required
+                  />
+                  {errors.name && <p className="text-sm text-red-600 mt-1">{errors.name}</p>}
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Email</label>
+                  <input
+                    type="email"
+                    value={formData.email}
+                    onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500"
+                  />
+                  {errors.email && <p className="text-sm text-red-600 mt-1">{errors.email}</p>}
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Telefone</label>
+                  <input
+                    type="tel"
+                    value={formData.phone}
+                    onChange={(e) => {
+                      const val = e.target.value;
+                      const formatted = formatPhone(val);
+                      setFormData({ ...formData, phone: formatted });
+                      setErrors((prev) => ({ ...prev, phone: '' }));
+                    }}
+                    placeholder="+55(27)98133-0708"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500"
+                  />
+                  {errors.phone && <p className="text-sm text-red-600 mt-1">{errors.phone}</p>}
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Data de Nascimento</label>
+                  <input
+                    type="date"
+                    value={formData.birthDate}
+                    onChange={(e) => setFormData({ ...formData, birthDate: e.target.value })}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Tipo de Documento</label>
+                  <select
+                    value={formData.documentType}
+                    onChange={(e) => {
+                      const newType = e.target.value;
+                      const newDoc = newType === 'CPF' ? formatCPF(formData.document || '') : onlyDigits(formData.document || '');
+                      setFormData({ ...formData, documentType: newType, document: newDoc });
+                    }}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500"
+                  >
+                    <option value="CPF">CPF</option>
+                    <option value="RG">RG</option>
+                    <option value="Passaporte">Passaporte</option>
+                    <option value="CNH">CNH</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Documento</label>
+                  <input
+                    type="text"
+                    value={formData.document}
+                    onChange={(e) => {
+                      const val = e.target.value;
+                      if (formData.documentType === 'CPF') {
+                        const formatted = formatCPF(val);
+                        setFormData({ ...formData, document: formatted });
+                        setErrors((prev) => ({ ...prev, document: '' }));
+                      } else {
+                        setFormData({ ...formData, document: val });
+                        setErrors((prev) => ({ ...prev, document: '' }));
+                      }
+                    }}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500"
+                  />
+                  {errors.document && <p className="text-sm text-red-600 mt-1">{errors.document}</p>}
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Nacionalidade</label>
+                  <input
+                    type="text"
+                    value={formData.nationality}
+                    onChange={(e) => setFormData({ ...formData, nationality: e.target.value })}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Endereço</label>
+                  <input
+                    type="text"
+                    value={formData.address}
+                    onChange={(e) => setFormData({ ...formData, address: e.target.value })}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Estado</label>
+                  {loadingStates ? (
+                    <div className="w-full px-3 py-2 border border-gray-300 rounded-lg bg-gray-50 text-gray-500">Carregando estados...</div>
+                  ) : (
+                    <select
+                      value={formData.state}
+                      onChange={async (e) => {
+                        const sigla = e.target.value;
+                        setFormData({ ...formData, state: sigla, city: '' });
+                        if (sigla) await fetchCitiesForState(sigla);
+                        else setCities([]);
+                      }}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500"
+                    >
+                      <option value="">Selecione...</option>
+                      {states.map((s) => (
+                        <option key={s.id} value={s.sigla}>{`${s.sigla} - ${s.nome}`}</option>
+                      ))}
+                    </select>
+                  )}
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Cidade</label>
+                  {loadingCities ? (
+                    <div className="w-full px-3 py-2 border border-gray-300 rounded-lg bg-gray-50 text-gray-500">Carregando cidades...</div>
+                  ) : (
+                    <select
+                      value={formData.city}
+                      onChange={(e) => setFormData({ ...formData, city: e.target.value })}
+                      disabled={cities.length === 0}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 disabled:opacity-60"
+                    >
+                      {cities.length === 0 ? (
+                        <option value="">Selecione o estado primeiro</option>
+                      ) : (
+                        <>
+                          <option value="">Selecione...</option>
+                          {cities.map((c) => (
+                            <option key={c.id} value={c.nome}>{c.nome}</option>
+                          ))}
+                        </>
+                      )}
+                    </select>
+                  )}
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Check-in</label>
+                  <input
+                    type="date"
+                    value={formData.checkInDate}
+                    onChange={(e) => setFormData({ ...formData, checkInDate: e.target.value })}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500"
+                  />
+                  {errors.checkInDate && <p className="text-sm text-red-600 mt-1">{errors.checkInDate}</p>}
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Check-out</label>
+                  <input
+                    type="date"
+                    value={formData.checkOutDate}
+                    onChange={(e) => setFormData({ ...formData, checkOutDate: e.target.value })}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500"
+                  />
+                  {errors.checkOutDate && <p className="text-sm text-red-600 mt-1">{errors.checkOutDate}</p>}
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Observações</label>
+                <textarea
+                  value={formData.notes}
+                  onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
+                  rows={3}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500"
+                />
+              </div>
+
+              {editingGuest ? (
+                <div className="flex items-center gap-3">
+                  <input
+                    id="agreedToRules"
+                    type="checkbox"
+                    checked={!!formData.agreedToRules}
+                    onChange={(e) => setFormData({ ...formData, agreedToRules: e.target.checked })}
+                    className="h-4 w-4 rounded border-gray-300 text-amber-600 focus:ring-amber-500"
+                  />
+                  <label htmlFor="agreedToRules" className="text-sm text-gray-700">Concordo com as regras da casa</label>
+                </div>
+              ) : null}
+
+              <div className="flex justify-end gap-2 pt-4">
+                <button type="button" onClick={closeModal} className="px-4 py-2 text-gray-600 hover:text-gray-800">Cancelar</button>
+                <button type="submit" disabled={saving} className="px-4 py-2 bg-amber-600 text-white rounded-lg hover:bg-amber-700 disabled:opacity-50">{saving ? 'Salvando...' : 'Salvar'}</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
