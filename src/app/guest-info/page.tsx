@@ -11,6 +11,8 @@ import {
   CheckCircleIcon
 } from '@heroicons/react/24/outline';
 import Link from 'next/link';
+import { getServerSession } from 'next-auth';
+import { authOptions } from '@/lib/auth';
 
 export const metadata = {
   title: 'Check-in & Check-out | Casa da Pampulha',
@@ -19,7 +21,12 @@ export const metadata = {
 
 async function getGuestInfo() {
   await dbConnect();
-  const items = await GuestInfo.find({ isActive: true, isRestricted: false }).sort({ order: 1 });
+  // Only include restricted items when the user is authenticated
+  const session = await getServerSession(authOptions);
+  const query: Record<string, unknown> = { isActive: true };
+  if (!session) query.isRestricted = false;
+
+  const items = await GuestInfo.find(query).sort({ order: 1 });
   return JSON.parse(JSON.stringify(items));
 }
 
@@ -41,15 +48,17 @@ export default async function CheckinPage() {
   const rules = items.filter((item: { type: string }) => item.type === 'rule');
   const instructions = items.filter((item: { type: string }) => item.type === 'instruction');
 
+  const totalCount = items.length;
+  const countsSummary = `Check-in: ${checkinItems.length} · Check-out: ${checkoutItems.length} · Regras: ${rules.length} · Instruções: ${instructions.length}`;
+
   return (
     <div className="pt-20">
       {/* Header */}
       <section className="bg-gradient-to-br from-amber-600 to-amber-700 text-white py-16">
         <div className="container-section py-0">
           <h1 className="text-4xl md:text-5xl font-bold mb-4">Check-in & Check-out</h1>
-          <p className="text-lg text-amber-100">
-            Tudo o que você precisa saber para sua chegada e partida
-          </p>
+          <p className="text-lg text-amber-100">Tudo o que você precisa saber para sua chegada e partida</p>
+          <p className="text-sm text-amber-100 mt-2">Mostrando <span className="font-semibold">{totalCount}</span> itens — <span className="italic">{countsSummary}</span></p>
         </div>
       </section>
 
