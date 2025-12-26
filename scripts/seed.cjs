@@ -315,6 +315,18 @@ async function seed() {
     await User.create({ email: 'admin@casadapampulha.com.br', password: hashedPassword, name: 'Administrador', role: 'admin', isActive: true });
     console.log('Usuário admin criado (admin@casadapampulha.com.br / admin123)');
 
+    // Inserir GuestInfo (check-in / check-out / regras / instruções)
+    try {
+      const seedGuest = require('./seed-checkin.cjs');
+      if (seedGuest && typeof seedGuest.seedGuestInfo === 'function') {
+        console.log('Inserindo informações para hóspedes (GuestInfo) via scripts/seed-checkin.cjs...');
+        await seedGuest.seedGuestInfo();
+        console.log('GuestInfo inserido via seed-checkin.cjs.');
+      }
+    } catch (e) {
+      console.warn('Não foi possível executar seed-checkin.cjs automaticamente:', e.message || e);
+    }
+
     console.log('\n✅ Seed concluído com sucesso!');
     process.exit(0);
   } catch (error) {

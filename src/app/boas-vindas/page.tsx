@@ -221,7 +221,7 @@ export default function BoasVindasPage() {
             Links Úteis
           </h2>
           <div className="grid sm:grid-cols-2 md:grid-cols-4 gap-4">
-            <a href="/checkin" className="p-4 bg-amber-50 rounded-xl hover:bg-amber-100 transition-colors">
+            <a href="/guest-info" className="p-4 bg-amber-50 rounded-xl hover:bg-amber-100 transition-colors">
               <FaKey className="w-8 h-8 mx-auto text-amber-600 mb-2" />
               <span className="font-medium text-gray-800">Check-in</span>
             </a>

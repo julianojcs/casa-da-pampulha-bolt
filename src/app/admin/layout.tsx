@@ -28,7 +28,7 @@ const sidebarItems = [
   { name: 'Comodidades', href: '/admin/comodidades', icon: SquaresPlusIcon },
   { name: 'FAQs', href: '/admin/faqs', icon: QuestionMarkCircleIcon },
   { name: 'Hóspedes', href: '/admin/hospedes', icon: UsersIcon },
-  { name: 'Check-in', href: '/admin/checkin', icon: ClipboardDocumentCheckIcon },
+  { name: 'Informações', href: '/admin/guest-info', icon: ClipboardDocumentCheckIcon },
   { name: 'Área Kids', href: '/admin/kids', icon: SparklesIcon },
   { name: 'Configurações', href: '/admin/configuracoes', icon: CogIcon },
 ];

@@ -348,7 +348,7 @@ function WelcomeSection() {
           Aproveite cada momento e sinta-se em casa!
         </p>
         <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-          <Link href="/checkin" className="bg-white text-amber-700 hover:bg-amber-50 font-semibold py-3 px-6 rounded-lg transition-colors">
+          <Link href="/guest-info" className="bg-white text-amber-700 hover:bg-amber-50 font-semibold py-3 px-6 rounded-lg transition-colors">
             Instruções de Check-in
           </Link>
           <Link href="/guia-local" className="border-2 border-white text-white hover:bg-white/10 font-semibold py-3 px-6 rounded-lg transition-colors">
