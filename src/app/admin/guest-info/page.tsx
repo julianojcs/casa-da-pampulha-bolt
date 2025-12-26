@@ -9,7 +9,7 @@ import {
 } from '@heroicons/react/24/outline';
 import toast from 'react-hot-toast';
 
-interface CheckinInfo {
+interface GuestInfo {
   _id: string;
   type: string;
   title: string;
@@ -27,7 +27,7 @@ const types = [
   { value: 'instruction', label: 'Instrução' },
 ];
 
-const emptyItem: Omit<CheckinInfo, '_id'> = {
+const emptyItem: Omit<GuestInfo, '_id'> = {
   type: 'checkin',
   title: '',
   content: '',
@@ -37,13 +37,13 @@ const emptyItem: Omit<CheckinInfo, '_id'> = {
   isActive: true,
 };
 
-export default function AdminCheckinPage() {
-  const [items, setItems] = useState<CheckinInfo[]>([]);
+export default function AdminGuestInfoPage() {
+  const [items, setItems] = useState<GuestInfo[]>([]);
   const [loading, setLoading] = useState(true);
   const [filterType, setFilterType] = useState<string>('');
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [editingItem, setEditingItem] = useState<CheckinInfo | null>(null);
-  const [formData, setFormData] = useState<Omit<CheckinInfo, '_id'>>(emptyItem);
+  const [editingItem, setEditingItem] = useState<GuestInfo | null>(null);
+  const [formData, setFormData] = useState<Omit<GuestInfo, '_id'>>(emptyItem);
   const [saving, setSaving] = useState(false);
 
   useEffect(() => {
@@ -52,7 +52,7 @@ export default function AdminCheckinPage() {
 
   const fetchItems = async () => {
     try {
-      const response = await fetch('/api/checkin?includeRestricted=true');
+      const response = await fetch('/api/guest-info?includeRestricted=true');
       const data = await response.json();
       setItems(Array.isArray(data) ? data : []);
     } catch (error) {
@@ -63,7 +63,7 @@ export default function AdminCheckinPage() {
     }
   };
 
-  const openModal = (item?: CheckinInfo) => {
+  const openModal = (item?: GuestInfo) => {
     if (item) {
       setEditingItem(item);
       setFormData({
@@ -94,8 +94,8 @@ export default function AdminCheckinPage() {
 
     try {
       const url = editingItem
-        ? `/api/checkin?id=${editingItem._id}`
-        : '/api/checkin';
+        ? `/api/guest-info?id=${editingItem._id}`
+        : '/api/guest-info';
 
       const response = await fetch(url, {
         method: editingItem ? 'PUT' : 'POST',
@@ -119,7 +119,7 @@ export default function AdminCheckinPage() {
     if (!confirm('Tem certeza que deseja excluir este item?')) return;
 
     try {
-      const response = await fetch(`/api/checkin?id=${id}`, {
+      const response = await fetch(`/api/guest-info?id=${id}`, {
         method: 'DELETE',
       });
 
@@ -161,15 +161,30 @@ export default function AdminCheckinPage() {
 
   return (
     <div className="space-y-6">
-      <div className="flex justify-between items-center">
-        <h1 className="text-2xl font-bold text-gray-800">Check-in / Check-out</h1>
-        <button
-          onClick={() => openModal()}
-          className="flex items-center gap-2 px-4 py-2 bg-amber-600 text-white rounded-lg hover:bg-amber-700"
-        >
-          <PlusIcon className="h-5 w-5" />
-          Novo Item
-        </button>
+      <div>
+        <div className="flex justify-between items-center mb-3">
+          <h1 className="text-2xl font-bold text-gray-800">Informações ao Hóspede</h1>
+          <button
+            onClick={() => openModal()}
+            className="flex items-center gap-2 px-4 py-2 bg-amber-600 text-white rounded-lg hover:bg-amber-700"
+          >
+            <PlusIcon className="h-5 w-5" />
+            Novo Item
+          </button>
+        </div>
+        <div className="bg-blue-50 border-l-4 border-blue-500 p-4 rounded-lg">
+          <h2 className="text-sm font-semibold text-blue-900 mb-2">📋 Sobre esta página</h2>
+          <p className="text-sm text-blue-800 mb-2">
+            Gerencie todas as informações destinadas aos hóspedes: check-in, check-out, regras da casa e instruções gerais.
+            Estas informações são exibidas na área restrita do site após o hóspede fazer login.
+          </p>
+          <ul className="text-sm text-blue-800 space-y-1 ml-4">
+            <li><strong>Check-in:</strong> Informações sobre horários, procedimentos e local de chegada</li>
+            <li><strong>Check-out:</strong> Horários e procedimentos de saída, devolução de chaves</li>
+            <li><strong>Regras:</strong> Normas da casa que os hóspedes devem seguir</li>
+            <li><strong>Instruções:</strong> Orientações gerais sobre uso de equipamentos, Wi-Fi, etc.</li>
+          </ul>
+        </div>
       </div>
 
       {/* Filtro por tipo */}
@@ -207,8 +222,22 @@ export default function AdminCheckinPage() {
           <tbody className="divide-y divide-gray-200">
             {filteredItems.length === 0 ? (
               <tr>
-                <td colSpan={6} className="px-6 py-8 text-center text-gray-500">
-                  Nenhum item encontrado
+                <td colSpan={6} className="px-6 py-12 text-center">
+                  <div className="flex flex-col items-center justify-center text-gray-500">
+                    <PlusIcon className="h-12 w-12 text-gray-400 mb-3" />
+                    <p className="text-lg font-medium text-gray-700 mb-1">
+                      {filterType ? 'Nenhum item deste tipo ainda' : 'Nenhuma informação cadastrada'}
+                    </p>
+                    <p className="text-sm text-gray-500 mb-4">
+                      {filterType ? `Clique em "Novo Item" para adicionar ${getTypeLabel(filterType).toLowerCase()}` : 'Comece criando informações de check-in, check-out ou regras da casa'}
+                    </p>
+                    <button
+                      onClick={() => openModal()}
+                      className="text-amber-600 hover:text-amber-700 font-medium text-sm"
+                    >
+                      + Criar primeiro item
+                    </button>
+                  </div>
                 </td>
               </tr>
             ) : (
@@ -266,7 +295,10 @@ export default function AdminCheckinPage() {
             <form onSubmit={handleSubmit} className="space-y-4">
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Tipo</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Tipo
+                    <span className="text-xs text-gray-500 ml-1">(categoria da informação)</span>
+                  </label>
                   <select
                     value={formData.type}
                     onChange={(e) => setFormData({ ...formData, type: e.target.value })}
@@ -278,33 +310,45 @@ export default function AdminCheckinPage() {
                   </select>
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Ordem</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Ordem
+                    <span className="text-xs text-gray-500 ml-1">(ordem de exibição)</span>
+                  </label>
                   <input
                     type="number"
                     value={formData.order}
                     onChange={(e) => setFormData({ ...formData, order: Number(e.target.value) })}
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500"
+                    min="0"
                   />
                 </div>
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Título</label>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Título
+                  <span className="text-xs text-gray-500 ml-1">(ex: "Horário de Check-in", "Chaves")</span>
+                </label>
                 <input
                   type="text"
                   value={formData.title}
                   onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+                  placeholder="Ex: Horário de Check-in"
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500"
                   required
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Conteúdo</label>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Conteúdo
+                  <span className="text-xs text-gray-500 ml-1">(descrição detalhada)</span>
+                </label>
                 <textarea
                   value={formData.content}
                   onChange={(e) => setFormData({ ...formData, content: e.target.value })}
                   rows={4}
+                  placeholder="Ex: O check-in pode ser realizado das 14h às 22h. As chaves estarão na caixa de correio."
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500"
                   required
                 />
@@ -312,14 +356,18 @@ export default function AdminCheckinPage() {
 
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Ícone</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Ícone
+                    <span className="text-xs text-gray-500 ml-1">(opcional)</span>
+                  </label>
                   <input
                     type="text"
                     value={formData.icon}
                     onChange={(e) => setFormData({ ...formData, icon: e.target.value })}
-                    placeholder="clock, key, home..."
+                    placeholder="clock, key, home, wifi..."
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500"
                   />
+                  <p className="text-xs text-gray-500 mt-1">Sugestões: clock, key, home, wifi, tv, rules</p>
                 </div>
                 <div className="flex flex-col justify-end gap-2">
                   <label className="flex items-center gap-2">
@@ -329,7 +377,10 @@ export default function AdminCheckinPage() {
                       onChange={(e) => setFormData({ ...formData, isRestricted: e.target.checked })}
                       className="rounded border-gray-300 text-amber-600 focus:ring-amber-500"
                     />
-                    <span className="text-sm text-gray-700">Restrito (só hóspedes)</span>
+                    <span className="text-sm text-gray-700">
+                      Restrito
+                      <span className="text-xs text-gray-500 ml-1">(visível apenas para hóspedes logados)</span>
+                    </span>
                   </label>
                   <label className="flex items-center gap-2">
                     <input
@@ -338,7 +389,10 @@ export default function AdminCheckinPage() {
                       onChange={(e) => setFormData({ ...formData, isActive: e.target.checked })}
                       className="rounded border-gray-300 text-amber-600 focus:ring-amber-500"
                     />
-                    <span className="text-sm text-gray-700">Ativo</span>
+                    <span className="text-sm text-gray-700">
+                      Ativo
+                      <span className="text-xs text-gray-500 ml-1">(exibir no site)</span>
+                    </span>
                   </label>
                 </div>
               </div>

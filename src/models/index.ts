@@ -5,7 +5,7 @@ export { Room } from './Room';
 export { Amenity } from './Amenity';
 export { Host } from './Host';
 export { Property } from './Property';
-export { CheckinInfo } from './CheckinInfo';
+export { GuestInfo } from './GuestInfo';
 export { FAQ } from './FAQ';
 export { KidsArea } from './KidsArea';
 export { SocialLink } from './SocialLink';

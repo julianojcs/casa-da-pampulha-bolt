@@ -1,9 +1,9 @@
 import mongoose, { Schema, Document } from 'mongoose';
-import { ICheckinInfo } from '@/types';
+import { IGuestInfo } from '@/types';
 
-export interface CheckinInfoDocument extends Omit<ICheckinInfo, '_id'>, Document {}
+export interface GuestInfoDocument extends Omit<IGuestInfo, '_id'>, Document {}
 
-const CheckinInfoSchema = new Schema<CheckinInfoDocument>(
+const GuestInfoSchema = new Schema<GuestInfoDocument>(
   {
     type: {
       type: String,
@@ -20,4 +20,4 @@ const CheckinInfoSchema = new Schema<CheckinInfoDocument>(
   { timestamps: true }
 );
 
-export const CheckinInfo = mongoose.models.CheckinInfo || mongoose.model<CheckinInfoDocument>('CheckinInfo', CheckinInfoSchema);
+export const GuestInfo = mongoose.models.GuestInfo || mongoose.model<GuestInfoDocument>('GuestInfo', GuestInfoSchema);

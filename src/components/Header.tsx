@@ -21,7 +21,7 @@ const navigation = [
   { name: 'Comodidades', href: '/comodidades' },
   { name: 'Anfitriões', href: '/anfitrioes' },
   { name: 'Crianças', href: '/criancas' },
-  { name: 'Check-in', href: '/checkin' },
+  { name: 'Informações', href: '/guest-info' },
   { name: 'FAQ', href: '/faq' },
 ];
 

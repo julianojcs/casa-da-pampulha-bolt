@@ -80,6 +80,16 @@ const CheckoutInfoSchema = new mongoose.Schema({
   isActive: { type: Boolean, default: true },
 }, { timestamps: true });
 
+const GuestInfoSchema = new mongoose.Schema({
+  type: String,
+  title: String,
+  content: String,
+  icon: String,
+  order: Number,
+  isRestricted: { type: Boolean, default: false },
+  isActive: { type: Boolean, default: true },
+}, { timestamps: true });
+
 const HostSchema = new mongoose.Schema({
   name: String,
   role: String,
@@ -137,24 +147,117 @@ const faqsData = [
   },
 ];
 
-// Checkout Instructions
-const checkoutData = {
-  title: "Instruções de Check-out",
-  instructions: [
-    "Os espetos, grelhas e utensílios da churrasqueira devem ser entregues limpos (lavados)",
-    "O mesmo serve para louças, talheres, panelas, airfrier, misteira, etc",
-    "Todo o lixo das lixeiras dos banheiros devem ser recolhidos, lacrados/amarrados e armazenados em sacos maiores",
-    "Todo o resto de alimentos devem ser recolhidos e dispensados em sacolas de lixo (não deixem restos de alimentos pela casa, sobre as mesas e bancadas, e nem dentro da geladeira, freezer, frigobar e cervejeira)",
-    "Os sacos de lixo podem ser colocados no recipiente próprio da área externa da casa localizado na calçada (se atentar ao horário de Coleta de Lixo da prefeitura: terça, quinta e sábado pela manhã), ou deixados ao lado da lixeira grande na área gourmet para serem recolhidos posteriormente",
-    "Verifique se não estão deixando nenhum pertence para trás (faça o check em todos os cômodos)",
-    "Junte os controles da garagem e as chaves para que sejam entregues, EM MÃOS, ao responsável pelo check-out",
-    "Verifique se os controles das tvs, dos amazon fire tv e ar condicionados estão em cima do rack e aproveite pra ver se, caso tenha feito login nos apps de streaming, fizeram o devido logout",
-    "Não desliguem a geladeira, freezer, frigobar e cervejeira",
-    "Caso tenham, de forma excepcional, levado algum Pet, não se esqueçam de dar aquela última olhada em toda a casa (principalmente nos jardins) para ver se não ficou nenhum cocô do seu bichinho perdido e não recolhido",
-    "Caso tenha movido algum móvel do seu lugar, esse é o momento para retornar tudo às suas configurações iniciais",
-    "Contamos com a sua colaboração. E caso tenham gostado do atendimento e da hospedagem, considere fazer um feedback 5 estrelas ⭐⭐⭐⭐⭐ no Airbnb (esse feedback é muito importante para nós)"
-  ]
-};
+// Checkout Instructions (convertidas para registros individuais de GuestInfo)
+const checkoutInstructionsData = [
+  {
+    type: 'checkout',
+    title: 'Limpeza de Churrasqueira',
+    content: 'Os espetos, grelhas e utensílios da churrasqueira devem ser entregues limpos (lavados)',
+    icon: 'fire',
+    order: 1,
+    isRestricted: true,
+    isActive: true
+  },
+  {
+    type: 'checkout',
+    title: 'Louças e Utensílios',
+    content: 'O mesmo serve para louças, talheres, panelas, airfrier, misteira, etc',
+    icon: 'utensils',
+    order: 2,
+    isRestricted: true,
+    isActive: true
+  },
+  {
+    type: 'checkout',
+    title: 'Lixo dos Banheiros',
+    content: 'Todo o lixo das lixeiras dos banheiros devem ser recolhidos, lacrados/amarrados e armazenados em sacos maiores',
+    icon: 'trash',
+    order: 3,
+    isRestricted: true,
+    isActive: true
+  },
+  {
+    type: 'checkout',
+    title: 'Restos de Alimentos',
+    content: 'Todo o resto de alimentos devem ser recolhidos e dispensados em sacolas de lixo (não deixem restos de alimentos pela casa, sobre as mesas e bancadas, e nem dentro da geladeira, freezer, frigobar e cervejeira)',
+    icon: 'food',
+    order: 4,
+    isRestricted: true,
+    isActive: true
+  },
+  {
+    type: 'checkout',
+    title: 'Descarte de Lixo',
+    content: 'Os sacos de lixo podem ser colocados no recipiente próprio da área externa da casa localizado na calçada (se atentar ao horário de Coleta de Lixo da prefeitura: terça, quinta e sábado pela manhã), ou deixados ao lado da lixeira grande na área gourmet para serem recolhidos posteriormente',
+    icon: 'recycle',
+    order: 5,
+    isRestricted: true,
+    isActive: true
+  },
+  {
+    type: 'checkout',
+    title: 'Verificação de Pertences',
+    content: 'Verifique se não estão deixando nenhum pertence para trás (faça o check em todos os cômodos)',
+    icon: 'search',
+    order: 6,
+    isRestricted: true,
+    isActive: true
+  },
+  {
+    type: 'checkout',
+    title: 'Devolução de Chaves',
+    content: 'Junte os controles da garagem e as chaves para que sejam entregues, EM MÃOS, ao responsável pelo check-out',
+    icon: 'key',
+    order: 7,
+    isRestricted: true,
+    isActive: true
+  },
+  {
+    type: 'checkout',
+    title: 'Controles e Apps',
+    content: 'Verifique se os controles das tvs, dos amazon fire tv e ar condicionados estão em cima do rack e aproveite pra ver se, caso tenha feito login nos apps de streaming, fizeram o devido logout',
+    icon: 'tv',
+    order: 8,
+    isRestricted: true,
+    isActive: true
+  },
+  {
+    type: 'checkout',
+    title: 'Eletrodomésticos',
+    content: 'Não desliguem a geladeira, freezer, frigobar e cervejeira',
+    icon: 'appliance',
+    order: 9,
+    isRestricted: true,
+    isActive: true
+  },
+  {
+    type: 'checkout',
+    title: 'Verificação de Pets',
+    content: 'Caso tenham, de forma excepcional, levado algum Pet, não se esqueçam de dar aquela última olhada em toda a casa (principalmente nos jardins) para ver se não ficou nenhum cocô do seu bichinho perdido e não recolhido',
+    icon: 'pet',
+    order: 10,
+    isRestricted: true,
+    isActive: true
+  },
+  {
+    type: 'checkout',
+    title: 'Organização de Móveis',
+    content: 'Caso tenha movido algum móvel do seu lugar, esse é o momento para retornar tudo às suas configurações iniciais',
+    icon: 'home',
+    order: 11,
+    isRestricted: true,
+    isActive: true
+  },
+  {
+    type: 'checkout',
+    title: 'Feedback Airbnb',
+    content: 'Contamos com a sua colaboração. E caso tenham gostado do atendimento e da hospedagem, considere fazer um feedback 5 estrelas ⭐⭐⭐⭐⭐ no Airbnb (esse feedback é muito importante para nós)',
+    icon: 'star',
+    order: 12,
+    isRestricted: true,
+    isActive: true
+  },
+];
 
 // Hosts Data
 const hostsData = [
@@ -357,11 +460,13 @@ async function seed() {
     const GalleryItem = mongoose.models.GalleryItem || mongoose.model('GalleryItem', GalleryItemSchema);
     const Property = mongoose.models.Property || mongoose.model('Property', PropertySchema);
     const CheckoutInfo = mongoose.models.CheckoutInfo || mongoose.model('CheckoutInfo', CheckoutInfoSchema);
+    const GuestInfo = mongoose.models.GuestInfo || mongoose.model('GuestInfo', GuestInfoSchema);
     const Host = mongoose.models.Host || mongoose.model('Host', HostSchema);
 
     console.log('🗑️  Limpando coleções...');
     await FAQ.deleteMany({});
     await CheckoutInfo.deleteMany({});
+    await GuestInfo.deleteMany({});
     await Host.deleteMany({});
     await GalleryItem.deleteMany({});
     // Don't clear places and property if they might have data
@@ -370,9 +475,9 @@ async function seed() {
     await FAQ.insertMany(faqsData);
     console.log(`✅ ${faqsData.length} FAQs inseridos`);
 
-    console.log('📋 Inserindo instruções de check-out...');
-    await CheckoutInfo.create(checkoutData);
-    console.log('✅ Instruções de check-out inseridas');
+    console.log('📋 Inserindo instruções de check-out (formato otimizado)...');
+    await GuestInfo.insertMany(checkoutInstructionsData);
+    console.log(`✅ ${checkoutInstructionsData.length} instruções de check-out inseridas`);
 
     console.log('👥 Inserindo anfitriões...');
     await Host.insertMany(hostsData);

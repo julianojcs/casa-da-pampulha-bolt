@@ -23,7 +23,7 @@ const quickLinks = [
   { name: 'Comodidades', href: '/#comodidades' },
   { name: 'Galeria', href: '/galeria' },
   { name: 'Guia Local', href: '/guia-local' },
-  { name: 'Check-in', href: '/checkin' },
+  { name: 'Informações', href: '/guest-info' },
   { name: 'FAQ', href: '/faq' },
 ];
 
