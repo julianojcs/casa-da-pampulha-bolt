@@ -23,6 +23,7 @@ const quickLinks = [
   { name: 'Comodidades', href: '/#comodidades' },
   { name: 'Galeria', href: '/galeria' },
   { name: 'Guia Local', href: '/guia-local' },
+  { name: 'Calendário', href: '/calendario' },
   { name: 'Informações', href: '/guest-info' },
   { name: 'FAQ', href: '/faq' },
 ];

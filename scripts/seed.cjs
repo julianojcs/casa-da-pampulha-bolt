@@ -176,6 +176,7 @@ const propertyData = {
   checkOutTime: "11:00",
   minNights: 3,
   airbnbUrl: "https://www.airbnb.com.br/rooms/1028115044709052736",
+  airbnbCalendarUrl: "https://www.airbnb.com.br/calendar/ical/1028115044709052736.ics?t=b0844288173d4a2792d06ab35a945a78",
   heroImage: "/gallery/20240119_114828.jpg",
   heroImages: ["/gallery/20240119_114828.jpg"],
   welcomeMessage: "Estamos muito felizes em recebê-lo!",
@@ -250,7 +251,7 @@ const kidsAreaData = {
   isActive: true
 };
 
-const socialLinksData = [ { platform: "Instagram", url: "https://instagram.com/casadapampulha", icon: "instagram", order: 1 } ];
+const socialLinksData = [ { platform: "Instagram", url: "https://instagram.com/casadapampulhabh", icon: "instagram", order: 1 } ];
 
 async function seed() {
   try {
@@ -312,8 +313,8 @@ async function seed() {
 
     console.log('Criando usuário admin...');
     const hashedPassword = await bcrypt.hash('admin123', 10);
-    await User.create({ email: 'admin@casadapampulha.com.br', password: hashedPassword, name: 'Administrador', role: 'admin', isActive: true });
-    console.log('Usuário admin criado (admin@casadapampulha.com.br / admin123)');
+    await User.create({ email: 'apfjuliano@gmail.com', password: hashedPassword, name: 'Administrador', role: 'admin', isActive: true });
+    console.log('Usuário admin criado (apfjuliano@gmail.com / admin123)');
 
     // Inserir GuestInfo (check-in / check-out / regras / instruções)
     try {

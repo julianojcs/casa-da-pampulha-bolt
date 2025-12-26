@@ -44,8 +44,8 @@ const guestInfoData = [
   },
   {
     type: 'checkin',
-    title: 'Como Pegar as Chaves',
-    content: 'As chaves estarão em um porta-chaves eletrônico na entrada principal. Você receberá o código de acesso por mensagem algumas horas antes da sua chegada. Após abrir o porta-chaves, retire todas as chaves e feche novamente.',
+    title: 'Chaves e senhas de acesso',
+    content: 'O portão de pedestres na entrada da residência tem uma fechadura digital que pode ser aberta com senha ou tag (a tag será fornecida no check-in).\nAs chaves estarão em uma cesta em cima da geladeira da área gourmet (área externa).\nO código de acesso do portão de pedestres são os últimos 6 dígitos do seu celular seguido de # (ex: 999999#).\nUtilize a chave para ter acesso à casa principal.',
     icon: 'key',
     order: 3,
     isRestricted: true,
@@ -54,7 +54,7 @@ const guestInfoData = [
   {
     type: 'checkin',
     title: 'Estacionamento',
-    content: 'A casa dispõe de estacionamento coberto para até 4 veículos. O acesso é pelo portão automático da entrada principal. Há também espaço na rua, caso necessário.',
+    content: 'A casa dispõe de estacionamento coberto para até 5 veículos. O acesso é pelo portão automático da entrada principal. Há também espaço na rua, caso necessário.',
     icon: 'car',
     order: 4,
     isRestricted: false,
@@ -62,6 +62,15 @@ const guestInfoData = [
   },
 
   // ===== CHECK-OUT =====
+  {
+    type: 'checkout',
+    title: 'Intercorrências Durante a Estadia',
+    content: 'informe ao anfitrião se teve alguma ocorrência na casa (danos à mobília, roupas de cama ou banho, intercorrencia com vizinhos, etc).',
+    icon: 'alert',
+    order: 1,
+    isRestricted: true,
+    isActive: true,
+  },
   {
     type: 'checkout',
     title: 'Horário de Check-out',
@@ -74,7 +83,7 @@ const guestInfoData = [
   {
     type: 'checkout',
     title: 'Devolução das Chaves',
-    content: 'Ao sair, por favor, retorne todas as chaves ao porta-chaves eletrônico na entrada e feche-o com o mesmo código. Verifique se não esqueceu nenhum pertence pessoal antes de sair.',
+    content: 'Ao sair, por favor, feche todas as portas e janelas e retorne a chave à cesta em cima da geladeira da área gourmet (área externa). Verifique se não esqueceu nenhum pertence pessoal antes de sair.',
     icon: 'key',
     order: 2,
     isRestricted: true,
@@ -83,8 +92,17 @@ const guestInfoData = [
   {
     type: 'checkout',
     title: 'Antes de Sair',
-    content: 'Por favor, desligue todos os aparelhos (ar-condicionado, luzes, TV, som), feche portas e janelas, e deixe o lixo separado nos locais indicados. Não é necessário lavar louças ou arrumar camas - nossa equipe cuidará da limpeza.',
+    content: 'Por favor, desligue todos os aparelhos (ar-condicionado, luzes, TV, som), feche portas e janelas, e deixe o lixo separado nos locais indicados. Todo o resto de alimentos devem ser recolhidos e dispensados em sacolas de lixo (não deixem restos de alimentos pela casa, sobre as mesas e bancadas, e nem dentro da geladeira, freezer, frigobar e cervejeira).',
     icon: 'checklist',
+    order: 3,
+    isRestricted: true,
+    isActive: true,
+  },
+  {
+    type: 'checkout',
+    title: 'Descarte do Lixo',
+    content: 'os sacos de lixo podem ser colocados no recipiente da área externa da casa (localizado na calçada) ou deixados ao lado do portão da garagem ou dentro da área gourmet, ao lado da janela em frente ao banheiro, para serem recolhidos posteriormente.',
+    icon: 'trash',
     order: 3,
     isRestricted: true,
     isActive: true,
@@ -98,12 +116,21 @@ const guestInfoData = [
     isRestricted: true,
     isActive: true,
   },
+  {
+    type: 'checkout',
+    title: 'Churrasqueira',
+    content: 'Se você utilizou a churrasqueira, por favor, limpe a grelha, espetos e utensílios, e descarte as cinzas no local indicado antes de sair. Certifique-se de que o carvão esteja completamente apagado.',
+    icon: 'shield',
+    order: 4,
+    isRestricted: true,
+    isActive: true,
+  },
 
   // ===== REGRAS DA CASA =====
   {
     type: 'rule',
     title: 'Número Máximo de Hóspedes',
-    content: 'A casa acomoda confortavelmente até 16 pessoas. Por questões de seguro e conforto, não é permitido exceder este número. Visitantes externos precisam ser autorizados previamente.',
+    content: 'A casa acomoda confortavelmente até 10 pessoas. Caso desejem hospedar mais, por favor, entre em contato para verificar a disponibilidade e valores extras. Visitantes externos precisam ser autorizados previamente.',
     icon: 'users',
     order: 1,
     isRestricted: false,
@@ -112,7 +139,7 @@ const guestInfoData = [
   {
     type: 'rule',
     title: 'Festas e Eventos',
-    content: 'Não são permitidas festas ou eventos sem autorização prévia. A casa é ideal para confraternizações familiares e reuniões tranquilas. Respeite o horário de silêncio após as 22h.',
+    content: 'Não são permitidas festas ou eventos sem autorização prévia. A casa é ideal para confraternizações familiares e reuniões tranquilas. Respeite o horário de silêncio após as 21h.',
     icon: 'music',
     order: 2,
     isRestricted: false,
@@ -121,7 +148,7 @@ const guestInfoData = [
   {
     type: 'rule',
     title: 'Animais de Estimação',
-    content: 'Não aceitamos animais de estimação. Esta política é importante para manter a casa livre de alergênicos e preservar o mobiliário.',
+    content: 'Não aceitamos animais de estimação. Esta política é importante para manter a casa livre de alergênicos e preservar o mobiliário e o jardim.',
     icon: 'ban',
     order: 3,
     isRestricted: false,
@@ -139,7 +166,7 @@ const guestInfoData = [
   {
     type: 'rule',
     title: 'Crianças e Piscina',
-    content: 'Crianças devem estar sempre acompanhadas de adultos, especialmente na área da piscina. A piscina é aquecida, mas o uso é por conta e risco dos hóspedes. Não há salva-vidas no local.',
+    content: 'Crianças devem estar sempre acompanhadas de adultos, especialmente na área da piscina. A piscina é aquecida, e o seu uso é por conta e risco dos hóspedes. Não há salva-vidas no local.',
     icon: 'child',
     order: 5,
     isRestricted: false,
@@ -159,10 +186,55 @@ const guestInfoData = [
   {
     type: 'instruction',
     title: 'Wi-Fi',
-    content: 'Nome da rede: Casa_Pampulha_5G\nSenha: pampulha2024\n\nTambém disponível: Casa_Pampulha_2.4G (mesma senha) para melhor alcance em áreas mais distantes.',
+    content: 'Nome da rede principal: googlewifi\nSenha: Luc654321.\n\nRede secundária: elitehouse\nSenha: Luc6543212\nPS: Na casa possui placas com QRCode para conexão automática com a Internet principal (googlewifi).',
     icon: 'wifi',
     order: 1,
     isRestricted: true,
+    isActive: true,
+  },
+  {
+    type: 'instruction',
+    title: 'Caminhão de Lixo',
+    content: 'O caminhão de lixo passa às terças, quintas e sábados pela manhã.\n É proibido colocar lixo pra fora da casa nos demais dias.\nPor favor, coloque os sacos de lixo no recipiente da área externa da casa (localizado na calçada) nos dias de coleta, ou deixe-os ao lado do portão da garagem ou dentro da área gourmet, ao lado da janela em frente ao banheiro, nos dias que não possuem coleta.',
+    icon: 'trash',
+    order: 2,
+    isRestricted: false,
+    isActive: true,
+  },
+  {
+    type: 'instruction',
+    title: 'Câmera de Segurança',
+    content: 'A casa possui apenas 1 (uma) câmera de segurança na área externa da casa (área gourmet).\nSua utilização segue as normas vigentes do Airbnb e legislação atual.\nTal câmera não pode ser obstruída e nem ser movida. Suas imagens são privadas e de uso confidencial, estando de acordo com a Lei Geral de Proteção de Dados Pessoais (LGPD - Lei nº 13.709, de 14 de agosto de 2018)',
+    icon: 'camera',
+    order: 2,
+    isRestricted: false,
+    isActive: true,
+  },
+  {
+    type: 'instruction',
+    title: 'Roupas de Cama e Banho',
+    content: 'Pedimos a gentileza de cuidarem bem das roupas de cama e banho, e, principalmente, para não usarem as tolhas como pano de chão e também não a utilizarem para limpeza de maquiagem.\nCaso as peças sejam avariadas, é cobrado a substituição da mesma',
+    icon: 'bed',
+    order: 2,
+    isRestricted: true,
+    isActive: true,
+  },
+  {
+    type: 'instruction',
+    title: 'Multa por Danos',
+    content: 'Após a vistoria em seu check-out, peças com manchas ou sujidade de sangue, maquiagem ou fluidos corporais, serão descartadas e cobradas conforme tabela abaixo (valor unitário):\n\nToalha de banho/piscina: R$ 80,00\nToalha de rosto/piso: R$ 40,00\nLençol de solteiro: R$ 100,00\nLençol de casal: R$ 150,00\nFronha: R$ 50,00\nManta/edredom: R$ 200,00\nCapa de travesseiro: R$ 70,00\nVaso sanitário/pia entupida: R$ 200\n\nAgradecemos a compreensão.',
+    icon: 'bed',
+    order: 2,
+    isRestricted: true,
+    isActive: true,
+  },
+  {
+    type: 'instruction',
+    title: 'Câmera de Segurança',
+    content: 'A casa possui apenas 1 (uma) câmera de segurança na área externa da casa (área gourmet).\nSua utilização segue as normas vigentes do Airbnb e legislação atual.\nTal câmera não pode ser obstruída e nem ser movida. Suas imagens são privadas e de uso confidencial, estando de acordo com a Lei Geral de Proteção de Dados Pessoais (LGPD - Lei nº 13.709, de 14 de agosto de 2018)',
+    icon: 'camera',
+    order: 2,
+    isRestricted: false,
     isActive: true,
   },
   {
@@ -177,7 +249,7 @@ const guestInfoData = [
   {
     type: 'instruction',
     title: 'Aquecimento da Piscina',
-    content: 'A piscina é aquecida e mantida entre 28-30°C. O sistema fica ligado automaticamente. Não é necessário ajustar nada. Em dias muito frios, a temperatura pode variar levemente.',
+    content: 'A piscina é aquecida e mantida entre 28-30°C. O sistema fica ligado automaticamente. Não é necessário ajustar nada. Em dias muito frios, a temperatura pode variar levemente.\nA noite mantenha a piscina coberta para conservar o calor.\nPor favor, não utilize produtos químicos na piscina sem autorização prévia.',
     icon: 'water',
     order: 3,
     isRestricted: true,
@@ -186,7 +258,7 @@ const guestInfoData = [
   {
     type: 'instruction',
     title: 'Churrasqueira',
-    content: 'A área gourmet possui churrasqueira a carvão. Você encontrará utensílios no armário ao lado. Após o uso, aguarde esfriar completamente, limpe a grelha e descarte as cinzas no local indicado. Não deixe carvão aceso sem supervisão.',
+    content: 'A área gourmet possui churrasqueira. Você encontrará utensílios no armário ao lado. Após o uso, aguarde esfriar completamente, limpe a grelha e descarte as cinzas no local indicado. Não deixe carvão aceso sem supervisão.',
     icon: 'fire',
     order: 4,
     isRestricted: true,
@@ -195,7 +267,7 @@ const guestInfoData = [
   {
     type: 'instruction',
     title: 'Televisões e Som',
-    content: 'As TVs são smart e já estão conectadas ao Wi-Fi. Você pode usar Netflix, YouTube e outros apps (faça logout ao sair). O sistema de som da sala pode ser conectado via Bluetooth. Reduza o volume após as 22h.',
+    content: 'As TVs são smart e já estão conectadas ao Wi-Fi. Você pode usar Netflix, YouTube e outros apps (faça logout ao sair). O sistema de som da sala pode ser conectado via Bluetooth. Reduza o volume após as 21h.',
     icon: 'tv',
     order: 5,
     isRestricted: true,
