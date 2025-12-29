@@ -1,11 +1,23 @@
 import mongoose, { Schema, Document } from 'mongoose';
 import bcrypt from 'bcryptjs';
-import { IUser } from '@/types';
-import { HostSchema } from '@/models/Host';
+import { IUser, IHost } from '@/types';
 
 export interface UserDocument extends Omit<IUser, '_id'>, Document {
   comparePassword(candidatePassword: string): Promise<boolean>;
 }
+
+const HostSchema = new Schema<Omit<IHost, '_id'>>(
+  {
+    bio: { type: String, required: true },
+    role: { type: String, required: true },
+    languages: [{ type: String }],
+    responseTime: { type: String, required: true },
+    responseRate: { type: String, required: true },
+    isSuperhost: { type: Boolean, default: false },
+    joinedDate: { type: Date, required: true },
+  },
+  { _id: false }
+);
 
 const UserSchema = new Schema<UserDocument>(
   {

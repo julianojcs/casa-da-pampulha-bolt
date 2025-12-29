@@ -3,7 +3,6 @@ export { Place } from './Place';
 export { GalleryItem } from './GalleryItem';
 export { Room } from './Room';
 export { Amenity } from './Amenity';
-export { Host } from './Host';
 export { Property } from './Property';
 export { GuestInfo } from './GuestInfo';
 export { FAQ } from './FAQ';
