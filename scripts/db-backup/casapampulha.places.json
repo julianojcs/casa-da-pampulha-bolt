@@ -1,0 +1,984 @@
+[{
+  "_id": {
+    "$oid": "694e19cb238c9d0a3c239224"
+  },
+  "name": "Lagoa da Pampulha",
+  "description": "Explore a beleza da Lagoa da Pampulha.",
+  "address": "Pampulha, Belo Horizonte",
+  "category": "attractions",
+  "rating": 5,
+  "distanceWalk": "4 min",
+  "distanceCar": "1 min",
+  "distance": "250 m",
+  "image": "/images/Lagoa_da_Pampulha.png",
+  "isActive": true,
+  "__v": 0,
+  "createdAt": {
+    "$date": "2025-12-26T05:14:51.659Z"
+  },
+  "updatedAt": {
+    "$date": "2025-12-26T05:14:51.659Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "694e1a7e59bd36cd0622bc6b"
+  },
+  "name": "Lagoa da Pampulha",
+  "description": "Explore a beleza da Lagoa da Pampulha, projetada por Oscar Niemeyer, com suas casas e igrejas arquitetonicamente interessantes. Lugar adequado para quem curte andar de bike e praticar exercício.",
+  "address": "Pampulha, Belo Horizonte",
+  "category": "attractions",
+  "rating": 5,
+  "distanceWalk": "4 min",
+  "distanceCar": "1 min",
+  "distance": "250 m",
+  "image": "/images/Lagoa_da_Pampulha.png",
+  "isActive": true,
+  "__v": 0,
+  "createdAt": {
+    "$date": "2025-12-26T05:17:50.936Z"
+  },
+  "updatedAt": {
+    "$date": "2025-12-26T05:17:50.936Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "694e1a7e59bd36cd0622bc6c"
+  },
+  "name": "Santuário São Francisco de Assis",
+  "description": "Igrejinha da Pampulha (Oscar Niemeyer). Consagrada em 1959, esta capela católica moderna e única foi projetada por Oscar Niemeyer. Patrimônio Cultural da Humanidade pela UNESCO.",
+  "address": "Av. Otacílio Negrão de Lima, 3000",
+  "category": "attractions",
+  "rating": 5,
+  "distanceWalk": "1 h 32 min",
+  "distanceCar": "14 min",
+  "distance": "6.4 km",
+  "image": "/images/Santuario_Arquidiocesano_Sao_Francisco_de_Assis.png",
+  "mapUrl": "https://maps.app.goo.gl/QpLFzQ9mYX4N1aXeA",
+  "isActive": true,
+  "__v": 0,
+  "createdAt": {
+    "$date": "2025-12-26T05:17:50.936Z"
+  },
+  "updatedAt": {
+    "$date": "2025-12-26T05:17:50.936Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "694e1a7e59bd36cd0622bc6d"
+  },
+  "name": "Estádio Mineirão",
+  "description": "O maior estádio de Minas Gerais e um dos mais importantes do Brasil. Sede de grandes jogos e shows internacionais.",
+  "address": "Av. Antônio Abrahão Caram, 1001",
+  "category": "attractions",
+  "rating": 5,
+  "distanceWalk": "1 h 39 min",
+  "distanceCar": "15 min",
+  "distance": "7.1 km",
+  "image": "/images/Mineirao.png",
+  "mapUrl": "https://maps.app.goo.gl/6ujVrUgsNg6cwb67A",
+  "isActive": true,
+  "__v": 0,
+  "createdAt": {
+    "$date": "2025-12-26T05:17:50.936Z"
+  },
+  "updatedAt": {
+    "$date": "2025-12-26T05:17:50.936Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "694e1a7e59bd36cd0622bc6e"
+  },
+  "name": "Jardim Zoológico de Belo Horizonte",
+  "description": "Uma opção para famílias, o zoológico abriga diversas espécies de animais. Passeio tradicional para as crianças.",
+  "address": "Av. Otacílio Negrão de Lima, 8000",
+  "category": "kids",
+  "rating": 5,
+  "distanceWalk": "42 min",
+  "distanceCar": "6 min",
+  "distance": "2.9 km",
+  "image": "/images/Jardim_Zoologico_De_Belo_Horizonte.png",
+  "mapUrl": "https://maps.app.goo.gl/vkqhZcLjGNwHXrXw8",
+  "isActive": true,
+  "__v": 0,
+  "createdAt": {
+    "$date": "2025-12-26T05:17:50.936Z"
+  },
+  "updatedAt": {
+    "$date": "2025-12-26T05:17:50.936Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "694e1a7e59bd36cd0622bc6f"
+  },
+  "name": "Parque Ecológico da Pampulha",
+  "description": "Parque Ecológico Francisco Lins do Rego. Ótimo para caminhadas, observação de aves e contato com a natureza.",
+  "address": "Av. Otacílio Negrão de Lima",
+  "category": "attractions",
+  "rating": 4,
+  "distanceWalk": "1 h 12 min",
+  "distanceCar": "10 min",
+  "distance": "5.1 km",
+  "image": "/images/Parque_Ecologico_da_Pampulha.png",
+  "mapUrl": "https://maps.app.goo.gl/yvEpqrDVpc1mAE4W8",
+  "isActive": true,
+  "__v": 0,
+  "createdAt": {
+    "$date": "2025-12-26T05:17:50.936Z"
+  },
+  "updatedAt": {
+    "$date": "2025-12-26T05:17:50.936Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "694e1a7e59bd36cd0622bc70"
+  },
+  "name": "Museu Casa Kubitschek",
+  "description": "Casa-museu do ex-presidente Juscelino Kubitschek, com acervo histórico e arquitetura modernista.",
+  "address": "Av. Otacílio Negrão de Lima, 4188",
+  "category": "attractions",
+  "rating": 5,
+  "distanceWalk": "1 h 32 min",
+  "distanceCar": "13 min",
+  "distance": "6.4 km",
+  "image": "/images/Museu_Casa_Kubitschek.png",
+  "mapUrl": "https://maps.app.goo.gl/9kREWhZhYHRHgxZV7",
+  "isActive": true,
+  "__v": 0,
+  "createdAt": {
+    "$date": "2025-12-26T05:17:50.936Z"
+  },
+  "updatedAt": {
+    "$date": "2025-12-26T05:17:50.936Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "694e1a7e59bd36cd0622bc71"
+  },
+  "name": "Parque Guanabara",
+  "description": "Um dos 10 melhores parques de diversões do Brasil! As crianças simplesmente AMAM! Atrações clássicas incluindo carrinhos de bate-bate e roda gigante.",
+  "address": "Av. Expedicionário Benvindo Belém de Lima, 15 - São Luiz",
+  "category": "kids",
+  "rating": 5,
+  "distanceWalk": "1 h 32 min",
+  "distanceCar": "13 min",
+  "distance": "6.3 km",
+  "image": "/images/Parque_Guanabara.png",
+  "mapUrl": "https://maps.app.goo.gl/YJuV2bwGuuQEPwKj6",
+  "isActive": true,
+  "__v": 0,
+  "createdAt": {
+    "$date": "2025-12-26T05:17:50.936Z"
+  },
+  "updatedAt": {
+    "$date": "2025-12-26T05:17:50.936Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "694e1a7e59bd36cd0622bc72"
+  },
+  "name": "Museu de Arte da Pampulha",
+  "description": "Museu de arte contemporânea com exposições rotativas em edifício modernista de Oscar Niemeyer.",
+  "address": "Av. Otacílio Negrão de Lima, 16585",
+  "category": "attractions",
+  "rating": 5,
+  "distanceWalk": "57 min",
+  "distanceCar": "7 min",
+  "distance": "4.3 km",
+  "image": "/images/Museu_de_Arte_da_Pampulha.png",
+  "mapUrl": "https://maps.app.goo.gl/6GbKz4bq9XetpAHm7",
+  "isActive": true,
+  "__v": 0,
+  "createdAt": {
+    "$date": "2025-12-26T05:17:50.936Z"
+  },
+  "updatedAt": {
+    "$date": "2025-12-26T05:17:50.936Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "694e1a7e59bd36cd0622bc73"
+  },
+  "name": "Casa do Baile",
+  "description": "Centro de Referência de Arquitetura, Urbanismo e Design. Obra de Oscar Niemeyer às margens da Lagoa.",
+  "address": "Av. Otacílio Negrão de Lima, 751",
+  "category": "attractions",
+  "rating": 5,
+  "distanceWalk": "1 h 20 min",
+  "distanceCar": "10 min",
+  "distance": "5.9 km",
+  "image": "/images/Casa_do_Baile.png",
+  "mapUrl": "https://maps.app.goo.gl/xkwKSsgfy1XYPS2f8",
+  "isActive": true,
+  "__v": 0,
+  "createdAt": {
+    "$date": "2025-12-26T05:17:50.936Z"
+  },
+  "updatedAt": {
+    "$date": "2025-12-26T05:17:50.936Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "694e1a7e59bd36cd0622bc74"
+  },
+  "name": "Marco Zero Belo Horizonte",
+  "description": "Atração turística que marca o ponto de referência geográfico da cidade.",
+  "address": "Pampulha, Belo Horizonte",
+  "category": "attractions",
+  "rating": 4,
+  "distanceWalk": "1 h 17 min",
+  "distanceCar": "12 min",
+  "distance": "5.5 km",
+  "image": "/images/Marco_Zero_da_Pampulha.png",
+  "mapUrl": "https://maps.app.goo.gl/NFRVSKqRGwZrLhwn7",
+  "isActive": true,
+  "__v": 0,
+  "createdAt": {
+    "$date": "2025-12-26T05:17:50.936Z"
+  },
+  "updatedAt": {
+    "$date": "2025-12-26T05:17:50.936Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "694e1a7e59bd36cd0622bc75"
+  },
+  "name": "Mercado Central de BH",
+  "description": "Encontre todos os tipos de queijos mineiros, artesanato, cachaças, biscoitos e doce de leite para levar como lembrança.",
+  "address": "Av. Augusto de Lima, 744 - Centro",
+  "category": "attractions",
+  "rating": 5,
+  "distanceWalk": "3 h 25 min",
+  "distanceCar": "22 min",
+  "distance": "14.5 km",
+  "image": "/images/Mercado_Central_de_Belo_Horizonte.png",
+  "isActive": true,
+  "__v": 0,
+  "createdAt": {
+    "$date": "2025-12-26T05:17:50.936Z"
+  },
+  "updatedAt": {
+    "$date": "2025-12-26T05:17:50.936Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "694e1a7e59bd36cd0622bc76"
+  },
+  "name": "Restaurante Xapuri",
+  "description": "Restaurante tradicional que oferece pratos típicos mineiros, com uma atmosfera aconchegante e hospitalidade típica de Minas.",
+  "address": "Rua Mandacarú, 260 - Trevo",
+  "category": "restaurants",
+  "rating": 5,
+  "distanceWalk": "25 min",
+  "distanceCar": "4 min",
+  "distance": "1.7 km",
+  "image": "/images/Restaurante_Xapuri.png",
+  "isActive": true,
+  "__v": 0,
+  "createdAt": {
+    "$date": "2025-12-26T05:17:50.936Z"
+  },
+  "updatedAt": {
+    "$date": "2025-12-26T05:17:50.936Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "694e1a7e59bd36cd0622bc77"
+  },
+  "name": "Caipira Xique",
+  "description": "Excelente restaurante com pratos típicos mineiros, atmosfera aconchegante e ótimo para crianças. Bem perto da Casa da Pampulha.",
+  "address": "R. Francisco Bretas Bering, 324, Copacabana",
+  "category": "restaurants",
+  "rating": 4,
+  "distanceWalk": "16 min",
+  "distanceCar": "3 min",
+  "distance": "1.1 km",
+  "image": "/images/Caipira_Xique_Restaurante.png",
+  "isActive": true,
+  "__v": 0,
+  "createdAt": {
+    "$date": "2025-12-26T05:17:50.936Z"
+  },
+  "updatedAt": {
+    "$date": "2025-12-26T05:17:50.936Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "694e1a7e59bd36cd0622bc78"
+  },
+  "name": "Anella Restaurante",
+  "description": "Um dos melhores restaurantes italianos de BH. Ambiente sofisticado e pratos excepcionais.",
+  "address": "Av. Min. Guilhermino de Oliveira, 325 - Santa Amelia",
+  "category": "restaurants",
+  "rating": 5,
+  "distanceWalk": "53 min",
+  "distanceCar": "8 min",
+  "distance": "3.6 km",
+  "image": "/images/Anella_Restaurante.png",
+  "isActive": true,
+  "__v": 0,
+  "createdAt": {
+    "$date": "2025-12-26T05:17:50.936Z"
+  },
+  "updatedAt": {
+    "$date": "2025-12-26T19:52:37.969Z"
+  },
+  "mapUrl": ""
+},
+{
+  "_id": {
+    "$oid": "694e1a7e59bd36cd0622bc79"
+  },
+  "name": "Grill e Restaurante Dom Toro",
+  "description": "Ótima opção para refeições saborosas com ambiente agradável.",
+  "address": "Pampulha, Belo Horizonte",
+  "category": "restaurants",
+  "rating": 4,
+  "distanceWalk": "44 min",
+  "distanceCar": "7 min",
+  "distance": "3.1 km",
+  "image": "/images/Grill_E_Restaurante_Dom_Toro.png",
+  "mapUrl": "https://maps.app.goo.gl/sSENZJhkQsMFTF3d9",
+  "isActive": true,
+  "__v": 0,
+  "createdAt": {
+    "$date": "2025-12-26T05:17:50.936Z"
+  },
+  "updatedAt": {
+    "$date": "2025-12-26T05:17:50.936Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "694e1a7e59bd36cd0622bc7a"
+  },
+  "name": "Padaria e Panificadora Portugal",
+  "description": "Padaria e panificadora com pães frescos, doces e lanches variados.",
+  "address": "Pampulha, Belo Horizonte",
+  "category": "restaurants",
+  "rating": 4,
+  "distanceWalk": "42 min",
+  "distanceCar": "6 min",
+  "distance": "3 km",
+  "image": "/images/Padaria_E_Panificadora_Portugal.png",
+  "mapUrl": "https://maps.app.goo.gl/NZtZGZEc1EvUw6YG8",
+  "isActive": true,
+  "__v": 0,
+  "createdAt": {
+    "$date": "2025-12-26T05:17:50.936Z"
+  },
+  "updatedAt": {
+    "$date": "2025-12-26T05:17:50.936Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "694e1a7e59bd36cd0622bc7b"
+  },
+  "name": "Restaurante Paladino",
+  "description": "Restaurante muito bom e fica relativamente perto da casa. Ótima comida e atendimento.",
+  "address": "Pampulha, Belo Horizonte",
+  "category": "restaurants",
+  "rating": 5,
+  "distanceWalk": "37 min",
+  "distanceCar": "8 min",
+  "distance": "2.6 km",
+  "image": "/images/Restaurante_Paladino.png",
+  "mapUrl": "https://maps.app.goo.gl/Bm4cTFWCMxZXEvMe9",
+  "isActive": true,
+  "__v": 0,
+  "createdAt": {
+    "$date": "2025-12-26T05:17:50.936Z"
+  },
+  "updatedAt": {
+    "$date": "2025-12-26T05:17:50.936Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "694e1a7e59bd36cd0622bc7c"
+  },
+  "name": "Chopp da Fábrica Pampulha",
+  "description": "Restaurante de Comida Mineira com chopp gelado. Ambiente tradicional e boa culinária.",
+  "address": "Pampulha, Belo Horizonte",
+  "category": "restaurants",
+  "rating": 4,
+  "distanceWalk": "50 min",
+  "distanceCar": "1 h 38 min",
+  "distance": "6.8 km",
+  "image": "/images/Chopp_da_Fabrica_Pampulha.png",
+  "mapUrl": "https://maps.app.goo.gl/fpxBvAT9ohnDLBXu5",
+  "isActive": true,
+  "__v": 0,
+  "createdAt": {
+    "$date": "2025-12-26T05:17:50.936Z"
+  },
+  "updatedAt": {
+    "$date": "2025-12-26T05:17:50.936Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "694e1a7e59bd36cd0622bc7d"
+  },
+  "name": "McDonald's Av. Portugal",
+  "description": "Rede de fast-food conhecida mundialmente. Prático para refeições rápidas.",
+  "address": "Pampulha, Belo Horizonte",
+  "category": "restaurants",
+  "rating": 4,
+  "distanceWalk": "52 min",
+  "distanceCar": "7 min",
+  "distance": "3.8 km",
+  "image": "/images/McDonalds.png",
+  "mapUrl": "https://maps.app.goo.gl/nARf6K9Zk7RdSaui8",
+  "isActive": true,
+  "__v": 0,
+  "createdAt": {
+    "$date": "2025-12-26T05:17:50.936Z"
+  },
+  "updatedAt": {
+    "$date": "2025-12-26T05:17:50.936Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "694e1a7e59bd36cd0622bc7e"
+  },
+  "name": "Cozinha Japonesa/Oriental",
+  "description": "Restaurante de comida japonesa e oriental com pratos típicos e frescos.",
+  "address": "Pampulha, Belo Horizonte",
+  "category": "restaurants",
+  "rating": 4,
+  "distanceWalk": "46 min",
+  "distanceCar": "8 min",
+  "distance": "3.1 km",
+  "image": "/images/Cozinha_Japonesa_Oriental.png",
+  "mapUrl": "https://maps.app.goo.gl/XRL9VYDWbc8KapjG6",
+  "isActive": true,
+  "__v": 0,
+  "createdAt": {
+    "$date": "2025-12-26T05:17:50.936Z"
+  },
+  "updatedAt": {
+    "$date": "2025-12-26T05:17:50.936Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "694e1a7e59bd36cd0622bc7f"
+  },
+  "name": "Divino Restaurante",
+  "description": "Super recomendado! De dia tem um ótimo self-service e a noite funciona uma pizzaria muito boa. Tem parquinho para crianças.",
+  "address": "Pampulha, Belo Horizonte",
+  "category": "restaurants",
+  "rating": 5,
+  "distanceWalk": "43 min",
+  "distanceCar": "6 min",
+  "distance": "3.1 km",
+  "image": "/images/Divino_Restaurante.png",
+  "mapUrl": "https://maps.app.goo.gl/J7GfLcE9K6WaDn996",
+  "isActive": true,
+  "__v": 0,
+  "createdAt": {
+    "$date": "2025-12-26T05:17:50.936Z"
+  },
+  "updatedAt": {
+    "$date": "2025-12-26T05:17:50.936Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "694e1a7e59bd36cd0622bc80"
+  },
+  "name": "Lagoas Frutas Caldo De Cana",
+  "description": "Ótimo lugar para tomar um caldo de cana e comer um pastel. Fica a poucos metros da casa, em frente a lagoa. Dá pra ir a pé.",
+  "address": "Em frente à Lagoa da Pampulha",
+  "category": "restaurants",
+  "rating": 5,
+  "distanceWalk": "9 min",
+  "distanceCar": "2 min",
+  "distance": "650 m",
+  "image": "/images/Lagoas_Frutas_Caldo_De_Cana.png",
+  "mapUrl": "https://maps.app.goo.gl/xgf9oVpohNP1dP3w8",
+  "isActive": true,
+  "__v": 0,
+  "createdAt": {
+    "$date": "2025-12-26T05:17:50.936Z"
+  },
+  "updatedAt": {
+    "$date": "2025-12-26T05:17:50.936Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "694e1a7e59bd36cd0622bc81"
+  },
+  "name": "Ponto do Açaí Fruto D'Amazônia",
+  "description": "Lanchonete de caldo de cana, frutas e pastel frito na hora. Ambiente simples e saboroso.",
+  "address": "Pampulha, Belo Horizonte",
+  "category": "restaurants",
+  "rating": 4,
+  "distanceWalk": "26 min",
+  "distanceCar": "4 min",
+  "distance": "1.9 km",
+  "image": "/images/Ponto_do_Acai_Fruto_D_Amazonia.png",
+  "mapUrl": "https://maps.app.goo.gl/ktFCbghYGWHdtVp3A",
+  "isActive": true,
+  "__v": 0,
+  "createdAt": {
+    "$date": "2025-12-26T05:17:50.936Z"
+  },
+  "updatedAt": {
+    "$date": "2025-12-26T05:17:50.936Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "694e1a7e59bd36cd0622bc82"
+  },
+  "name": "Lanchonete e Pastelaria Pampulha",
+  "description": "Opção para lanches rápidos e pastéis frescos.",
+  "address": "Pampulha, Belo Horizonte",
+  "category": "restaurants",
+  "rating": 3,
+  "distanceWalk": "4 min",
+  "distanceCar": "1 min",
+  "distance": "350 m",
+  "image": "/images/Lanchonete_Pampulha.png",
+  "mapUrl": "https://maps.app.goo.gl/5ohZmJQ77VMmmF4R6",
+  "isActive": true,
+  "__v": 0,
+  "createdAt": {
+    "$date": "2025-12-26T05:17:50.936Z"
+  },
+  "updatedAt": {
+    "$date": "2025-12-26T05:17:50.936Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "694e1a7e59bd36cd0622bc83"
+  },
+  "name": "Seu Pai Bar & Drinkeria",
+  "description": "Bar com drinks especiais e ambiente descolado.",
+  "address": "Pampulha, Belo Horizonte",
+  "category": "bars",
+  "rating": 4,
+  "distanceWalk": "58 min",
+  "distanceCar": "8 min",
+  "distance": "4 km",
+  "image": "/images/Seu_Pai_Bar_E_Drinkeria.png",
+  "mapUrl": "https://maps.app.goo.gl/59fhHGoQHVqKmN4L7",
+  "isActive": true,
+  "__v": 0,
+  "createdAt": {
+    "$date": "2025-12-26T05:17:50.936Z"
+  },
+  "updatedAt": {
+    "$date": "2025-12-26T05:17:50.936Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "694e1a7e59bd36cd0622bc84"
+  },
+  "name": "Lagoa Rock Bar",
+  "description": "Bar temático de rock às margens da Lagoa da Pampulha.",
+  "address": "Av. Otacílio Negrão de Lima, 17790 - Pampulha",
+  "category": "bars",
+  "rating": 4,
+  "distanceWalk": "59 min",
+  "distanceCar": "8 min",
+  "distance": "4.1 km",
+  "image": "/images/Lagoa_Rock_Bar.png",
+  "mapUrl": "https://maps.app.goo.gl/t9jpmyWUogrHGTMUA",
+  "isActive": true,
+  "__v": 0,
+  "createdAt": {
+    "$date": "2025-12-26T05:17:50.936Z"
+  },
+  "updatedAt": {
+    "$date": "2025-12-26T05:17:50.936Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "694e1a7e59bd36cd0622bc85"
+  },
+  "name": "Zero Grau Distribuidora de Bebidas",
+  "description": "Faz entregas e possui preços muito bons. Ótima opção para abastecer a casa.",
+  "address": "Pampulha, Belo Horizonte",
+  "category": "services",
+  "rating": 5,
+  "distanceWalk": "48 min",
+  "distanceCar": "7 min",
+  "distance": "3.5 km",
+  "image": "/images/Zero_Grau_Distribuidora_de_Bebidas.png",
+  "mapUrl": "https://maps.app.goo.gl/a6L9tB2jDxXdUQ6ZA",
+  "isActive": true,
+  "__v": 0,
+  "createdAt": {
+    "$date": "2025-12-26T05:17:50.936Z"
+  },
+  "updatedAt": {
+    "$date": "2025-12-26T05:17:50.936Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "694e1a7e59bd36cd0622bc86"
+  },
+  "name": "Supernosso Pampulha",
+  "description": "Supermercado que nós recomendamos. Ótima variedade e qualidade.",
+  "address": "Pampulha, Belo Horizonte",
+  "category": "services",
+  "rating": 5,
+  "distanceWalk": "50 min",
+  "distanceCar": "8 min",
+  "distance": "3.6 km",
+  "image": "/images/Supernosso_Pampulha.png",
+  "mapUrl": "https://maps.app.goo.gl/U1RhPdNo9d66Q6436",
+  "isActive": true,
+  "__v": 0,
+  "createdAt": {
+    "$date": "2025-12-26T05:17:50.936Z"
+  },
+  "updatedAt": {
+    "$date": "2025-12-26T05:17:50.936Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "694e1a7e59bd36cd0622bc87"
+  },
+  "name": "Supermercados BH",
+  "description": "Supermercado mais popular. Fica bem perto da casa.",
+  "address": "Pampulha, Belo Horizonte",
+  "category": "services",
+  "rating": 4,
+  "distanceWalk": "19 min",
+  "distanceCar": "3 min",
+  "distance": "1.4 km",
+  "image": "/images/Supermercados_BH.png",
+  "mapUrl": "https://maps.app.goo.gl/cTBNBHeyXyeVrY2C8",
+  "isActive": true,
+  "__v": 0,
+  "createdAt": {
+    "$date": "2025-12-26T05:17:50.936Z"
+  },
+  "updatedAt": {
+    "$date": "2025-12-26T05:17:50.936Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "694e1a7e59bd36cd0622bc88"
+  },
+  "name": "Sacolão Total",
+  "description": "Frutas e verduras fresquinhas. Bem perto da Casa.",
+  "address": "Pampulha, Belo Horizonte",
+  "category": "services",
+  "rating": 4,
+  "distanceWalk": "3 min",
+  "distanceCar": "1 min",
+  "distance": "180 m",
+  "image": "/images/Sacolao_Total.png",
+  "mapUrl": "https://maps.app.goo.gl/WvMCk76KhjMhnFRg6",
+  "isActive": true,
+  "__v": 0,
+  "createdAt": {
+    "$date": "2025-12-26T05:17:50.936Z"
+  },
+  "updatedAt": {
+    "$date": "2025-12-26T05:17:50.936Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "694e1a7e59bd36cd0622bc89"
+  },
+  "name": "Ao Gosto Carnes Nobres e Exóticas",
+  "description": "Açougue com carnes nobres e exóticas. Para um churrasco especial.",
+  "address": "Pampulha, Belo Horizonte",
+  "category": "services",
+  "rating": 5,
+  "distanceWalk": "48 min",
+  "distanceCar": "7 min",
+  "distance": "3.5 km",
+  "image": "/images/Ao_Gosto_Carnes_Nobres_E_Exoticas.png",
+  "mapUrl": "https://maps.app.goo.gl/5F9WXBUAy6R3C6bD8",
+  "isActive": true,
+  "__v": 0,
+  "createdAt": {
+    "$date": "2025-12-26T05:17:50.936Z"
+  },
+  "updatedAt": {
+    "$date": "2025-12-26T05:17:50.936Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "694e1a7e59bd36cd0622bc8a"
+  },
+  "name": "Drogaria Araújo",
+  "description": "Drogaria/Farmácia. Fica bem próxima à casa.",
+  "address": "Pampulha, Belo Horizonte",
+  "category": "services",
+  "rating": 4,
+  "distanceWalk": "19 min",
+  "distanceCar": "4 min",
+  "distance": "1.4 km",
+  "image": "/images/Drogaria_Araujo.png",
+  "mapUrl": "https://maps.app.goo.gl/5qWFNuVRJB3tMsjJ8",
+  "isActive": true,
+  "__v": 0,
+  "createdAt": {
+    "$date": "2025-12-26T05:17:50.936Z"
+  },
+  "updatedAt": {
+    "$date": "2025-12-26T05:17:50.936Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "694e1a7e59bd36cd0622bc8b"
+  },
+  "name": "Posto Ipiranga Copacabana",
+  "description": "Posto de combustível mais próximo.",
+  "address": "Pampulha, Belo Horizonte",
+  "category": "services",
+  "rating": 4,
+  "distanceWalk": "14 min",
+  "distanceCar": "3 min",
+  "distance": "1 km",
+  "image": "/images/Posto_Ipiranga.png",
+  "mapUrl": "https://maps.app.goo.gl/VmxPBvCdN3qQfJb69",
+  "isActive": true,
+  "__v": 0,
+  "createdAt": {
+    "$date": "2025-12-26T05:17:50.936Z"
+  },
+  "updatedAt": {
+    "$date": "2025-12-26T05:17:50.936Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "694e1a7e59bd36cd0622bc8c"
+  },
+  "name": "Arena MRV",
+  "description": "Estádio do Atlético Mineiro. Casa do Galo!",
+  "address": "Pampulha, Belo Horizonte",
+  "category": "sports",
+  "rating": 5,
+  "distanceWalk": "1 h 33 min",
+  "distanceCar": "17 min",
+  "distance": "7.2 km",
+  "image": "/images/Arena_MRV.png",
+  "mapUrl": "https://maps.app.goo.gl/rWYB2qhLp2rP1dPp9",
+  "isActive": true,
+  "__v": 0,
+  "createdAt": {
+    "$date": "2025-12-26T05:17:50.936Z"
+  },
+  "updatedAt": {
+    "$date": "2025-12-26T05:17:50.936Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "694e1a7e59bd36cd0622bc8d"
+  },
+  "name": "Toca da Raposa - Cruzeiro",
+  "description": "Centro de Treinamento do Cruzeiro Esporte Clube.",
+  "address": "Pampulha, Belo Horizonte",
+  "category": "sports",
+  "rating": 4,
+  "distanceWalk": "57 min",
+  "distanceCar": "8 min",
+  "distance": "3.9 km",
+  "image": "/images/Toca_da_Raposa_Cruzeiro_Esporte_Clube.png",
+  "mapUrl": "https://maps.app.goo.gl/1yDt4qN7fX7GHvjh8",
+  "isActive": true,
+  "__v": 0,
+  "createdAt": {
+    "$date": "2025-12-26T05:17:50.936Z"
+  },
+  "updatedAt": {
+    "$date": "2025-12-26T05:17:50.936Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "694e1a7e59bd36cd0622bc8e"
+  },
+  "name": "Território do Galo",
+  "description": "Loja oficial do Atlético Mineiro.",
+  "address": "Pampulha, Belo Horizonte",
+  "category": "sports",
+  "rating": 4,
+  "distanceWalk": "1 h 23 min",
+  "distanceCar": "15 min",
+  "distance": "6 km",
+  "image": "/images/Territorio_do_Galo.png",
+  "mapUrl": "https://maps.app.goo.gl/5kRJ2mXeX8TT7qN16",
+  "isActive": true,
+  "__v": 0,
+  "createdAt": {
+    "$date": "2025-12-26T05:17:50.936Z"
+  },
+  "updatedAt": {
+    "$date": "2025-12-26T05:17:50.936Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "694e1a7e59bd36cd0622bc8f"
+  },
+  "name": "Smart Fit Pampulha",
+  "description": "Academia Smart Fit na Pampulha.",
+  "address": "Pampulha, Belo Horizonte",
+  "category": "sports",
+  "rating": 4,
+  "distanceWalk": "1 h 1 min",
+  "distanceCar": "8 min",
+  "distance": "4.4 km",
+  "image": "/images/Academia_Smart_Fit_Pampulha.png",
+  "mapUrl": "https://maps.app.goo.gl/Apm9aCrL3fqJjDLv6",
+  "isActive": true,
+  "__v": 0,
+  "createdAt": {
+    "$date": "2025-12-26T05:17:50.936Z"
+  },
+  "updatedAt": {
+    "$date": "2025-12-26T05:17:50.936Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "694e1a7e59bd36cd0622bc90"
+  },
+  "name": "Califa Beach Sports",
+  "description": "Beach Sports com quadras de areia para prática de esportes.",
+  "address": "Pampulha, Belo Horizonte",
+  "category": "sports",
+  "rating": 4,
+  "distanceWalk": "26 min",
+  "distanceCar": "4 min",
+  "distance": "1.8 km",
+  "image": "/images/Califa_Beach_Sports.png",
+  "mapUrl": "https://maps.app.goo.gl/hRW3vpzPhtSN9sMU7",
+  "isActive": true,
+  "__v": 0,
+  "createdAt": {
+    "$date": "2025-12-26T05:17:50.936Z"
+  },
+  "updatedAt": {
+    "$date": "2025-12-26T05:17:50.936Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "694e1a7e59bd36cd0622bc91"
+  },
+  "name": "Arena Marco Zero BH",
+  "description": "Arena de esportes como Beach Tenis e Futevôlei.",
+  "address": "Pampulha, Belo Horizonte",
+  "category": "sports",
+  "rating": 4,
+  "distanceWalk": "1 h 23 min",
+  "distanceCar": "14 min",
+  "distance": "6 km",
+  "image": "/images/Arena_Marco_Zero_BH.png",
+  "mapUrl": "https://maps.app.goo.gl/6bmhGJWNZa4EqMU47",
+  "isActive": true,
+  "__v": 0,
+  "createdAt": {
+    "$date": "2025-12-26T05:17:50.936Z"
+  },
+  "updatedAt": {
+    "$date": "2025-12-26T05:17:50.936Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "694e1a7e59bd36cd0622bc92"
+  },
+  "name": "AABB BH",
+  "description": "Clube com piscinas, quadras e atividades para toda a família.",
+  "address": "Pampulha, Belo Horizonte",
+  "category": "sports",
+  "rating": 4,
+  "distanceWalk": "34 min",
+  "distanceCar": "5 min",
+  "distance": "2.4 km",
+  "image": "/images/AABB.png",
+  "mapUrl": "https://maps.app.goo.gl/MXHqQKbE7J4hfV9E9",
+  "isActive": true,
+  "__v": 0,
+  "createdAt": {
+    "$date": "2025-12-26T05:17:50.936Z"
+  },
+  "updatedAt": {
+    "$date": "2025-12-26T05:17:50.936Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "694e1a7e59bd36cd0622bc93"
+  },
+  "name": "Estação 08 BIKE BH",
+  "description": "Estação de aluguel de bicicletas para passeios na orla da Lagoa.",
+  "address": "Pampulha, Belo Horizonte",
+  "category": "sports",
+  "rating": 4,
+  "distanceWalk": "8 min",
+  "distanceCar": "1 min",
+  "distance": "550 m",
+  "image": "/images/Estacao_08_BIKE_BH.png",
+  "mapUrl": "https://maps.app.goo.gl/1eCh3X6E5eGt6pMn7",
+  "isActive": true,
+  "__v": 0,
+  "createdAt": {
+    "$date": "2025-12-26T05:17:50.936Z"
+  },
+  "updatedAt": {
+    "$date": "2025-12-26T05:17:50.936Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "694e1a7e59bd36cd0622bc94"
+  },
+  "name": "Barnabé Bar e Espetaria",
+  "description": "Bar com espaço para crianças. Ótimo para famílias.",
+  "address": "Pampulha, Belo Horizonte",
+  "category": "kids",
+  "rating": 4,
+  "distanceWalk": "36 min",
+  "distanceCar": "5 min",
+  "distance": "2.5 km",
+  "image": "/images/Barnabe_Bar_E_Espetaria.png",
+  "mapUrl": "https://maps.app.goo.gl/rSR4sSixSNmJDRvj8",
+  "isActive": true,
+  "__v": 0,
+  "createdAt": {
+    "$date": "2025-12-26T05:17:50.936Z"
+  },
+  "updatedAt": {
+    "$date": "2025-12-26T05:17:50.936Z"
+  }
+}]

@@ -12,6 +12,8 @@ import {
   VideoCameraIcon
 } from '@heroicons/react/24/outline';
 import toast from 'react-hot-toast';
+import { CloudinaryUpload } from '@/components/CloudinaryUpload';
+import { CLOUDINARY_FOLDERS } from '@/lib/cloudinary';
 
 interface GalleryItem {
   _id: string;
@@ -314,30 +316,40 @@ export default function AdminGaleriaPage() {
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
-                  URL da Mídia *
+                  {formData.type === 'video' ? 'URL do Vídeo *' : 'Imagem *'}
                 </label>
-                <input
-                  type="text"
-                  required
-                  placeholder={formData.type === 'video' ? 'https://www.youtube.com/embed/...' : '/gallery/foto.jpg'}
-                  value={formData.src}
-                  onChange={(e) => setFormData(prev => ({ ...prev, src: e.target.value }))}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500"
-                />
+                {formData.type === 'video' ? (
+                  <input
+                    type="text"
+                    required
+                    placeholder="https://www.youtube.com/embed/..."
+                    value={formData.src}
+                    onChange={(e) => setFormData(prev => ({ ...prev, src: e.target.value }))}
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500"
+                  />
+                ) : (
+                  <CloudinaryUpload
+                    folder={CLOUDINARY_FOLDERS.GALLERY}
+                    value={formData.src}
+                    onChange={(url) => setFormData(prev => ({ ...prev, src: url, thumbnail: url }))}
+                    previewClassName="h-48 w-full"
+                  />
+                )}
               </div>
 
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  URL do Thumbnail
-                </label>
-                <input
-                  type="text"
-                  placeholder="/gallery/thumbnails/foto.jpg"
-                  value={formData.thumbnail}
-                  onChange={(e) => setFormData(prev => ({ ...prev, thumbnail: e.target.value }))}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500"
-                />
-              </div>
+              {formData.type === 'video' && (
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Thumbnail do Vídeo
+                  </label>
+                  <CloudinaryUpload
+                    folder={CLOUDINARY_FOLDERS.GALLERY}
+                    value={formData.thumbnail}
+                    onChange={(url) => setFormData(prev => ({ ...prev, thumbnail: url }))}
+                    previewClassName="h-32 w-full"
+                  />
+                </div>
+              )}
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">

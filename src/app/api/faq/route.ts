@@ -44,3 +44,70 @@ export async function POST(request: NextRequest) {
     );
   }
 }
+
+export async function PUT(request: NextRequest) {
+  try {
+    await dbConnect();
+
+    const { searchParams } = new URL(request.url);
+    const id = searchParams.get('id');
+
+    if (!id) {
+      return NextResponse.json(
+        { error: 'ID é obrigatório' },
+        { status: 400 }
+      );
+    }
+
+    const body = await request.json();
+    const faq = await FAQ.findByIdAndUpdate(id, body, { new: true });
+
+    if (!faq) {
+      return NextResponse.json(
+        { error: 'FAQ não encontrada' },
+        { status: 404 }
+      );
+    }
+
+    return NextResponse.json(faq);
+  } catch (error) {
+    console.error('Error updating FAQ:', error);
+    return NextResponse.json(
+      { error: 'Erro ao atualizar pergunta frequente' },
+      { status: 500 }
+    );
+  }
+}
+
+export async function DELETE(request: NextRequest) {
+  try {
+    await dbConnect();
+
+    const { searchParams } = new URL(request.url);
+    const id = searchParams.get('id');
+
+    if (!id) {
+      return NextResponse.json(
+        { error: 'ID é obrigatório' },
+        { status: 400 }
+      );
+    }
+
+    const faq = await FAQ.findByIdAndDelete(id);
+
+    if (!faq) {
+      return NextResponse.json(
+        { error: 'FAQ não encontrada' },
+        { status: 404 }
+      );
+    }
+
+    return NextResponse.json({ message: 'FAQ excluída com sucesso' });
+  } catch (error) {
+    console.error('Error deleting FAQ:', error);
+    return NextResponse.json(
+      { error: 'Erro ao excluir pergunta frequente' },
+      { status: 500 }
+    );
+  }
+}

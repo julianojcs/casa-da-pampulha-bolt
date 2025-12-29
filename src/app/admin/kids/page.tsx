@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { XMarkIcon } from '@heroicons/react/24/outline';
 import toast from 'react-hot-toast';
+import { CloudinaryUpload } from '@/components/CloudinaryUpload';
 
 interface KidsArea {
   _id: string;
@@ -183,28 +184,28 @@ export default function AdminKidsPage() {
         {/* Imagens */}
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">Imagens</label>
-          <div className="flex gap-2 mb-2">
-            <input
-              type="text"
-              value={imageInput}
-              onChange={(e) => setImageInput(e.target.value)}
-              placeholder="/gallery/imagem.jpg"
-              className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500"
-              onKeyPress={(e) => e.key === 'Enter' && (e.preventDefault(), addImage())}
-            />
-            <button
-              type="button"
-              onClick={addImage}
-              className="px-4 py-2 bg-amber-600 text-white rounded-lg hover:bg-amber-700"
-            >
-              Adicionar
-            </button>
-          </div>
+          <CloudinaryUpload
+            folder="gallery"
+            value=""
+            onChange={(url) => {
+              if (url) {
+                setFormData({
+                  ...formData,
+                  images: [...formData.images, url],
+                });
+              }
+            }}
+            label=""
+            placeholder="Clique para adicionar imagem"
+            previewClassName="h-32 w-full"
+            maxSizeKB={2048}
+            showPreview={false}
+          />
           {formData.images.length > 0 && (
-            <div className="flex flex-wrap gap-2">
+            <div className="mt-2 flex flex-wrap gap-2">
               {formData.images.map((image, index) => (
                 <span key={index} className="inline-flex items-center gap-1 px-3 py-1 bg-gray-100 rounded text-sm">
-                  {image}
+                  <span className="max-w-[200px] truncate">{image.split('/').pop()}</span>
                   <button type="button" onClick={() => removeImage(index)}>
                     <XMarkIcon className="h-4 w-4 text-gray-500 hover:text-red-600" />
                   </button>

@@ -1,0 +1,2052 @@
+[{
+  "_id": {
+    "$oid": "694e1a7e59bd36cd0622bbff"
+  },
+  "type": "image",
+  "src": "/gallery/20240119_114208.jpg",
+  "thumbnail": "/gallery/thumbnails/20240119_114208 Pequena.jpeg",
+  "title": "Cozinha da área gourmet",
+  "category": "Área Gourmet",
+  "order": 1,
+  "isActive": true,
+  "__v": 0,
+  "createdAt": {
+    "$date": "2025-12-26T05:17:50.930Z"
+  },
+  "updatedAt": {
+    "$date": "2025-12-26T05:17:50.930Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "694e1a7e59bd36cd0622bc00"
+  },
+  "type": "image",
+  "src": "/gallery/20240119_114214.jpg",
+  "thumbnail": "/gallery/thumbnails/20240119_114214 Pequena.jpeg",
+  "title": "Cantinho do churrasqueiro",
+  "category": "Área Gourmet",
+  "order": 2,
+  "isActive": true,
+  "__v": 0,
+  "createdAt": {
+    "$date": "2025-12-26T05:17:50.930Z"
+  },
+  "updatedAt": {
+    "$date": "2025-12-26T05:17:50.930Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "694e1a7e59bd36cd0622bc01"
+  },
+  "type": "image",
+  "src": "/gallery/20240119_114222.jpg",
+  "thumbnail": "/gallery/thumbnails/20240119_114222 Pequena.jpeg",
+  "title": "Cantinho do cervejeiro",
+  "category": "Área Gourmet",
+  "order": 3,
+  "isActive": true,
+  "__v": 0,
+  "createdAt": {
+    "$date": "2025-12-26T05:17:50.930Z"
+  },
+  "updatedAt": {
+    "$date": "2025-12-26T05:17:50.930Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "694e1a7e59bd36cd0622bc02"
+  },
+  "type": "image",
+  "src": "/gallery/20240119_114237.jpg",
+  "thumbnail": "/gallery/thumbnails/20240119_114237 Pequena.jpeg",
+  "title": "Mesa da área gourmet",
+  "category": "Área Gourmet",
+  "order": 4,
+  "isActive": true,
+  "__v": 0,
+  "createdAt": {
+    "$date": "2025-12-26T05:17:50.930Z"
+  },
+  "updatedAt": {
+    "$date": "2025-12-26T05:17:50.930Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "694e1a7e59bd36cd0622bc03"
+  },
+  "type": "image",
+  "src": "/gallery/20240204_132819.jpg",
+  "thumbnail": "/gallery/thumbnails/20240204_132819 Pequena.jpeg",
+  "title": "Vista da Lagoa da Pampulha",
+  "category": "Arredores",
+  "order": 5,
+  "isActive": true,
+  "__v": 0,
+  "createdAt": {
+    "$date": "2025-12-26T05:17:50.930Z"
+  },
+  "updatedAt": {
+    "$date": "2025-12-26T05:17:50.930Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "694e1a7e59bd36cd0622bc04"
+  },
+  "type": "image",
+  "src": "/gallery/20240204_132820.jpg",
+  "thumbnail": "/gallery/thumbnails/20240204_132820 Pequena.jpeg",
+  "title": "Por do sol na Lagoa da Pampulha",
+  "category": "Arredores",
+  "order": 6,
+  "isActive": true,
+  "__v": 0,
+  "createdAt": {
+    "$date": "2025-12-26T05:17:50.930Z"
+  },
+  "updatedAt": {
+    "$date": "2025-12-26T05:17:50.930Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "694e1a7e59bd36cd0622bc05"
+  },
+  "type": "image",
+  "src": "/gallery/20240119_113828.jpg",
+  "thumbnail": "/gallery/thumbnails/20240119_113828 Pequena.jpeg",
+  "title": "Banheiro social",
+  "category": "Banheiros",
+  "order": 7,
+  "isActive": true,
+  "__v": 0,
+  "createdAt": {
+    "$date": "2025-12-26T05:17:50.930Z"
+  },
+  "updatedAt": {
+    "$date": "2025-12-26T05:17:50.930Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "694e1a7e59bd36cd0622bc06"
+  },
+  "type": "image",
+  "src": "/gallery/20240119_113840.jpg",
+  "thumbnail": "/gallery/thumbnails/20240119_113840 Pequena.jpeg",
+  "title": "Banheiro social",
+  "category": "Banheiros",
+  "order": 8,
+  "isActive": true,
+  "__v": 0,
+  "createdAt": {
+    "$date": "2025-12-26T05:17:50.931Z"
+  },
+  "updatedAt": {
+    "$date": "2025-12-26T05:17:50.931Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "694e1a7e59bd36cd0622bc07"
+  },
+  "type": "image",
+  "src": "/gallery/20240119_113853.jpg",
+  "thumbnail": "/gallery/thumbnails/20240119_113853 Pequena.jpeg",
+  "title": "Banheiro social",
+  "category": "Banheiros",
+  "order": 9,
+  "isActive": true,
+  "__v": 0,
+  "createdAt": {
+    "$date": "2025-12-26T05:17:50.931Z"
+  },
+  "updatedAt": {
+    "$date": "2025-12-26T05:17:50.931Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "694e1a7e59bd36cd0622bc08"
+  },
+  "type": "image",
+  "src": "/gallery/20240119_114200.jpg",
+  "thumbnail": "/gallery/thumbnails/20240119_114200 Pequena.jpeg",
+  "title": "Banheiro area gourmet",
+  "category": "Banheiros",
+  "order": 10,
+  "isActive": true,
+  "__v": 0,
+  "createdAt": {
+    "$date": "2025-12-26T05:17:50.931Z"
+  },
+  "updatedAt": {
+    "$date": "2025-12-26T05:17:50.931Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "694e1a7e59bd36cd0622bc09"
+  },
+  "type": "image",
+  "src": "/gallery/20240119_114551.jpg",
+  "thumbnail": "/gallery/thumbnails/20240119_114551 Pequena.jpeg",
+  "title": "Banheiro do loft",
+  "category": "Banheiros",
+  "order": 11,
+  "isActive": true,
+  "__v": 0,
+  "createdAt": {
+    "$date": "2025-12-26T05:17:50.931Z"
+  },
+  "updatedAt": {
+    "$date": "2025-12-26T05:17:50.931Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "694e1a7e59bd36cd0622bc0a"
+  },
+  "type": "image",
+  "src": "/gallery/20240119_114603.jpg",
+  "thumbnail": "/gallery/thumbnails/20240119_114603 Pequena.jpeg",
+  "title": "Banheiro do loft",
+  "category": "Banheiros",
+  "order": 12,
+  "isActive": true,
+  "__v": 0,
+  "createdAt": {
+    "$date": "2025-12-26T05:17:50.931Z"
+  },
+  "updatedAt": {
+    "$date": "2025-12-26T05:17:50.931Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "694e1a7e59bd36cd0622bc0b"
+  },
+  "type": "image",
+  "src": "/gallery/20231225_160419.jpg",
+  "thumbnail": "/gallery/thumbnails/20231225_160419 Pequena.jpeg",
+  "title": "Lavabo da sala de estar",
+  "category": "Banheiros",
+  "order": 13,
+  "isActive": true,
+  "__v": 0,
+  "createdAt": {
+    "$date": "2025-12-26T05:17:50.931Z"
+  },
+  "updatedAt": {
+    "$date": "2025-12-26T05:17:50.931Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "694e1a7e59bd36cd0622bc0c"
+  },
+  "type": "image",
+  "src": "/gallery/20240119_113657.jpg",
+  "thumbnail": "/gallery/thumbnails/20240119_113657 Pequena.jpeg",
+  "title": "Cozinha",
+  "category": "Cozinha Completa",
+  "order": 14,
+  "isActive": true,
+  "__v": 0,
+  "createdAt": {
+    "$date": "2025-12-26T05:17:50.931Z"
+  },
+  "updatedAt": {
+    "$date": "2025-12-26T05:17:50.931Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "694e1a7e59bd36cd0622bc0d"
+  },
+  "type": "image",
+  "src": "/gallery/20240119_113706.jpg",
+  "thumbnail": "/gallery/thumbnails/20240119_113706 Pequena.jpeg",
+  "title": "Cozinha",
+  "category": "Cozinha Completa",
+  "order": 15,
+  "isActive": true,
+  "__v": 0,
+  "createdAt": {
+    "$date": "2025-12-26T05:17:50.931Z"
+  },
+  "updatedAt": {
+    "$date": "2025-12-26T05:17:50.931Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "694e1a7e59bd36cd0622bc0e"
+  },
+  "type": "image",
+  "src": "/gallery/20240119_113716.jpg",
+  "thumbnail": "/gallery/thumbnails/20240119_113716 Pequena.jpeg",
+  "title": "Cozinha",
+  "category": "Cozinha Completa",
+  "order": 16,
+  "isActive": true,
+  "__v": 0,
+  "createdAt": {
+    "$date": "2025-12-26T05:17:50.931Z"
+  },
+  "updatedAt": {
+    "$date": "2025-12-26T05:17:50.931Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "694e1a7e59bd36cd0622bc0f"
+  },
+  "type": "image",
+  "src": "/gallery/20240119_114342.jpg",
+  "thumbnail": "/gallery/thumbnails/20240119_114342 Pequena.jpeg",
+  "title": "Estacionamento e palmeiras real",
+  "category": "Estacionamento",
+  "order": 17,
+  "isActive": true,
+  "__v": 0,
+  "createdAt": {
+    "$date": "2025-12-26T05:17:50.931Z"
+  },
+  "updatedAt": {
+    "$date": "2025-12-26T05:17:50.931Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "694e1a7e59bd36cd0622bc10"
+  },
+  "type": "image",
+  "src": "/gallery/20240119_114408.jpg",
+  "thumbnail": "/gallery/thumbnails/20240119_114408 Pequena.jpeg",
+  "title": "Estacionamento para 5 veículos",
+  "category": "Estacionamento",
+  "order": 18,
+  "isActive": true,
+  "__v": 0,
+  "createdAt": {
+    "$date": "2025-12-26T05:17:50.931Z"
+  },
+  "updatedAt": {
+    "$date": "2025-12-26T05:17:50.931Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "694e1a7e59bd36cd0622bc11"
+  },
+  "type": "image",
+  "src": "/gallery/20231225_174638.jpg",
+  "thumbnail": "/gallery/thumbnails/20231225_174638 Pequena.jpeg",
+  "title": "Estacionamento para 5 veículos",
+  "category": "Estacionamento",
+  "order": 19,
+  "isActive": true,
+  "__v": 0,
+  "createdAt": {
+    "$date": "2025-12-26T05:17:50.931Z"
+  },
+  "updatedAt": {
+    "$date": "2025-12-26T05:17:50.931Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "694e1a7e59bd36cd0622bc12"
+  },
+  "type": "image",
+  "src": "/gallery/20240119_114009.jpg",
+  "thumbnail": "/gallery/thumbnails/20240119_114009 Pequena.jpeg",
+  "title": "Varanda com rampa de acesso",
+  "category": "Jardim",
+  "order": 20,
+  "isActive": true,
+  "__v": 0,
+  "createdAt": {
+    "$date": "2025-12-26T05:17:50.931Z"
+  },
+  "updatedAt": {
+    "$date": "2025-12-26T05:17:50.931Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "694e1a7e59bd36cd0622bc13"
+  },
+  "type": "image",
+  "src": "/gallery/20240118_144304.jpg",
+  "thumbnail": "/gallery/thumbnails/20240118_144304 Pequena.jpeg",
+  "title": "Flores do jardim",
+  "category": "Jardim",
+  "order": 21,
+  "isActive": true,
+  "__v": 0,
+  "createdAt": {
+    "$date": "2025-12-26T05:17:50.931Z"
+  },
+  "updatedAt": {
+    "$date": "2025-12-26T05:17:50.931Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "694e1a7e59bd36cd0622bc14"
+  },
+  "type": "image",
+  "src": "/gallery/20240119_114019.jpg",
+  "thumbnail": "/gallery/thumbnails/20240119_114019 Pequena.jpeg",
+  "title": "Varanda",
+  "category": "Jardim",
+  "order": 22,
+  "isActive": true,
+  "__v": 0,
+  "createdAt": {
+    "$date": "2025-12-26T05:17:50.931Z"
+  },
+  "updatedAt": {
+    "$date": "2025-12-26T05:17:50.931Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "694e1a7e59bd36cd0622bc15"
+  },
+  "type": "image",
+  "src": "/gallery/20240119_114059.jpg",
+  "thumbnail": "/gallery/thumbnails/20240119_114059 Pequena.jpeg",
+  "title": "Varanda",
+  "category": "Jardim",
+  "order": 23,
+  "isActive": true,
+  "__v": 0,
+  "createdAt": {
+    "$date": "2025-12-26T05:17:50.931Z"
+  },
+  "updatedAt": {
+    "$date": "2025-12-26T05:17:50.931Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "694e1a7e59bd36cd0622bc16"
+  },
+  "type": "image",
+  "src": "/gallery/20240119_114034.jpg",
+  "thumbnail": "/gallery/thumbnails/20240119_114034 Pequena.jpeg",
+  "title": "Jardim",
+  "category": "Jardim",
+  "order": 24,
+  "isActive": true,
+  "__v": 0,
+  "createdAt": {
+    "$date": "2025-12-26T05:17:50.931Z"
+  },
+  "updatedAt": {
+    "$date": "2025-12-26T05:17:50.931Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "694e1a7e59bd36cd0622bc17"
+  },
+  "type": "image",
+  "src": "/gallery/20240119_114929.jpg",
+  "thumbnail": "/gallery/thumbnails/20240119_114929 Pequena.jpeg",
+  "title": "Jardim",
+  "category": "Jardim",
+  "order": 25,
+  "isActive": true,
+  "__v": 0,
+  "createdAt": {
+    "$date": "2025-12-26T05:17:50.931Z"
+  },
+  "updatedAt": {
+    "$date": "2025-12-26T05:17:50.931Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "694e1a7e59bd36cd0622bc18"
+  },
+  "type": "image",
+  "src": "/gallery/20240119_114039.jpg",
+  "thumbnail": "/gallery/thumbnails/20240119_114039 Pequena.jpeg",
+  "title": "Quaresmeira",
+  "category": "Jardim",
+  "order": 26,
+  "isActive": true,
+  "__v": 0,
+  "createdAt": {
+    "$date": "2025-12-26T05:17:50.931Z"
+  },
+  "updatedAt": {
+    "$date": "2025-12-26T05:17:50.931Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "694e1a7e59bd36cd0622bc19"
+  },
+  "type": "image",
+  "src": "/gallery/20240119_114115.jpg",
+  "thumbnail": "/gallery/thumbnails/20240119_114115 Pequena.jpeg",
+  "title": "Quaresmeira",
+  "category": "Jardim",
+  "order": 27,
+  "isActive": true,
+  "__v": 0,
+  "createdAt": {
+    "$date": "2025-12-26T05:17:50.931Z"
+  },
+  "updatedAt": {
+    "$date": "2025-12-26T05:17:50.931Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "694e1a7e59bd36cd0622bc1a"
+  },
+  "type": "image",
+  "src": "/gallery/20240119_114149.jpg",
+  "thumbnail": "/gallery/thumbnails/20240119_114149 Pequena.jpeg",
+  "title": "Quaresmeira",
+  "category": "Jardim",
+  "order": 28,
+  "isActive": true,
+  "__v": 0,
+  "createdAt": {
+    "$date": "2025-12-26T05:17:50.931Z"
+  },
+  "updatedAt": {
+    "$date": "2025-12-26T05:17:50.931Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "694e1a7e59bd36cd0622bc1b"
+  },
+  "type": "image",
+  "src": "/gallery/20240119_114419.jpg",
+  "thumbnail": "/gallery/thumbnails/20240119_114419 Pequena.jpeg",
+  "title": "Jardim do loft",
+  "category": "Jardim",
+  "order": 29,
+  "isActive": true,
+  "__v": 0,
+  "createdAt": {
+    "$date": "2025-12-26T05:17:50.931Z"
+  },
+  "updatedAt": {
+    "$date": "2025-12-26T05:17:50.931Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "694e1a7e59bd36cd0622bc1c"
+  },
+  "type": "image",
+  "src": "/gallery/20240119_114643.jpg",
+  "thumbnail": "/gallery/thumbnails/20240119_114643 Pequena.jpeg",
+  "title": "Jardim do loft",
+  "category": "Jardim",
+  "order": 30,
+  "isActive": true,
+  "__v": 0,
+  "createdAt": {
+    "$date": "2025-12-26T05:17:50.931Z"
+  },
+  "updatedAt": {
+    "$date": "2025-12-26T05:17:50.931Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "694e1a7e59bd36cd0622bc1d"
+  },
+  "type": "image",
+  "src": "/gallery/20240119_114651.jpg",
+  "thumbnail": "/gallery/thumbnails/20240119_114651 Pequena.jpeg",
+  "title": "Jardim dos fundos do loft",
+  "category": "Jardim",
+  "order": 31,
+  "isActive": true,
+  "__v": 0,
+  "createdAt": {
+    "$date": "2025-12-26T05:17:50.931Z"
+  },
+  "updatedAt": {
+    "$date": "2025-12-26T05:17:50.931Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "694e1a7e59bd36cd0622bc1e"
+  },
+  "type": "image",
+  "src": "/gallery/20240119_114125.jpg",
+  "thumbnail": "/gallery/thumbnails/20240119_114125 Pequena.jpeg",
+  "title": "Quaresmeira e pula-pula",
+  "category": "Jardim",
+  "order": 32,
+  "isActive": true,
+  "__v": 0,
+  "createdAt": {
+    "$date": "2025-12-26T05:17:50.931Z"
+  },
+  "updatedAt": {
+    "$date": "2025-12-26T05:17:50.931Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "694e1a7e59bd36cd0622bc1f"
+  },
+  "type": "image",
+  "src": "/gallery/20240119_114717.jpg",
+  "thumbnail": "/gallery/thumbnails/20240119_114717 Pequena.jpeg",
+  "title": "Casa de passarinhos rústica",
+  "category": "Jardim",
+  "order": 33,
+  "isActive": true,
+  "__v": 0,
+  "createdAt": {
+    "$date": "2025-12-26T05:17:50.931Z"
+  },
+  "updatedAt": {
+    "$date": "2025-12-26T05:17:50.931Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "694e1a7e59bd36cd0622bc20"
+  },
+  "type": "image",
+  "src": "/gallery/20240119_114900.jpg",
+  "thumbnail": "/gallery/thumbnails/20240119_114900 Pequena.jpeg",
+  "title": "Jardim da piscina",
+  "category": "Jardim",
+  "order": 34,
+  "isActive": true,
+  "__v": 0,
+  "createdAt": {
+    "$date": "2025-12-26T05:17:50.931Z"
+  },
+  "updatedAt": {
+    "$date": "2025-12-26T05:17:50.931Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "694e1a7e59bd36cd0622bc21"
+  },
+  "type": "image",
+  "src": "/gallery/20240119_114910.jpg",
+  "thumbnail": "/gallery/thumbnails/20240119_114910 Pequena.jpeg",
+  "title": "Jabuticabeira e mangueira",
+  "category": "Jardim",
+  "order": 35,
+  "isActive": true,
+  "__v": 0,
+  "createdAt": {
+    "$date": "2025-12-26T05:17:50.931Z"
+  },
+  "updatedAt": {
+    "$date": "2025-12-26T05:17:50.931Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "694e1a7e59bd36cd0622bc22"
+  },
+  "type": "image",
+  "src": "/gallery/20230220_144452.jpg",
+  "thumbnail": "/gallery/thumbnails/20230220_144452 Pequena.jpeg",
+  "title": "Mico dourado",
+  "category": "Jardim",
+  "order": 36,
+  "isActive": true,
+  "__v": 0,
+  "createdAt": {
+    "$date": "2025-12-26T05:17:50.931Z"
+  },
+  "updatedAt": {
+    "$date": "2025-12-26T05:17:50.931Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "694e1a7e59bd36cd0622bc23"
+  },
+  "type": "image",
+  "src": "/gallery/20230220_144520.jpg",
+  "thumbnail": "/gallery/thumbnails/20230220_144520 Pequena.jpeg",
+  "title": "Mico dourado",
+  "category": "Jardim",
+  "order": 37,
+  "isActive": true,
+  "__v": 0,
+  "createdAt": {
+    "$date": "2025-12-26T05:17:50.931Z"
+  },
+  "updatedAt": {
+    "$date": "2025-12-26T05:17:50.931Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "694e1a7e59bd36cd0622bc24"
+  },
+  "type": "image",
+  "src": "/gallery/20230220_144525.jpg",
+  "thumbnail": "/gallery/thumbnails/20230220_144525 Pequena.jpeg",
+  "title": "Mico dourado",
+  "category": "Jardim",
+  "order": 38,
+  "isActive": true,
+  "__v": 0,
+  "createdAt": {
+    "$date": "2025-12-26T05:17:50.931Z"
+  },
+  "updatedAt": {
+    "$date": "2025-12-26T05:17:50.931Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "694e1a7e59bd36cd0622bc25"
+  },
+  "type": "image",
+  "src": "/gallery/20230220_144535.jpg",
+  "thumbnail": "/gallery/thumbnails/20230220_144535 Pequena.jpeg",
+  "title": "Mico dourado",
+  "category": "Jardim",
+  "order": 39,
+  "isActive": true,
+  "__v": 0,
+  "createdAt": {
+    "$date": "2025-12-26T05:17:50.931Z"
+  },
+  "updatedAt": {
+    "$date": "2025-12-26T05:17:50.931Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "694e1a7e59bd36cd0622bc26"
+  },
+  "type": "image",
+  "src": "/gallery/20230220_144542.jpg",
+  "thumbnail": "/gallery/thumbnails/20230220_144542 Pequena.jpeg",
+  "title": "Mico dourado",
+  "category": "Jardim",
+  "order": 40,
+  "isActive": true,
+  "__v": 0,
+  "createdAt": {
+    "$date": "2025-12-26T05:17:50.931Z"
+  },
+  "updatedAt": {
+    "$date": "2025-12-26T05:17:50.931Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "694e1a7e59bd36cd0622bc27"
+  },
+  "type": "image",
+  "src": "/gallery/20240119_113731.jpg",
+  "thumbnail": "/gallery/thumbnails/20240119_113731 Pequena.jpeg",
+  "title": "Area de serviço externa",
+  "category": "Lavanderia",
+  "order": 41,
+  "isActive": true,
+  "__v": 0,
+  "createdAt": {
+    "$date": "2025-12-26T05:17:50.931Z"
+  },
+  "updatedAt": {
+    "$date": "2025-12-26T05:17:50.931Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "694e1a7e59bd36cd0622bc28"
+  },
+  "type": "image",
+  "src": "/gallery/20240119_113737.jpg",
+  "thumbnail": "/gallery/thumbnails/20240119_113737 Pequena.jpeg",
+  "title": "Area de serviço externa",
+  "category": "Lavanderia",
+  "order": 42,
+  "isActive": true,
+  "__v": 0,
+  "createdAt": {
+    "$date": "2025-12-26T05:17:50.931Z"
+  },
+  "updatedAt": {
+    "$date": "2025-12-26T05:17:50.931Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "694e1a7e59bd36cd0622bc29"
+  },
+  "type": "image",
+  "src": "/gallery/20240119_113745.jpg",
+  "thumbnail": "/gallery/thumbnails/20240119_113745 Pequena.jpeg",
+  "title": "Varal e bicicletas na area de serviço externa",
+  "category": "Lavanderia",
+  "order": 43,
+  "isActive": true,
+  "__v": 0,
+  "createdAt": {
+    "$date": "2025-12-26T05:17:50.931Z"
+  },
+  "updatedAt": {
+    "$date": "2025-12-26T05:17:50.931Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "694e1a7e59bd36cd0622bc2a"
+  },
+  "type": "image",
+  "src": "/gallery/20240119_114322.jpg",
+  "thumbnail": "/gallery/thumbnails/20240119_114322 Pequena.jpeg",
+  "title": "Fundos do loft e gira-gira",
+  "category": "Loft",
+  "order": 44,
+  "isActive": true,
+  "__v": 0,
+  "createdAt": {
+    "$date": "2025-12-26T05:17:50.931Z"
+  },
+  "updatedAt": {
+    "$date": "2025-12-26T05:17:50.931Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "694e1a7e59bd36cd0622bc2b"
+  },
+  "type": "image",
+  "src": "/gallery/20240119_114334.jpg",
+  "thumbnail": "/gallery/thumbnails/20240119_114334 Pequena.jpeg",
+  "title": "Fundos do loft e estacionamento",
+  "category": "Loft",
+  "order": 45,
+  "isActive": true,
+  "__v": 0,
+  "createdAt": {
+    "$date": "2025-12-26T05:17:50.931Z"
+  },
+  "updatedAt": {
+    "$date": "2025-12-26T05:17:50.931Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "694e1a7e59bd36cd0622bc2c"
+  },
+  "type": "image",
+  "src": "/gallery/20240119_114351.jpg",
+  "thumbnail": "/gallery/thumbnails/20240119_114351 Pequena.jpeg",
+  "title": "Lateral do loft e estacionamento",
+  "category": "Loft",
+  "order": 46,
+  "isActive": true,
+  "__v": 0,
+  "createdAt": {
+    "$date": "2025-12-26T05:17:50.931Z"
+  },
+  "updatedAt": {
+    "$date": "2025-12-26T05:17:50.931Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "694e1a7e59bd36cd0622bc2d"
+  },
+  "type": "image",
+  "src": "/gallery/20240119_114400.jpg",
+  "thumbnail": "/gallery/thumbnails/20240119_114400 Pequena.jpeg",
+  "title": "Entrada para o loft",
+  "category": "Loft",
+  "order": 47,
+  "isActive": true,
+  "__v": 0,
+  "createdAt": {
+    "$date": "2025-12-26T05:17:50.931Z"
+  },
+  "updatedAt": {
+    "$date": "2025-12-26T05:17:50.931Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "694e1a7e59bd36cd0622bc2e"
+  },
+  "type": "image",
+  "src": "/gallery/20240119_114425.jpg",
+  "thumbnail": "/gallery/thumbnails/20240119_114425 Pequena.jpeg",
+  "title": "Vista frontal do loft",
+  "category": "Loft",
+  "order": 48,
+  "isActive": true,
+  "__v": 0,
+  "createdAt": {
+    "$date": "2025-12-26T05:17:50.931Z"
+  },
+  "updatedAt": {
+    "$date": "2025-12-26T05:17:50.931Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "694e1a7e59bd36cd0622bc2f"
+  },
+  "type": "image",
+  "src": "/gallery/20240119_114457.jpg",
+  "thumbnail": "/gallery/thumbnails/20240119_114457 Pequena.jpeg",
+  "title": "Cama de casal, solteiro (bicama) e sofá-cama do loft",
+  "category": "Loft",
+  "order": 49,
+  "isActive": true,
+  "__v": 0,
+  "createdAt": {
+    "$date": "2025-12-26T05:17:50.931Z"
+  },
+  "updatedAt": {
+    "$date": "2025-12-26T05:17:50.931Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "694e1a7e59bd36cd0622bc30"
+  },
+  "type": "image",
+  "src": "/gallery/20240119_114440.jpg",
+  "thumbnail": "/gallery/thumbnails/20240119_114440 Pequena.jpeg",
+  "title": "Área interna do loft com vista para a piscina",
+  "category": "Loft",
+  "order": 50,
+  "isActive": true,
+  "__v": 0,
+  "createdAt": {
+    "$date": "2025-12-26T05:17:50.931Z"
+  },
+  "updatedAt": {
+    "$date": "2025-12-26T05:17:50.931Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "694e1a7e59bd36cd0622bc31"
+  },
+  "type": "image",
+  "src": "/gallery/20240119_114502.jpg",
+  "thumbnail": "/gallery/thumbnails/20240119_114502 Pequena.jpeg",
+  "title": "Área interna do loft",
+  "category": "Loft",
+  "order": 51,
+  "isActive": true,
+  "__v": 0,
+  "createdAt": {
+    "$date": "2025-12-26T05:17:50.931Z"
+  },
+  "updatedAt": {
+    "$date": "2025-12-26T05:17:50.931Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "694e1a7e59bd36cd0622bc32"
+  },
+  "type": "image",
+  "src": "/gallery/20240119_114517.jpg",
+  "thumbnail": "/gallery/thumbnails/20240119_114517 Pequena.jpeg",
+  "title": "Vista ampla da sala de tv e espaço de trabalho do loft",
+  "category": "Loft",
+  "order": 52,
+  "isActive": true,
+  "__v": 0,
+  "createdAt": {
+    "$date": "2025-12-26T05:17:50.931Z"
+  },
+  "updatedAt": {
+    "$date": "2025-12-26T05:17:50.931Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "694e1a7e59bd36cd0622bc33"
+  },
+  "type": "image",
+  "src": "/gallery/20240119_114524.jpg",
+  "thumbnail": "/gallery/thumbnails/20240119_114524 Pequena.jpeg",
+  "title": "Sala de tv e espaço de trabalho do loft",
+  "category": "Loft",
+  "order": 53,
+  "isActive": true,
+  "__v": 0,
+  "createdAt": {
+    "$date": "2025-12-26T05:17:50.931Z"
+  },
+  "updatedAt": {
+    "$date": "2025-12-26T05:17:50.931Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "694e1a7e59bd36cd0622bc34"
+  },
+  "type": "image",
+  "src": "/gallery/20240119_114528.jpg",
+  "thumbnail": "/gallery/thumbnails/20240119_114528 Pequena.jpeg",
+  "title": "Sofá cama do loft",
+  "category": "Loft",
+  "order": 54,
+  "isActive": true,
+  "__v": 0,
+  "createdAt": {
+    "$date": "2025-12-26T05:17:50.931Z"
+  },
+  "updatedAt": {
+    "$date": "2025-12-26T05:17:50.931Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "694e1a7e59bd36cd0622bc35"
+  },
+  "type": "image",
+  "src": "/gallery/20240119_114537.jpg",
+  "thumbnail": "/gallery/thumbnails/20240119_114537 Pequena.jpeg",
+  "title": "Vista interna da entrada do loft",
+  "category": "Loft",
+  "order": 55,
+  "isActive": true,
+  "__v": 0,
+  "createdAt": {
+    "$date": "2025-12-26T05:17:50.931Z"
+  },
+  "updatedAt": {
+    "$date": "2025-12-26T05:17:50.931Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "694e1a7e59bd36cd0622bc36"
+  },
+  "type": "image",
+  "src": "/gallery/20240119_114600.jpg",
+  "thumbnail": "/gallery/thumbnails/20240119_114600 Pequena.jpeg",
+  "title": "Banheiro do loft",
+  "category": "Loft",
+  "order": 56,
+  "isActive": true,
+  "__v": 0,
+  "createdAt": {
+    "$date": "2025-12-26T05:17:50.931Z"
+  },
+  "updatedAt": {
+    "$date": "2025-12-26T05:17:50.931Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "694e1a7e59bd36cd0622bc37"
+  },
+  "type": "image",
+  "src": "/gallery/20240119_114048.jpg",
+  "thumbnail": "/gallery/thumbnails/20240119_114048 Pequena.jpeg",
+  "title": "Área da piscina, mangueira e jabuticabeira",
+  "category": "Piscina/Jacuzzi",
+  "order": 57,
+  "isActive": true,
+  "__v": 0,
+  "createdAt": {
+    "$date": "2025-12-26T05:17:50.931Z"
+  },
+  "updatedAt": {
+    "$date": "2025-12-26T05:17:50.931Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "694e1a7e59bd36cd0622bc38"
+  },
+  "type": "image",
+  "src": "/gallery/20240119_114107.jpg",
+  "thumbnail": "/gallery/thumbnails/20240119_114107 Pequena.jpeg",
+  "title": "Aquecedor da piscina e casa de máquinas",
+  "category": "Piscina/Jacuzzi",
+  "order": 58,
+  "isActive": true,
+  "__v": 0,
+  "createdAt": {
+    "$date": "2025-12-26T05:17:50.931Z"
+  },
+  "updatedAt": {
+    "$date": "2025-12-26T05:17:50.931Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "694e1a7e59bd36cd0622bc39"
+  },
+  "type": "image",
+  "src": "/gallery/20240204_132813.jpg",
+  "thumbnail": "/gallery/thumbnails/20240204_132813 Pequena.jpeg",
+  "title": "Aquecedor da piscina e casa de máquinas",
+  "category": "Piscina/Jacuzzi",
+  "order": 59,
+  "isActive": true,
+  "__v": 0,
+  "createdAt": {
+    "$date": "2025-12-26T05:17:50.931Z"
+  },
+  "updatedAt": {
+    "$date": "2025-12-26T05:17:50.931Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "694e1a7e59bd36cd0622bc3a"
+  },
+  "type": "image",
+  "src": "/gallery/20240119_114259.jpg",
+  "thumbnail": "/gallery/thumbnails/20240119_114259 Pequena.jpeg",
+  "title": "Área da piscina",
+  "category": "Piscina/Jacuzzi",
+  "order": 60,
+  "isActive": true,
+  "__v": 0,
+  "createdAt": {
+    "$date": "2025-12-26T05:17:50.931Z"
+  },
+  "updatedAt": {
+    "$date": "2025-12-26T05:17:50.931Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "694e1a7e59bd36cd0622bc3b"
+  },
+  "type": "image",
+  "src": "/gallery/20240119_114828.jpg",
+  "thumbnail": "/gallery/thumbnails/20240119_114828 Pequena.jpeg",
+  "title": "Piscina",
+  "category": "Piscina/Jacuzzi",
+  "order": 61,
+  "isActive": true,
+  "__v": 0,
+  "createdAt": {
+    "$date": "2025-12-26T05:17:50.931Z"
+  },
+  "updatedAt": {
+    "$date": "2025-12-26T05:17:50.931Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "694e1a7e59bd36cd0622bc3c"
+  },
+  "type": "image",
+  "src": "/gallery/20240119_114847.jpg",
+  "thumbnail": "/gallery/thumbnails/20240119_114847 Pequena.jpeg",
+  "title": "Piscina",
+  "category": "Piscina/Jacuzzi",
+  "order": 62,
+  "isActive": true,
+  "__v": 0,
+  "createdAt": {
+    "$date": "2025-12-26T05:17:50.931Z"
+  },
+  "updatedAt": {
+    "$date": "2025-12-26T05:17:50.931Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "694e1a7e59bd36cd0622bc3d"
+  },
+  "type": "image",
+  "src": "/gallery/20240204_132814.jpg",
+  "thumbnail": "/gallery/thumbnails/20240204_132814 Pequena.jpeg",
+  "title": "Iluminação da piscina",
+  "category": "Piscina/Jacuzzi",
+  "order": 63,
+  "isActive": true,
+  "__v": 0,
+  "createdAt": {
+    "$date": "2025-12-26T05:17:50.931Z"
+  },
+  "updatedAt": {
+    "$date": "2025-12-26T05:17:50.931Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "694e1a7e59bd36cd0622bc3e"
+  },
+  "type": "image",
+  "src": "/gallery/20230205_012010.jpg",
+  "thumbnail": "/gallery/thumbnails/20230205_012010 Pequena.jpeg",
+  "title": "Iluminação da piscina",
+  "category": "Piscina/Jacuzzi",
+  "order": 64,
+  "isActive": true,
+  "__v": 0,
+  "createdAt": {
+    "$date": "2025-12-26T05:17:50.931Z"
+  },
+  "updatedAt": {
+    "$date": "2025-12-26T05:17:50.931Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "694e1a7e59bd36cd0622bc3f"
+  },
+  "type": "image",
+  "src": "/gallery/20240119_114922.jpg",
+  "thumbnail": "/gallery/thumbnails/20240119_114922 Pequena.jpeg",
+  "title": "Jacuzzi",
+  "category": "Piscina/Jacuzzi",
+  "order": 65,
+  "isActive": true,
+  "__v": 0,
+  "createdAt": {
+    "$date": "2025-12-26T05:17:50.931Z"
+  },
+  "updatedAt": {
+    "$date": "2025-12-26T05:17:50.931Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "694e1a7e59bd36cd0622bc40"
+  },
+  "type": "image",
+  "src": "/gallery/20240119_114923.jpg",
+  "thumbnail": "/gallery/thumbnails/20240119_114923 Pequena.jpeg",
+  "title": "Jacuzzi",
+  "category": "Piscina/Jacuzzi",
+  "order": 66,
+  "isActive": true,
+  "__v": 0,
+  "createdAt": {
+    "$date": "2025-12-26T05:17:50.931Z"
+  },
+  "updatedAt": {
+    "$date": "2025-12-26T05:17:50.931Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "694e1a7e59bd36cd0622bc41"
+  },
+  "type": "image",
+  "src": "/gallery/20240119_114935.jpg",
+  "thumbnail": "/gallery/thumbnails/20240119_114935 Pequena.jpeg",
+  "title": "Chuveiro da piscina",
+  "category": "Piscina/Jacuzzi",
+  "order": 67,
+  "isActive": true,
+  "__v": 0,
+  "createdAt": {
+    "$date": "2025-12-26T05:17:50.931Z"
+  },
+  "updatedAt": {
+    "$date": "2025-12-26T05:17:50.931Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "694e1a7e59bd36cd0622bc42"
+  },
+  "type": "image",
+  "src": "/gallery/20240119_114141.jpg",
+  "thumbnail": "/gallery/thumbnails/20240119_114141 Pequena.jpeg",
+  "title": "Pula-pula",
+  "category": "Playground",
+  "order": 68,
+  "isActive": true,
+  "__v": 0,
+  "createdAt": {
+    "$date": "2025-12-26T05:17:50.931Z"
+  },
+  "updatedAt": {
+    "$date": "2025-12-26T05:17:50.931Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "694e1a7e59bd36cd0622bc43"
+  },
+  "type": "image",
+  "src": "/gallery/20240119_114304.jpg",
+  "thumbnail": "/gallery/thumbnails/20240119_114304 Pequena.jpeg",
+  "title": "Piscina e parquinho",
+  "category": "Playground",
+  "order": 69,
+  "isActive": true,
+  "__v": 0,
+  "createdAt": {
+    "$date": "2025-12-26T05:17:50.931Z"
+  },
+  "updatedAt": {
+    "$date": "2025-12-26T05:17:50.931Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "694e1a7e59bd36cd0622bc44"
+  },
+  "type": "image",
+  "src": "/gallery/20240119_114318.jpg",
+  "thumbnail": "/gallery/thumbnails/20240119_114318 Pequena.jpeg",
+  "title": "Casa de madeira e gira-gira",
+  "category": "Playground",
+  "order": 70,
+  "isActive": true,
+  "__v": 0,
+  "createdAt": {
+    "$date": "2025-12-26T05:17:50.931Z"
+  },
+  "updatedAt": {
+    "$date": "2025-12-26T05:17:50.931Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "694e1a7e59bd36cd0622bc45"
+  },
+  "type": "image",
+  "src": "/gallery/20240119_114700.jpg",
+  "thumbnail": "/gallery/thumbnails/20240119_114700 Pequena.jpeg",
+  "title": "Casa de madeira e gira-gira",
+  "category": "Playground",
+  "order": 71,
+  "isActive": true,
+  "__v": 0,
+  "createdAt": {
+    "$date": "2025-12-26T05:17:50.931Z"
+  },
+  "updatedAt": {
+    "$date": "2025-12-26T05:17:50.931Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "694e1a7e59bd36cd0622bc46"
+  },
+  "type": "image",
+  "src": "/gallery/20240119_114705.jpg",
+  "thumbnail": "/gallery/thumbnails/20240119_114705 Pequena.jpeg",
+  "title": "Gira-gira e rampa de cordas da casa de madeira",
+  "category": "Playground",
+  "order": 72,
+  "isActive": true,
+  "__v": 0,
+  "createdAt": {
+    "$date": "2025-12-26T05:17:50.931Z"
+  },
+  "updatedAt": {
+    "$date": "2025-12-26T05:17:50.931Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "694e1a7e59bd36cd0622bc47"
+  },
+  "type": "image",
+  "src": "/gallery/20240119_114312.jpg",
+  "thumbnail": "/gallery/thumbnails/20240119_114312 Pequena.jpeg",
+  "title": "Casa de madeira com escorrega e balanços",
+  "category": "Playground",
+  "order": 73,
+  "isActive": true,
+  "__v": 0,
+  "createdAt": {
+    "$date": "2025-12-26T05:17:50.931Z"
+  },
+  "updatedAt": {
+    "$date": "2025-12-26T05:17:50.931Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "694e1a7e59bd36cd0622bc48"
+  },
+  "type": "image",
+  "src": "/gallery/20240119_114621.jpg",
+  "thumbnail": "/gallery/thumbnails/20240119_114621 Pequena.jpeg",
+  "title": "Gramado da área do playground",
+  "category": "Playground",
+  "order": 74,
+  "isActive": true,
+  "__v": 0,
+  "createdAt": {
+    "$date": "2025-12-26T05:17:50.931Z"
+  },
+  "updatedAt": {
+    "$date": "2025-12-26T05:17:50.931Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "694e1a7e59bd36cd0622bc49"
+  },
+  "type": "image",
+  "src": "/gallery/20240119_113558.jpg",
+  "thumbnail": "/gallery/thumbnails/20240119_113558 Pequena.jpeg",
+  "title": "Quarto crianças",
+  "category": "Quarto Crianças",
+  "order": 75,
+  "isActive": true,
+  "__v": 0,
+  "createdAt": {
+    "$date": "2025-12-26T05:17:50.931Z"
+  },
+  "updatedAt": {
+    "$date": "2025-12-26T05:17:50.931Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "694e1a7e59bd36cd0622bc4a"
+  },
+  "type": "image",
+  "src": "/gallery/20240204_132815.jpg",
+  "thumbnail": "/gallery/thumbnails/20240204_132815 Pequena.jpeg",
+  "title": "Quarto crianças",
+  "category": "Quarto Crianças",
+  "order": 76,
+  "isActive": true,
+  "__v": 0,
+  "createdAt": {
+    "$date": "2025-12-26T05:17:50.931Z"
+  },
+  "updatedAt": {
+    "$date": "2025-12-26T05:17:50.931Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "694e1a7e59bd36cd0622bc4b"
+  },
+  "type": "image",
+  "src": "/gallery/20231225_160727.jpg",
+  "thumbnail": "/gallery/thumbnails/20231225_160727 Pequena.jpeg",
+  "title": "Quarto crianças",
+  "category": "Quarto Crianças",
+  "order": 77,
+  "isActive": true,
+  "__v": 0,
+  "createdAt": {
+    "$date": "2025-12-26T05:17:50.931Z"
+  },
+  "updatedAt": {
+    "$date": "2025-12-26T05:17:50.931Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "694e1a7e59bd36cd0622bc4c"
+  },
+  "type": "image",
+  "src": "/gallery/20231225_160732.jpg",
+  "thumbnail": "/gallery/thumbnails/20231225_160732 Pequena.jpeg",
+  "title": "Quarto crianças",
+  "category": "Quarto Crianças",
+  "order": 78,
+  "isActive": true,
+  "__v": 0,
+  "createdAt": {
+    "$date": "2025-12-26T05:17:50.931Z"
+  },
+  "updatedAt": {
+    "$date": "2025-12-26T05:17:50.931Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "694e1a7e59bd36cd0622bc4d"
+  },
+  "type": "image",
+  "src": "/gallery/20240119_113609.jpg",
+  "thumbnail": "/gallery/thumbnails/20240119_113609 Pequena.jpeg",
+  "title": "Quarto com 2 camas de solteiro",
+  "category": "Quarto Crianças",
+  "order": 79,
+  "isActive": true,
+  "__v": 0,
+  "createdAt": {
+    "$date": "2025-12-26T05:17:50.931Z"
+  },
+  "updatedAt": {
+    "$date": "2025-12-26T05:17:50.931Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "694e1a7e59bd36cd0622bc4e"
+  },
+  "type": "image",
+  "src": "/gallery/20231225_160702.jpg",
+  "thumbnail": "/gallery/thumbnails/20231225_160702 Pequena.jpeg",
+  "title": "Quarto com 2 camas de solteiro",
+  "category": "Quarto Crianças",
+  "order": 80,
+  "isActive": true,
+  "__v": 0,
+  "createdAt": {
+    "$date": "2025-12-26T05:17:50.931Z"
+  },
+  "updatedAt": {
+    "$date": "2025-12-26T05:17:50.931Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "694e1a7e59bd36cd0622bc4f"
+  },
+  "type": "image",
+  "src": "/gallery/20240119_113433.jpg",
+  "thumbnail": "/gallery/thumbnails/20240119_113433 Pequena.jpeg",
+  "title": "Quarto Família",
+  "category": "Quarto Família",
+  "order": 81,
+  "isActive": true,
+  "__v": 0,
+  "createdAt": {
+    "$date": "2025-12-26T05:17:50.931Z"
+  },
+  "updatedAt": {
+    "$date": "2025-12-26T05:17:50.931Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "694e1a7e59bd36cd0622bc50"
+  },
+  "type": "image",
+  "src": "/gallery/20240119_113453.jpg",
+  "thumbnail": "/gallery/thumbnails/20240119_113453 Pequena.jpeg",
+  "title": "Quarto Família",
+  "category": "Quarto Família",
+  "order": 82,
+  "isActive": true,
+  "__v": 0,
+  "createdAt": {
+    "$date": "2025-12-26T05:17:50.931Z"
+  },
+  "updatedAt": {
+    "$date": "2025-12-26T05:17:50.931Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "694e1a7e59bd36cd0622bc51"
+  },
+  "type": "image",
+  "src": "/gallery/20240119_113506.jpg",
+  "thumbnail": "/gallery/thumbnails/20240119_113506 Pequena.jpeg",
+  "title": "Cama de casal do quarto Família",
+  "category": "Quarto Família",
+  "order": 83,
+  "isActive": true,
+  "__v": 0,
+  "createdAt": {
+    "$date": "2025-12-26T05:17:50.931Z"
+  },
+  "updatedAt": {
+    "$date": "2025-12-26T05:17:50.931Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "694e1a7e59bd36cd0622bc52"
+  },
+  "type": "image",
+  "src": "/gallery/20240119_113514.jpg",
+  "thumbnail": "/gallery/thumbnails/20240119_113514 Pequena.jpeg",
+  "title": "SmartTv e Ventilador de teto do quarto Família",
+  "category": "Quarto Família",
+  "order": 84,
+  "isActive": true,
+  "__v": 0,
+  "createdAt": {
+    "$date": "2025-12-26T05:17:50.931Z"
+  },
+  "updatedAt": {
+    "$date": "2025-12-26T05:17:50.931Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "694e1a7e59bd36cd0622bc53"
+  },
+  "type": "image",
+  "src": "/gallery/20240118_194536.jpg",
+  "thumbnail": "/gallery/thumbnails/20240118_194536 Pequena.jpeg",
+  "title": "Cristaleira",
+  "category": "Sala de Estar",
+  "order": 85,
+  "isActive": true,
+  "__v": 0,
+  "createdAt": {
+    "$date": "2025-12-26T05:17:50.931Z"
+  },
+  "updatedAt": {
+    "$date": "2025-12-26T05:17:50.931Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "694e1a7e59bd36cd0622bc54"
+  },
+  "type": "image",
+  "src": "/gallery/20240118_194552.jpg",
+  "thumbnail": "/gallery/thumbnails/20240118_194552 Pequena.jpeg",
+  "title": "Taças cristaleira",
+  "category": "Sala de Estar",
+  "order": 86,
+  "isActive": true,
+  "__v": 0,
+  "createdAt": {
+    "$date": "2025-12-26T05:17:50.931Z"
+  },
+  "updatedAt": {
+    "$date": "2025-12-26T05:17:50.931Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "694e1a7e59bd36cd0622bc55"
+  },
+  "type": "image",
+  "src": "/gallery/20240118_194556.jpg",
+  "thumbnail": "/gallery/thumbnails/20240118_194556 Pequena.jpeg",
+  "title": "Pratos cristaleira",
+  "category": "Sala de Estar",
+  "order": 87,
+  "isActive": true,
+  "__v": 0,
+  "createdAt": {
+    "$date": "2025-12-26T05:17:50.931Z"
+  },
+  "updatedAt": {
+    "$date": "2025-12-26T05:17:50.931Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "694e1a7e59bd36cd0622bc56"
+  },
+  "type": "image",
+  "src": "/gallery/20240118_194625.jpg",
+  "thumbnail": "/gallery/thumbnails/20240118_194625 Pequena.jpeg",
+  "title": "Xicaras Nespresso",
+  "category": "Sala de Estar",
+  "order": 88,
+  "isActive": true,
+  "__v": 0,
+  "createdAt": {
+    "$date": "2025-12-26T05:17:50.931Z"
+  },
+  "updatedAt": {
+    "$date": "2025-12-26T05:17:50.931Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "694e1a7e59bd36cd0622bc57"
+  },
+  "type": "image",
+  "src": "/gallery/20240118_194727.jpg",
+  "thumbnail": "/gallery/thumbnails/20240118_194727 Pequena.jpeg",
+  "title": "Fogão a lenha",
+  "category": "Sala de Estar",
+  "order": 89,
+  "isActive": true,
+  "__v": 0,
+  "createdAt": {
+    "$date": "2025-12-26T05:17:50.931Z"
+  },
+  "updatedAt": {
+    "$date": "2025-12-26T05:17:50.931Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "694e1a7e59bd36cd0622bc58"
+  },
+  "type": "image",
+  "src": "/gallery/20240119_113240.jpg",
+  "thumbnail": "/gallery/thumbnails/20240119_113240 Pequena.jpeg",
+  "title": "Fogão a lenha",
+  "category": "Sala de Estar",
+  "order": 90,
+  "isActive": true,
+  "__v": 0,
+  "createdAt": {
+    "$date": "2025-12-26T05:17:50.931Z"
+  },
+  "updatedAt": {
+    "$date": "2025-12-26T05:17:50.931Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "694e1a7e59bd36cd0622bc59"
+  },
+  "type": "image",
+  "src": "/gallery/20240119_113211.jpg",
+  "thumbnail": "/gallery/thumbnails/20240119_113211 Pequena.jpeg",
+  "title": "Antessala",
+  "category": "Sala de Estar",
+  "order": 91,
+  "isActive": true,
+  "__v": 0,
+  "createdAt": {
+    "$date": "2025-12-26T05:17:50.931Z"
+  },
+  "updatedAt": {
+    "$date": "2025-12-26T05:17:50.931Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "694e1a7e59bd36cd0622bc5a"
+  },
+  "type": "image",
+  "src": "/gallery/20240119_113320.jpg",
+  "thumbnail": "/gallery/thumbnails/20240119_113320 Pequena.jpeg",
+  "title": "Antessala",
+  "category": "Sala de Estar",
+  "order": 92,
+  "isActive": true,
+  "__v": 0,
+  "createdAt": {
+    "$date": "2025-12-26T05:17:50.931Z"
+  },
+  "updatedAt": {
+    "$date": "2025-12-26T05:17:50.931Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "694e1a7e59bd36cd0622bc5b"
+  },
+  "type": "image",
+  "src": "/gallery/20240119_113348.jpg",
+  "thumbnail": "/gallery/thumbnails/20240119_113348 Pequena.jpeg",
+  "title": "Antessala",
+  "category": "Sala de Estar",
+  "order": 93,
+  "isActive": true,
+  "__v": 0,
+  "createdAt": {
+    "$date": "2025-12-26T05:17:50.931Z"
+  },
+  "updatedAt": {
+    "$date": "2025-12-26T05:17:50.931Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "694e1a7e59bd36cd0622bc5c"
+  },
+  "type": "image",
+  "src": "/gallery/20240119_113332.jpg",
+  "thumbnail": "/gallery/thumbnails/20240119_113332 Pequena.jpeg",
+  "title": "Aparadouro",
+  "category": "Sala de Estar",
+  "order": 94,
+  "isActive": true,
+  "__v": 0,
+  "createdAt": {
+    "$date": "2025-12-26T05:17:50.931Z"
+  },
+  "updatedAt": {
+    "$date": "2025-12-26T05:17:50.931Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "694e1a7e59bd36cd0622bc5d"
+  },
+  "type": "image",
+  "src": "/gallery/20240119_113916.jpg",
+  "thumbnail": "/gallery/thumbnails/20240119_113916 Pequena.jpeg",
+  "title": "Sala de TV",
+  "category": "Sala de Estar",
+  "order": 95,
+  "isActive": true,
+  "__v": 0,
+  "createdAt": {
+    "$date": "2025-12-26T05:17:50.931Z"
+  },
+  "updatedAt": {
+    "$date": "2025-12-26T05:17:50.931Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "694e1a7e59bd36cd0622bc5e"
+  },
+  "type": "image",
+  "src": "/gallery/20240119_113925.jpg",
+  "thumbnail": "/gallery/thumbnails/20240119_113925 Pequena.jpeg",
+  "title": "Sala de jantar",
+  "category": "Sala de Estar",
+  "order": 96,
+  "isActive": true,
+  "__v": 0,
+  "createdAt": {
+    "$date": "2025-12-26T05:17:50.931Z"
+  },
+  "updatedAt": {
+    "$date": "2025-12-26T05:17:50.931Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "694e1a7e59bd36cd0622bc5f"
+  },
+  "type": "image",
+  "src": "/gallery/20231225_160149.jpg",
+  "thumbnail": "/gallery/thumbnails/20231225_160149 Pequena.jpeg",
+  "title": "Sala de jantar",
+  "category": "Sala de Estar",
+  "order": 97,
+  "isActive": true,
+  "__v": 0,
+  "createdAt": {
+    "$date": "2025-12-26T05:17:50.931Z"
+  },
+  "updatedAt": {
+    "$date": "2025-12-26T05:17:50.931Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "694e1a7e59bd36cd0622bc60"
+  },
+  "type": "image",
+  "src": "/gallery/20240119_113941.jpg",
+  "thumbnail": "/gallery/thumbnails/20240119_113941 Pequena.jpeg",
+  "title": "Sala de jantar e de TV",
+  "category": "Sala de Estar",
+  "order": 98,
+  "isActive": true,
+  "__v": 0,
+  "createdAt": {
+    "$date": "2025-12-26T05:17:50.931Z"
+  },
+  "updatedAt": {
+    "$date": "2025-12-26T05:17:50.931Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "694e1a7e59bd36cd0622bc61"
+  },
+  "type": "image",
+  "src": "/gallery/20240119_113956.jpg",
+  "thumbnail": "/gallery/thumbnails/20240119_113956 Pequena.jpeg",
+  "title": "Sala de jantar e de TV",
+  "category": "Sala de Estar",
+  "order": 99,
+  "isActive": true,
+  "__v": 0,
+  "createdAt": {
+    "$date": "2025-12-26T05:17:50.931Z"
+  },
+  "updatedAt": {
+    "$date": "2025-12-26T05:17:50.931Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "694e1a7e59bd36cd0622bc62"
+  },
+  "type": "image",
+  "src": "/gallery/20231225_160221.jpg",
+  "thumbnail": "/gallery/thumbnails/20231225_160221 Pequena.jpeg",
+  "title": "Sala de jantar e de TV",
+  "category": "Sala de Estar",
+  "order": 100,
+  "isActive": true,
+  "__v": 0,
+  "createdAt": {
+    "$date": "2025-12-26T05:17:50.931Z"
+  },
+  "updatedAt": {
+    "$date": "2025-12-26T05:17:50.931Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "694e1a7e59bd36cd0622bc63"
+  },
+  "type": "image",
+  "src": "/gallery/20231225_160209.jpg",
+  "thumbnail": "/gallery/thumbnails/20231225_160209 Pequena.jpeg",
+  "title": "Sala de TV",
+  "category": "Sala de Estar",
+  "order": 101,
+  "isActive": true,
+  "__v": 0,
+  "createdAt": {
+    "$date": "2025-12-26T05:17:50.931Z"
+  },
+  "updatedAt": {
+    "$date": "2025-12-26T05:17:50.931Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "694e1a7e59bd36cd0622bc64"
+  },
+  "type": "image",
+  "src": "/gallery/20240204_132817.jpg",
+  "thumbnail": "/gallery/thumbnails/20240204_132817 Pequena.jpeg",
+  "title": "Cama Queen Size com roupas de cama e banho envelopadas",
+  "category": "Suite Master",
+  "order": 102,
+  "isActive": true,
+  "__v": 0,
+  "createdAt": {
+    "$date": "2025-12-26T05:17:50.931Z"
+  },
+  "updatedAt": {
+    "$date": "2025-12-26T05:17:50.931Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "694e1a7e59bd36cd0622bc65"
+  },
+  "type": "image",
+  "src": "/gallery/20240204_132818.jpg",
+  "thumbnail": "/gallery/thumbnails/20240204_132818 Pequena.jpeg",
+  "title": "Suite Master com vista para o jardim e piscina",
+  "category": "Suite Master",
+  "order": 103,
+  "isActive": true,
+  "__v": 0,
+  "createdAt": {
+    "$date": "2025-12-26T05:17:50.931Z"
+  },
+  "updatedAt": {
+    "$date": "2025-12-26T05:17:50.931Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "694e1a7e59bd36cd0622bc66"
+  },
+  "type": "video",
+  "src": "https://www.youtube.com/embed/OGmQQiDLc28",
+  "thumbnail": "/images/hall.jpg",
+  "title": "Como chegar",
+  "category": "Vídeos",
+  "order": 104,
+  "isActive": true,
+  "__v": 0,
+  "createdAt": {
+    "$date": "2025-12-26T05:17:50.931Z"
+  },
+  "updatedAt": {
+    "$date": "2025-12-26T05:17:50.931Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "694e1a7e59bd36cd0622bc67"
+  },
+  "type": "video",
+  "src": "https://www.youtube.com/embed/v30i_54VFz0",
+  "thumbnail": "/images/hall.jpg",
+  "title": "Conheça o Loft",
+  "category": "Vídeos",
+  "order": 105,
+  "isActive": true,
+  "__v": 0,
+  "createdAt": {
+    "$date": "2025-12-26T05:17:50.931Z"
+  },
+  "updatedAt": {
+    "$date": "2025-12-26T05:17:50.931Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "694e1a7e59bd36cd0622bc68"
+  },
+  "type": "video",
+  "src": "https://www.youtube.com/embed/xHoo8ZMQRq0",
+  "thumbnail": "/images/hall.jpg",
+  "title": "Tour Virtual da Casa",
+  "category": "Vídeos",
+  "order": 106,
+  "isActive": true,
+  "__v": 0,
+  "createdAt": {
+    "$date": "2025-12-26T05:17:50.931Z"
+  },
+  "updatedAt": {
+    "$date": "2025-12-26T05:17:50.931Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "694e1a7e59bd36cd0622bc69"
+  },
+  "type": "video",
+  "src": "https://www.youtube.com/embed/vJADRfDqq14",
+  "thumbnail": "/images/hall.jpg",
+  "title": "Continuação do Tour Virtual da Casa",
+  "category": "Vídeos",
+  "order": 107,
+  "isActive": true,
+  "__v": 0,
+  "createdAt": {
+    "$date": "2025-12-26T05:17:50.931Z"
+  },
+  "updatedAt": {
+    "$date": "2025-12-26T05:17:50.931Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "695173d7f9cc7d0b775c204a"
+  },
+  "type": "image",
+  "src": "https://res.cloudinary.com/dkhldcufo/image/upload/v1766945324/gallery/biizrf9aysmshc8xa3kl.jpg",
+  "thumbnail": "https://res.cloudinary.com/dkhldcufo/image/upload/v1766945324/gallery/biizrf9aysmshc8xa3kl.jpg",
+  "title": "teste",
+  "category": "Área Gourmet",
+  "order": 108,
+  "isActive": true,
+  "createdAt": {
+    "$date": "2025-12-28T18:15:51.942Z"
+  },
+  "updatedAt": {
+    "$date": "2025-12-28T18:15:51.942Z"
+  },
+  "__v": 0
+}]

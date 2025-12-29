@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { XMarkIcon } from '@heroicons/react/24/outline';
 import toast from 'react-hot-toast';
+import { CloudinaryUpload } from '@/components/CloudinaryUpload';
 
 interface Property {
   _id: string;
@@ -19,6 +20,7 @@ interface Property {
   bedrooms: number;
   beds: number;
   bathrooms: number;
+  rating: number;
   checkInTime: string;
   checkOutTime: string;
   minNights: number;
@@ -28,6 +30,13 @@ interface Property {
   heroImages: string[];
   welcomeMessage: string;
   isActive: boolean;
+  // Hero Section - textos dinâmicos
+  heroTagline: string;
+  heroSubtitle: string;
+  heroHighlights: string[];
+  // About Section - textos dinâmicos
+  aboutTitle: string;
+  aboutDescription: string[];
 }
 
 const emptyProperty: Omit<Property, '_id'> = {
@@ -44,6 +53,7 @@ const emptyProperty: Omit<Property, '_id'> = {
   bedrooms: 4,
   beds: 7,
   bathrooms: 5,
+  rating: 0,
   checkInTime: '15:00',
   checkOutTime: '11:00',
   minNights: 3,
@@ -53,6 +63,13 @@ const emptyProperty: Omit<Property, '_id'> = {
   heroImages: [],
   welcomeMessage: '',
   isActive: true,
+  // Hero Section - textos dinâmicos
+  heroTagline: '',
+  heroSubtitle: '',
+  heroHighlights: [],
+  // About Section - textos dinâmicos
+  aboutTitle: '',
+  aboutDescription: []
 };
 
 export default function AdminPropriedadePage() {
@@ -82,19 +99,27 @@ export default function AdminPropriedadePage() {
           country: data.country || 'Brasil',
           zipCode: data.zipCode || '',
           coordinates: data.coordinates || { lat: 0, lng: 0 },
-          maxGuests: data.maxGuests || 12,
-          bedrooms: data.bedrooms || 4,
-          beds: data.beds || 7,
-          bathrooms: data.bathrooms || 5,
+          maxGuests: data.maxGuests || null,
+          bedrooms: data.bedrooms || null,
+          beds: data.beds || null,
+          bathrooms: data.bathrooms || null,
+          rating: data.rating || null,
           checkInTime: data.checkInTime || '15:00',
           checkOutTime: data.checkOutTime || '11:00',
-          minNights: data.minNights || 3,
+          minNights: data.minNights || null,
           airbnbUrl: data.airbnbUrl || '',
           airbnbCalendarUrl: data.airbnbCalendarUrl || '',
           heroImage: data.heroImage || '',
           heroImages: data.heroImages || [],
           welcomeMessage: data.welcomeMessage || '',
           isActive: data.isActive ?? true,
+          // Hero Section - textos dinâmicos
+          heroTagline: data.heroTagline || '',
+          heroSubtitle: data.heroSubtitle || '',
+          heroHighlights: data.heroHighlights || [],
+          // About Section - textos dinâmicos
+          aboutTitle: data.aboutTitle || '',
+          aboutDescription: data.aboutDescription || [],
         });
       }
     } catch (error) {
@@ -188,6 +213,83 @@ export default function AdminPropriedadePage() {
               rows={4}
               className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent"
             />
+          </div>
+        </div>
+
+        {/* Hero Section - Textos */}
+        <div className="border-b pb-6">
+          <h2 className="text-lg font-semibold text-gray-700 mb-4">Textos da Página Inicial (Hero)</h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Hero Tagline</label>
+              <input
+                type="text"
+                value={formData.heroTagline}
+                onChange={(e) => setFormData({ ...formData, heroTagline: e.target.value })}
+                placeholder="Ex: Sua casa de férias perfeita em Belo Horizonte"
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Hero Subtítulo</label>
+              <input
+                type="text"
+                value={formData.heroSubtitle}
+                onChange={(e) => setFormData({ ...formData, heroSubtitle: e.target.value })}
+                placeholder="Ex: Piscina aquecida • Jacuzzi • Playground • Vista para a Lagoa"
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent"
+              />
+            </div>
+          </div>
+        </div>
+
+        {/* About Section - Textos */}
+        <div className="border-b pb-6">
+          <h2 className="text-lg font-semibold text-gray-700 mb-4">Textos da Seção "Sobre a Casa"</h2>
+          <div className="mb-4">
+            <label className="block text-sm font-medium text-gray-700 mb-1">Título da Seção</label>
+            <input
+              type="text"
+              value={formData.aboutTitle}
+              onChange={(e) => setFormData({ ...formData, aboutTitle: e.target.value })}
+              placeholder="Ex: Sobre a Casa"
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent"
+            />
+          </div>
+          <div className="space-y-3">
+            <label className="block text-sm font-medium text-gray-700">Parágrafos da Descrição</label>
+            {formData.aboutDescription.map((desc, index) => (
+              <div key={index} className="flex gap-2">
+                <textarea
+                  value={desc}
+                  onChange={(e) => {
+                    const newDescriptions = [...formData.aboutDescription];
+                    newDescriptions[index] = e.target.value;
+                    setFormData({ ...formData, aboutDescription: newDescriptions });
+                  }}
+                  rows={3}
+                  placeholder={`Parágrafo ${index + 1}...`}
+                  className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent"
+                />
+                <button
+                  type="button"
+                  onClick={() => {
+                    const newDescriptions = formData.aboutDescription.filter((_, i) => i !== index);
+                    setFormData({ ...formData, aboutDescription: newDescriptions });
+                  }}
+                  className="px-3 py-2 text-red-600 hover:bg-red-50 rounded-lg"
+                >
+                  <XMarkIcon className="h-5 w-5" />
+                </button>
+              </div>
+            ))}
+            <button
+              type="button"
+              onClick={() => setFormData({ ...formData, aboutDescription: [...formData.aboutDescription, ''] })}
+              className="px-4 py-2 text-amber-600 border border-amber-600 rounded-lg hover:bg-amber-50"
+            >
+              + Adicionar Parágrafo
+            </button>
           </div>
         </div>
 
@@ -341,37 +443,40 @@ export default function AdminPropriedadePage() {
           <h2 className="text-lg font-semibold text-gray-700 mb-4">Imagens</h2>
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">Imagem Principal</label>
-            <input
-              type="text"
+            <CloudinaryUpload
+              folder="gallery"
               value={formData.heroImage}
-              onChange={(e) => setFormData({ ...formData, heroImage: e.target.value })}
-              placeholder="/gallery/imagem.jpg"
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent"
+              onChange={(url) => setFormData({ ...formData, heroImage: url })}
+              label=""
+              placeholder="Clique para fazer upload da imagem principal"
+              previewClassName="h-48 w-full"
+              maxSizeKB={3072}
             />
           </div>
           <div className="mt-4">
             <label className="block text-sm font-medium text-gray-700 mb-1">Imagens do Carrossel</label>
-            <div className="flex gap-2">
-              <input
-                type="text"
-                value={heroImageInput}
-                onChange={(e) => setHeroImageInput(e.target.value)}
-                placeholder="/gallery/imagem.jpg"
-                className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent"
-              />
-              <button
-                type="button"
-                onClick={addHeroImage}
-                className="px-4 py-2 bg-amber-600 text-white rounded-lg hover:bg-amber-700"
-              >
-                Adicionar
-              </button>
-            </div>
+            <CloudinaryUpload
+              folder="gallery"
+              value=""
+              onChange={(url) => {
+                if (url) {
+                  setFormData({
+                    ...formData,
+                    heroImages: [...formData.heroImages, url],
+                  });
+                }
+              }}
+              label=""
+              placeholder="Clique para adicionar imagem ao carrossel"
+              previewClassName="h-32 w-full"
+              maxSizeKB={3072}
+              showPreview={false}
+            />
             {formData.heroImages.length > 0 && (
               <div className="mt-2 flex flex-wrap gap-2">
                 {formData.heroImages.map((img, index) => (
                   <span key={index} className="inline-flex items-center gap-1 px-2 py-1 bg-gray-100 rounded text-sm">
-                    {img}
+                    <span className="max-w-[200px] truncate">{img.split('/').pop()}</span>
                     <button type="button" onClick={() => removeHeroImage(index)}>
                       <XMarkIcon className="h-4 w-4 text-gray-500 hover:text-red-500" />
                     </button>

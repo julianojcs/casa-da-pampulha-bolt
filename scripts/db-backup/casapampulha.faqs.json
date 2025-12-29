@@ -1,0 +1,145 @@
+[{
+  "_id": {
+    "$oid": "694e1a7e59bd36cd0622bbe6"
+  },
+  "question": "Tem estacionamento disponível no local?",
+  "answer": "Sim! Nosso estacionamento comporta até 5 carros com total segurança.",
+  "order": 1,
+  "isActive": true,
+  "__v": 0,
+  "createdAt": {
+    "$date": "2025-12-26T05:17:50.921Z"
+  },
+  "updatedAt": {
+    "$date": "2025-12-26T05:17:50.921Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "694e1a7e59bd36cd0622bbe7"
+  },
+  "question": "Posso levar meu pet?",
+  "answer": "Infelizmente não aceitamos PETs em nossa propriedade.",
+  "order": 2,
+  "isActive": true,
+  "__v": 0,
+  "createdAt": {
+    "$date": "2025-12-26T05:17:50.921Z"
+  },
+  "updatedAt": {
+    "$date": "2025-12-26T05:17:50.921Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "694e1a7e59bd36cd0622bbe8"
+  },
+  "question": "Como posso me conectar à rede Wi-Fi?",
+  "answer": "Temos duas redes de Wi-Fi disponíveis com velocidade de até 500MB. As senhas serão enviadas para o chat do aplicativo ou WhatsApp após a confirmação da reserva.",
+  "order": 3,
+  "isActive": true,
+  "__v": 0,
+  "createdAt": {
+    "$date": "2025-12-26T05:17:50.921Z"
+  },
+  "updatedAt": {
+    "$date": "2025-12-26T05:17:50.921Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "694e1a7e59bd36cd0622bbe9"
+  },
+  "question": "Tem roupa de cama e banho disponível?",
+  "answer": "Sim! Fornecemos gratuitamente 1 toalha de banho, 1 lençol, 1 virol, 1 fronha e 1 travesseiro para cada hóspede. Cada banheiro é arrumado com 2 toalhas de rosto e tapete de chão. Também fornecemos 1 toalha de piscina por quarto (4 no total).",
+  "order": 4,
+  "isActive": true,
+  "__v": 0,
+  "createdAt": {
+    "$date": "2025-12-26T05:17:50.921Z"
+  },
+  "updatedAt": {
+    "$date": "2025-12-26T05:17:50.921Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "694e1a7e59bd36cd0622bbea"
+  },
+  "question": "Tem cobertores disponíveis?",
+  "answer": "Sim! Fornecemos gratuitamente 1 cobertor por hóspede.",
+  "order": 5,
+  "isActive": true,
+  "__v": 0,
+  "createdAt": {
+    "$date": "2025-12-26T05:17:50.922Z"
+  },
+  "updatedAt": {
+    "$date": "2025-12-26T05:17:50.922Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "694e1a7e59bd36cd0622bbeb"
+  },
+  "question": "Como funciona a lavanderia?",
+  "answer": "A casa possui uma lavanderia para fins particulares. Caso tenha interesse em utilizar (máquina de lavar e secar roupa), é necessário solicitar antes do check-in e uma taxa de R$200,00 será cobrada.",
+  "order": 6,
+  "isActive": true,
+  "__v": 0,
+  "createdAt": {
+    "$date": "2025-12-26T05:17:50.922Z"
+  },
+  "updatedAt": {
+    "$date": "2025-12-26T05:17:50.922Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "694e1a7e59bd36cd0622bbec"
+  },
+  "question": "Qual o horário de funcionamento da piscina?",
+  "answer": "O horário de funcionamento da piscina é das 08h00 às 19h00 (finais de semana e feriados até 22h00). Por razões de segurança, não é permitido nadar após o anoitecer.",
+  "order": 7,
+  "isActive": true,
+  "__v": 0,
+  "createdAt": {
+    "$date": "2025-12-26T05:17:50.922Z"
+  },
+  "updatedAt": {
+    "$date": "2025-12-26T05:17:50.922Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "694e1a7e59bd36cd0622bbed"
+  },
+  "question": "Posso receber visitas durante a estadia?",
+  "answer": "Não é permitido receber visitantes. Casos excepcionais poderão ser previamente autorizados pelo anfitrião.",
+  "order": 8,
+  "isActive": true,
+  "__v": 0,
+  "createdAt": {
+    "$date": "2025-12-26T05:17:50.922Z"
+  },
+  "updatedAt": {
+    "$date": "2025-12-26T05:17:50.922Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "69517760f9cc7d0b775c206b"
+  },
+  "question": "ets",
+  "answer": "sagdf",
+  "category": "Geral",
+  "order": 9,
+  "isActive": true,
+  "createdAt": {
+    "$date": "2025-12-28T18:30:56.575Z"
+  },
+  "updatedAt": {
+    "$date": "2025-12-28T18:30:56.575Z"
+  },
+  "__v": 0
+}]

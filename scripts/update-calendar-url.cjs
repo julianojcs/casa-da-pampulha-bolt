@@ -16,7 +16,7 @@ async function updateCalendarUrl() {
     );
 
     console.log(`✅ ${result.modifiedCount || result.nModified || 0} documento(s) atualizado(s) com airbnbCalendarUrl`);
-    
+
     process.exit(0);
   } catch (err) {
     console.error('❌ Erro:', err);

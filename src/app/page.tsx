@@ -1,36 +1,48 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import dbConnect from '@/lib/mongodb';
+import { formatValue, formatRating, toNumber } from '@/lib/utils';
 import { Property } from '@/models/Property';
 import { Place } from '@/models/Place';
 import { Amenity } from '@/models/Amenity';
 import { Room } from '@/models/Room';
 import { KidsArea } from '@/models/KidsArea';
 import {
-  HomeIcon,
-  UserGroupIcon,
   CalendarIcon,
   MapPinIcon,
   SparklesIcon,
   CheckCircleIcon,
   StarIcon
 } from '@heroicons/react/24/outline';
+import { Users, Bed } from 'lucide-react';
 import * as FaIcons from 'react-icons/fa';
 import { FaChild } from 'react-icons/fa';
 
+// Types para os componentes
+interface HeroProps {
+  property: {
+    name: string | null;
+    heroTagline: string | null;
+    heroSubtitle: string | null;
+    airbnbUrl: string | null;
+    maxGuests: number | null;
+    bedrooms: number | null;
+    bathrooms: number | null;
+    rating: number | null;
+  };
+}
+
 // Hero Section
-function HeroSection({
-  stats,
-}: {
-  stats: { maxGuests: number; bedrooms: number; bathrooms: number; rating: number };
-}) {
+function HeroSection({ property }: HeroProps) {
+  const p = property;
+
   return (
     <section className="relative h-screen min-h-[600px] flex items-center justify-center">
       {/* Background Image */}
       <div className="absolute inset-0">
         <Image
           src="/gallery/20240119_114828.jpg"
-          alt="Casa da Pampulha"
+          alt={p.name || 'Casa da Pampulha'}
           fill
           className="object-cover"
           priority
@@ -41,18 +53,18 @@ function HeroSection({
       {/* Content */}
       <div className="relative z-10 text-center text-white px-4 max-w-4xl mx-auto">
         <h1 className="font-display text-4xl md:text-6xl lg:text-7xl font-bold mb-6 animate-fade-in">
-          Casa da Pampulha
+          {p.name || 'Casa da Pampulha'}
         </h1>
         <p className="text-xl md:text-2xl mb-4 text-white/90">
-          Sua casa de férias perfeita em Belo Horizonte
+          {p.heroTagline || '-'}
         </p>
         <p className="text-lg md:text-xl mb-8 text-white/80">
-          Piscina aquecida • Jacuzzi • Playground • Vista para a Lagoa
+          {p.heroSubtitle || '-'}
         </p>
 
         <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
           <a
-            href="https://www.airbnb.com.br/rooms/1028115044709052736"
+            href={p.airbnbUrl || '#'}
             target="_blank"
             rel="noopener noreferrer"
             className="btn-primary text-lg"
@@ -67,20 +79,20 @@ function HeroSection({
         {/* Stats */}
         <div className="mt-12 grid grid-cols-2 md:grid-cols-4 gap-6">
           <div className="text-center">
-            <div className="text-3xl font-bold text-amber-400">{stats.maxGuests ?? '–'}</div>
+            <div className="text-3xl font-bold text-amber-400">{formatValue(p.maxGuests)}</div>
             <div className="text-sm text-white/80">Hóspedes</div>
           </div>
           <div className="text-center">
-            <div className="text-3xl font-bold text-amber-400">{stats.bedrooms ?? '–'}</div>
+            <div className="text-3xl font-bold text-amber-400">{formatValue(p.bedrooms)}</div>
             <div className="text-sm text-white/80">Quartos</div>
           </div>
           <div className="text-center">
-            <div className="text-3xl font-bold text-amber-400">{stats.bathrooms ?? '–'}</div>
+            <div className="text-3xl font-bold text-amber-400">{formatValue(p.bathrooms)}</div>
             <div className="text-sm text-white/80">Banheiros</div>
           </div>
           <div className="text-center">
             <div className="flex items-center justify-center gap-1">
-              <span className="text-3xl font-bold text-amber-400">{(stats.rating ?? 0).toFixed(1)}</span>
+              <span className="text-3xl font-bold text-amber-400">{formatRating(p.rating)}</span>
               <StarIcon className="h-6 w-6 text-amber-400 fill-amber-400" />
             </div>
             <div className="text-sm text-white/80">Avaliação</div>
@@ -98,45 +110,62 @@ function HeroSection({
   );
 }
 
+// Types para AboutSection
+interface AboutProps {
+  property: {
+    aboutTitle: string | null;
+    aboutDescription: string[] | null;
+    maxGuests: number | null;
+    bedrooms: number | null;
+    city: string | null;
+    minNights: number | null;
+    heroImages: string[];
+  };
+}
+
 // About Section
-function AboutSection({ property }: { property?: any }) {
-  const p: any = property;
+function AboutSection({ property }: AboutProps) {
+  const p = property;
 
   return (
     <section id="sobre" className="container-section bg-white">
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
         <div>
-          <h2 className="section-title">Sobre a Casa</h2>
-          <p className="text-gray-600 mb-6 leading-relaxed">{p?.tagline ?? 'Bem-vindo à Casa da Pampulha, um refúgio perfeito para famílias e grupos que buscam conforto, privacidade e uma localização privilegiada em Belo Horizonte.'}</p>
-          <p className="text-gray-600 mb-6 leading-relaxed">{p?.description ?? 'Localizada a poucos metros da Lagoa da Pampulha, nossa casa oferece uma experiência única de hospedagem com piscina e jacuzzi aquecidas, amplo playground para crianças, área gourmet completa e muito mais.'}</p>
-          <p className="text-gray-600 mb-8 leading-relaxed">{p?.welcomeMessage ?? 'Com vários quartos confortáveis, nossa casa acomoda grupos grandes com todo o conforto e comodidade.'}</p>
+          <h2 className="section-title">{p.aboutTitle || 'Sobre a Casa'}</h2>
+          {p.aboutDescription && p.aboutDescription.length > 0 ? (
+            p.aboutDescription.map((desc, index) => (
+              <p key={index} className="text-gray-600 mb-6 leading-relaxed">{desc}</p>
+            ))
+          ) : (
+            <p className="text-gray-600 mb-6 leading-relaxed">-</p>
+          )}
 
           <div className="grid grid-cols-2 gap-4">
             <div className="flex items-center space-x-3 p-3 bg-amber-50 rounded-lg">
-              <HomeIcon className="h-8 w-8 text-amber-600" />
+              <Users className="h-8 w-8 text-amber-600 flex-shrink-0" />
               <div>
-                <div className="font-semibold text-gray-800">{p?.maxGuests ?? '16+'}</div>
+                <div className="font-semibold text-gray-800">{formatValue(p.maxGuests)}</div>
                 <div className="text-sm text-gray-500">Hóspedes</div>
               </div>
             </div>
             <div className="flex items-center space-x-3 p-3 bg-amber-50 rounded-lg">
-              <UserGroupIcon className="h-8 w-8 text-amber-600" />
+              <Bed className="h-8 w-8 text-amber-600 flex-shrink-0" />
               <div>
-                <div className="font-semibold text-gray-800">{p?.bedrooms ?? 5}</div>
+                <div className="font-semibold text-gray-800">{formatValue(p.bedrooms)}</div>
                 <div className="text-sm text-gray-500">Quartos</div>
               </div>
             </div>
             <div className="flex items-center space-x-3 p-3 bg-amber-50 rounded-lg">
-              <MapPinIcon className="h-8 w-8 text-amber-600" />
+              <MapPinIcon className="h-8 w-8 text-amber-600 flex-shrink-0" />
               <div>
-                <div className="font-semibold text-gray-800">{p?.city ?? 'Pampulha'}</div>
+                <div className="font-semibold text-gray-800">{formatValue(p.city)}</div>
                 <div className="text-sm text-gray-500">Localização</div>
               </div>
             </div>
             <div className="flex items-center space-x-3 p-3 bg-amber-50 rounded-lg">
-              <CalendarIcon className="h-8 w-8 text-amber-600" />
+              <CalendarIcon className="h-8 w-8 text-amber-600 flex-shrink-0" />
               <div>
-                <div className="font-semibold text-gray-800">{p?.minNights ?? 1}</div>
+                <div className="font-semibold text-gray-800">{formatValue(p.minNights)}</div>
                 <div className="text-sm text-gray-500">Noites mín.</div>
               </div>
             </div>
@@ -147,7 +176,7 @@ function AboutSection({ property }: { property?: any }) {
           <div className="space-y-4">
             <div className="relative h-48 rounded-lg overflow-hidden">
               <Image
-                src={p?.heroImages?.[0] ?? '/gallery/20240119_113916.jpg'}
+                src={p.heroImages?.[0] || '/gallery/20240119_113916.jpg'}
                 alt="Sala de estar"
                 fill
                 className="object-cover"
@@ -155,7 +184,7 @@ function AboutSection({ property }: { property?: any }) {
             </div>
             <div className="relative h-64 rounded-lg overflow-hidden">
               <Image
-                src={p?.heroImages?.[1] ?? '/gallery/20240119_114828.jpg'}
+                src={p.heroImages?.[1] || '/gallery/20240119_114828.jpg'}
                 alt="Piscina"
                 fill
                 className="object-cover"
@@ -165,7 +194,7 @@ function AboutSection({ property }: { property?: any }) {
           <div className="space-y-4 pt-8">
             <div className="relative h-64 rounded-lg overflow-hidden">
               <Image
-                src={p?.heroImages?.[2] ?? '/gallery/20240119_114208.jpg'}
+                src={p.heroImages?.[2] || '/gallery/20240119_114208.jpg'}
                 alt="Área gourmet"
                 fill
                 className="object-cover"
@@ -173,7 +202,7 @@ function AboutSection({ property }: { property?: any }) {
             </div>
             <div className="relative h-48 rounded-lg overflow-hidden">
               <Image
-                src={p?.heroImages?.[3] ?? '/gallery/20240119_114312.jpg'}
+                src={p.heroImages?.[3] || '/gallery/20240119_114312.jpg'}
                 alt="Playground"
                 fill
                 className="object-cover"
@@ -237,7 +266,7 @@ function AmenitiesSection({ amenities }: { amenities: any[] }) {
 // Rooms Preview Section
 function RoomsSection({ rooms }: { rooms: any[] }) {
   const formatBeds = (beds: any[]) => {
-    if (!beds || beds.length === 0) return 'N/A';
+    if (!beds || beds.length === 0) return '-';
     return beds.map((bed: any) => `${bed.quantity} ${bed.type}`).join(' + ');
   };
 
@@ -267,8 +296,14 @@ function RoomsSection({ rooms }: { rooms: any[] }) {
                 <h3 className="text-xl font-semibold text-gray-800 mb-2">{room.name}</h3>
                 <p className="text-gray-600 mb-4">{room.description}</p>
                 <div className="flex items-center justify-between text-sm text-gray-500">
-                  <span>🛏️ {formatBeds(room.beds)}</span>
-                  <span>👥 {room.maxGuests} hóspedes</span>
+                  <span className="flex items-center gap-1">
+                    <Bed className="h-4 w-4 flex-shrink-0" />
+                    {formatBeds(room.beds)}
+                  </span>
+                  <span className="flex items-center gap-1">
+                    <Users className="h-4 w-4 flex-shrink-0" />
+                    {formatValue(room.maxGuests)} hóspedes
+                  </span>
                 </div>
               </div>
             </div>
@@ -362,8 +397,8 @@ function WelcomeSection() {
 
 // CTA Section
 function CTASection({ airbnbUrl, whatsapp }: { airbnbUrl?: string; whatsapp?: string }) {
-  const airbnb = airbnbUrl || 'https://www.airbnb.com.br/rooms/1028115044709052736';
-  const whatsappLink = whatsapp || '5531999999999';
+  const airbnb = airbnbUrl || 'https://www.airbnb.com.br';
+  const whatsappLink = whatsapp || 'não informado';
   const whatsappUrl = whatsapp?.startsWith('http') ? whatsapp : `https://wa.me/${whatsappLink.replace(/\D/g, '')}`;
 
   return (
@@ -405,22 +440,36 @@ export default async function HomePage() {
     await dbConnect();
 
     const property = await Property.findOne({ isActive: true }).lean();
-    const placeRatings = await Place.find({ isActive: true }).select('rating').lean();
     const amenities = await Amenity.find({ isActive: true }).sort({ order: 1 }).lean();
     const rooms = await Room.find({ isActive: true }).sort({ order: 1 }).lean();
     const kidsArea = await KidsArea.findOne({ isActive: true }).lean();
 
-    const avgRating = placeRatings && placeRatings.length
-      ? placeRatings.reduce((sum, p) => sum + (p.rating || 0), 0) / placeRatings.length
-      : 0;
-
     const propertyAny: any = property;
 
-    const stats = {
-      maxGuests: propertyAny?.maxGuests,
-      bedrooms: propertyAny?.bedrooms,
-      bathrooms: propertyAny?.bathrooms,
-      rating: Number(avgRating.toFixed(1)),
+    // Convert Decimal128 rating to primitive number using helper
+    const rating = toNumber(propertyAny?.rating);
+
+    // Prepare hero props with null fallbacks
+    const heroProps: HeroProps['property'] = {
+      name: propertyAny?.name || null,
+      heroTagline: propertyAny?.heroTagline || null,
+      heroSubtitle: propertyAny?.heroSubtitle || null,
+      airbnbUrl: propertyAny?.airbnbUrl || null,
+      maxGuests: toNumber(propertyAny?.maxGuests),
+      bedrooms: toNumber(propertyAny?.bedrooms),
+      bathrooms: toNumber(propertyAny?.bathrooms),
+      rating: rating,
+    };
+
+    // Prepare about props with null fallbacks
+    const aboutProps: AboutProps['property'] = {
+      aboutTitle: propertyAny?.aboutTitle || null,
+      aboutDescription: propertyAny?.aboutDescription || null,
+      maxGuests: toNumber(propertyAny?.maxGuests),
+      bedrooms: toNumber(propertyAny?.bedrooms),
+      city: propertyAny?.city || null,
+      minNights: toNumber(propertyAny?.minNights),
+      heroImages: propertyAny?.heroImages || [],
     };
 
     // Serializar dados para evitar problemas com lean()
@@ -430,8 +479,8 @@ export default async function HomePage() {
 
     return (
       <>
-        <HeroSection stats={stats} />
-        <AboutSection property={propertyAny} />
+        <HeroSection property={heroProps} />
+        <AboutSection property={aboutProps} />
         <AmenitiesSection amenities={serializedAmenities} />
         <RoomsSection rooms={serializedRooms} />
         <KidsSection kidsArea={serializedKidsArea} />
@@ -441,11 +490,33 @@ export default async function HomePage() {
     );
   } catch (error) {
     console.error('Error loading home data:', error);
-    const fallback = { maxGuests: 16, bedrooms: 5, bathrooms: 5, rating: 5.0 };
+
+    // Fallback props with null values
+    const fallbackHero: HeroProps['property'] = {
+      name: null,
+      heroTagline: null,
+      heroSubtitle: null,
+      airbnbUrl: null,
+      maxGuests: null,
+      bedrooms: null,
+      bathrooms: null,
+      rating: null,
+    };
+
+    const fallbackAbout: AboutProps['property'] = {
+      aboutTitle: null,
+      aboutDescription: null,
+      maxGuests: null,
+      bedrooms: null,
+      city: null,
+      minNights: null,
+      heroImages: [],
+    };
+
     return (
       <>
-        <HeroSection stats={fallback} />
-        <AboutSection />
+        <HeroSection property={fallbackHero} />
+        <AboutSection property={fallbackAbout} />
         <AmenitiesSection amenities={[]} />
         <RoomsSection rooms={[]} />
         <KidsSection kidsArea={null} />

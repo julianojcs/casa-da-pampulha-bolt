@@ -1,4 +1,5 @@
 // Types for the application
+import { Schema } from 'mongoose';
 
 export type Category = "all" | "attractions" | "restaurants" | "kids" | "bars" | "services" | "sports";
 
@@ -65,9 +66,7 @@ export interface IAmenity {
 
 export interface IHost {
   _id?: string;
-  name: string;
   bio: string;
-  photo: string;
   role: string;
   languages: string[];
   responseTime: string;
@@ -92,10 +91,11 @@ export interface IProperty {
     lat: number;
     lng: number;
   };
-  maxGuests: number;
-  bedrooms: number;
-  beds: number;
-  bathrooms: number;
+  maxGuests: number | string;
+  bedrooms: number | string;
+  beds: number | string;
+  bathrooms: number | string;
+  rating: number | string;
   checkInTime: string;
   checkOutTime: string;
   minNights: number;
@@ -108,6 +108,16 @@ export interface IProperty {
   whatsapp?: string;
   email?: string;
   isActive: boolean;
+
+  // Hero Section - textos dinâmicos
+  heroTagline?: string;
+  heroSubtitle?: string;
+  heroHighlights?: string[];
+
+  // About Section - textos dinâmicos
+  aboutTitle?: string;
+  aboutDescription?: string[];
+
   createdAt?: Date;
   updatedAt?: Date;
 }
@@ -124,6 +134,9 @@ export interface ICheckinInfo {
   createdAt?: Date;
   updatedAt?: Date;
 }
+
+// Alias for GuestInfo (same structure as CheckinInfo)
+export type IGuestInfo = ICheckinInfo;
 
 export interface IFAQ {
   _id?: string;
@@ -167,10 +180,15 @@ export interface IUser {
   name: string;
   role: UserRole;
   phone?: string;
+  avatar?: string;
   reservationCode?: string;
   checkInDate?: Date;
   checkOutDate?: Date;
   isActive: boolean;
+  emailVerified?: boolean;
+  emailVerificationToken?: string;
+  emailVerificationExpires?: Date;
+  host?: IHost | null;
   createdAt?: Date;
   updatedAt?: Date;
 }
@@ -183,6 +201,7 @@ export interface IGuestRegistration {
   documentType: string;
   document?: string;
   documentImage?: string;
+  avatar?: string;
   nationality?: string;
   birthDate?: Date;
   address?: string;
@@ -204,6 +223,7 @@ export interface IGuestRegistration {
     color?: string;
     plate: string }[];
   agreedToRules: boolean;
+  isActive?: boolean;
   createdAt?: Date;
   updatedAt?: Date;
 }

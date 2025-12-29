@@ -272,43 +272,97 @@ export default function AdminConfiguracoesPage() {
           </div>
 
           <div className="bg-white rounded-xl shadow-sm overflow-hidden">
-            <table className="min-w-full divide-y divide-gray-200">
-              <thead className="bg-gray-50">
-                <tr>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Plataforma</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">URL</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Ícone</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
-                  <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">Ações</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-gray-200">
-                {socialLinks.map((link) => (
-                  <tr key={link._id} className="hover:bg-gray-50">
-                    <td className="px-6 py-4 font-medium text-gray-900">{link.platform}</td>
-                    <td className="px-6 py-4 text-sm text-blue-600 truncate max-w-xs">
-                      <a href={link.url} target="_blank" rel="noopener noreferrer">{link.url}</a>
-                    </td>
-                    <td className="px-6 py-4 text-sm text-gray-500">{link.icon}</td>
-                    <td className="px-6 py-4">
-                      <span className={`px-2 py-1 text-xs rounded-full ${
-                        link.isActive ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
-                      }`}>
-                        {link.isActive ? 'Ativo' : 'Inativo'}
-                      </span>
-                    </td>
-                    <td className="px-6 py-4 text-right space-x-2">
-                      <button onClick={() => openSocialModal(link)} className="text-amber-600 hover:text-amber-800">
-                        <PencilIcon className="h-5 w-5" />
-                      </button>
-                      <button onClick={() => handleSocialDelete(link._id)} className="text-red-600 hover:text-red-800">
-                        <TrashIcon className="h-5 w-5" />
-                      </button>
-                    </td>
+            {/* Desktop Table */}
+            <div className="hidden md:block">
+              <table className="min-w-full divide-y divide-gray-200">
+                <thead className="bg-gray-50">
+                  <tr>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Plataforma</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">URL</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Ícone</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
+                    <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">Ações</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
+                </thead>
+                <tbody className="divide-y divide-gray-200">
+                  {socialLinks.map((link) => (
+                    <tr key={link._id} className="hover:bg-gray-50">
+                      <td className="px-6 py-4 font-medium text-gray-900">{link.platform}</td>
+                      <td className="px-6 py-4 text-sm text-blue-600 truncate max-w-xs">
+                        <a href={link.url} target="_blank" rel="noopener noreferrer">{link.url}</a>
+                      </td>
+                      <td className="px-6 py-4 text-sm text-gray-500">{link.icon}</td>
+                      <td className="px-6 py-4">
+                        <span className={`px-2 py-1 text-xs rounded-full ${
+                          link.isActive ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
+                        }`}>
+                          {link.isActive ? 'Ativo' : 'Inativo'}
+                        </span>
+                      </td>
+                      <td className="px-6 py-4 text-right space-x-2">
+                        <button onClick={() => openSocialModal(link)} className="text-amber-600 hover:text-amber-800">
+                          <PencilIcon className="h-5 w-5" />
+                        </button>
+                        <button onClick={() => handleSocialDelete(link._id)} className="text-red-600 hover:text-red-800">
+                          <TrashIcon className="h-5 w-5" />
+                        </button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+
+            {/* Mobile Cards */}
+            <div className="md:hidden divide-y divide-gray-200">
+              {socialLinks.length === 0 ? (
+                <div className="p-6 text-center text-gray-500">
+                  Nenhum link social cadastrado
+                </div>
+              ) : (
+                socialLinks.map((link) => (
+                  <div key={link._id} className="p-4 hover:bg-gray-50">
+                    <div className="flex items-start justify-between gap-3">
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-2 mb-1">
+                          <span className="font-medium text-gray-900">{link.platform}</span>
+                          <span className={`px-2 py-0.5 text-xs rounded-full ${
+                            link.isActive ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
+                          }`}>
+                            {link.isActive ? 'Ativo' : 'Inativo'}
+                          </span>
+                        </div>
+                        <a
+                          href={link.url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-sm text-blue-600 truncate block"
+                        >
+                          {link.url}
+                        </a>
+                        {link.icon && (
+                          <span className="text-xs text-gray-500">Ícone: {link.icon}</span>
+                        )}
+                      </div>
+                      <div className="flex items-center gap-1 flex-shrink-0">
+                        <button
+                          onClick={() => openSocialModal(link)}
+                          className="p-2 text-amber-600 hover:text-amber-800 hover:bg-amber-50 rounded"
+                        >
+                          <PencilIcon className="h-5 w-5" />
+                        </button>
+                        <button
+                          onClick={() => handleSocialDelete(link._id)}
+                          className="p-2 text-red-600 hover:text-red-800 hover:bg-red-50 rounded"
+                        >
+                          <TrashIcon className="h-5 w-5" />
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                ))
+              )}
+            </div>
           </div>
         </div>
       )}

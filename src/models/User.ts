@@ -1,6 +1,7 @@
 import mongoose, { Schema, Document } from 'mongoose';
 import bcrypt from 'bcryptjs';
 import { IUser } from '@/types';
+import { HostSchema } from '@/models/Host';
 
 export interface UserDocument extends Omit<IUser, '_id'>, Document {
   comparePassword(candidatePassword: string): Promise<boolean>;
@@ -13,10 +14,15 @@ const UserSchema = new Schema<UserDocument>(
     name: { type: String, required: true },
     role: { type: String, enum: ['admin', 'guest'], required: true },
     phone: { type: String },
+    avatar: { type: String },
     reservationCode: { type: String },
     checkInDate: { type: Date },
     checkOutDate: { type: Date },
     isActive: { type: Boolean, default: true },
+    emailVerified: { type: Boolean, default: false },
+    emailVerificationToken: { type: String },
+    emailVerificationExpires: { type: Date },
+    host: { type: HostSchema, default: null },
   },
   { timestamps: true }
 );

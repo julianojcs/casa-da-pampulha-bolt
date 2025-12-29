@@ -8,6 +8,8 @@ import {
   XMarkIcon
 } from '@heroicons/react/24/outline';
 import toast from 'react-hot-toast';
+import { IconPicker, DynamicIcon } from '@/components/IconPicker';
+import { ScrollableFilter } from '@/components/ScrollableFilter';
 
 interface Amenity {
   _id: string;
@@ -43,6 +45,7 @@ export default function AdminComodidadesPage() {
   const [editingAmenity, setEditingAmenity] = useState<Amenity | null>(null);
   const [formData, setFormData] = useState<Omit<Amenity, '_id'>>(emptyAmenity);
   const [saving, setSaving] = useState(false);
+  const [filterCategory, setFilterCategory] = useState('');
 
   useEffect(() => {
     fetchAmenities();
@@ -139,39 +142,53 @@ export default function AdminComodidadesPage() {
 
   return (
     <div className="space-y-6">
-      <div className="flex justify-between items-center">
+      <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
         <h1 className="text-2xl font-bold text-gray-800">Comodidades</h1>
         <button
           onClick={() => openModal()}
-          className="flex items-center gap-2 px-4 py-2 bg-amber-600 text-white rounded-lg hover:bg-amber-700"
+          className="flex items-center justify-center gap-2 px-4 py-2 bg-amber-600 text-white rounded-lg hover:bg-amber-700"
         >
           <PlusIcon className="h-5 w-5" />
           Nova Comodidade
         </button>
       </div>
 
-      {/* Lista de Comodidades */}
-      <div className="bg-white rounded-xl shadow-sm overflow-hidden">
+      {/* Filtro por Categoria */}
+      <ScrollableFilter
+        options={categories}
+        value={filterCategory}
+        onChange={setFilterCategory}
+        allLabel="Todas"
+      />
+
+      {/* Lista de Comodidades - Desktop */}
+      <div className="hidden md:block bg-white rounded-xl shadow-sm overflow-hidden">
         <table className="min-w-full divide-y divide-gray-200">
           <thead className="bg-gray-50">
             <tr>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Ícone</th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Nome</th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Categoria</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Ícone</th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Ordem</th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
               <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">Ações</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-200">
-            {amenities.map((amenity) => (
+            {amenities
+              .filter(a => !filterCategory || a.category === filterCategory)
+              .map((amenity) => (
               <tr key={amenity._id} className="hover:bg-gray-50">
                 <td className="px-6 py-4">
+                  <div className="flex items-center justify-center w-10 h-10 bg-amber-100 rounded-lg">
+                    <DynamicIcon name={amenity.icon} className="h-5 w-5 text-amber-600" />
+                  </div>
+                </td>
+                <td className="px-6 py-4">
                   <div className="font-medium text-gray-900">{amenity.name}</div>
-                  <div className="text-sm text-gray-500">{amenity.description}</div>
+                  <div className="text-sm text-gray-500 line-clamp-1">{amenity.description}</div>
                 </td>
                 <td className="px-6 py-4 text-sm text-gray-500">{amenity.category}</td>
-                <td className="px-6 py-4 text-sm text-gray-500">{amenity.icon}</td>
                 <td className="px-6 py-4 text-sm text-gray-500">{amenity.order}</td>
                 <td className="px-6 py-4">
                   <span className={`px-2 py-1 text-xs rounded-full ${
@@ -200,11 +217,56 @@ export default function AdminComodidadesPage() {
         </table>
       </div>
 
+      {/* Lista de Comodidades - Mobile Cards */}
+      <div className="md:hidden space-y-4">
+        {amenities
+          .filter(a => !filterCategory || a.category === filterCategory)
+          .map((amenity) => (
+          <div key={amenity._id} className="bg-white rounded-xl shadow-sm p-4">
+            <div className="flex items-start gap-4">
+              <div className="flex items-center justify-center w-12 h-12 bg-amber-100 rounded-lg flex-shrink-0">
+                <DynamicIcon name={amenity.icon} className="h-6 w-6 text-amber-600" />
+              </div>
+              <div className="flex-1 min-w-0">
+                <div className="flex items-center justify-between">
+                  <h3 className="font-medium text-gray-900 truncate">{amenity.name}</h3>
+                  <span className={`px-2 py-1 text-xs rounded-full ${
+                    amenity.isActive ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
+                  }`}>
+                    {amenity.isActive ? 'Ativo' : 'Inativo'}
+                  </span>
+                </div>
+                <p className="text-sm text-gray-500 line-clamp-2 mt-1">{amenity.description}</p>
+                <div className="flex items-center gap-4 mt-2 text-xs text-gray-500">
+                  <span>{amenity.category}</span>
+                  <span>Ordem: {amenity.order}</span>
+                </div>
+              </div>
+            </div>
+            <div className="flex gap-2 mt-4 pt-4 border-t">
+              <button
+                onClick={() => openModal(amenity)}
+                className="flex-1 flex items-center justify-center gap-2 px-3 py-2 text-amber-600 border border-amber-600 rounded-lg hover:bg-amber-50"
+              >
+                <PencilIcon className="h-4 w-4" />
+                Editar
+              </button>
+              <button
+                onClick={() => handleDelete(amenity._id)}
+                className="px-3 py-2 text-red-600 border border-red-600 rounded-lg hover:bg-red-50"
+              >
+                <TrashIcon className="h-4 w-4" />
+              </button>
+            </div>
+          </div>
+        ))}
+      </div>
+
       {/* Modal */}
       {isModalOpen && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-xl p-6 w-full max-w-md">
-            <div className="flex justify-between items-center mb-4">
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-xl w-full max-w-md max-h-[90vh] flex flex-col overflow-hidden">
+            <div className="flex justify-between items-center p-4 border-b flex-shrink-0">
               <h2 className="text-xl font-bold">
                 {editingAmenity ? 'Editar Comodidade' : 'Nova Comodidade'}
               </h2>
@@ -213,7 +275,7 @@ export default function AdminComodidadesPage() {
               </button>
             </div>
 
-            <form onSubmit={handleSubmit} className="space-y-4">
+            <form onSubmit={handleSubmit} className="p-4 space-y-4 overflow-y-auto flex-1">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">Nome</label>
                 <input
@@ -235,7 +297,7 @@ export default function AdminComodidadesPage() {
                 />
               </div>
 
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">Categoria</label>
                   <select
@@ -248,16 +310,10 @@ export default function AdminComodidadesPage() {
                     ))}
                   </select>
                 </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Ícone</label>
-                  <input
-                    type="text"
-                    value={formData.icon}
-                    onChange={(e) => setFormData({ ...formData, icon: e.target.value })}
-                    placeholder="pool, wifi, etc"
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500"
-                  />
-                </div>
+                <IconPicker
+                  value={formData.icon}
+                  onChange={(icon) => setFormData({ ...formData, icon })}
+                />
               </div>
 
               <div className="grid grid-cols-2 gap-4">

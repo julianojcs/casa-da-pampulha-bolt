@@ -1,9 +1,10 @@
 'use client';
 
 import { useSession } from 'next-auth/react';
-import { useRouter } from 'next/navigation';
+import { useRouter, usePathname } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import {
   HomeIcon,
   PhotoIcon,
@@ -16,7 +17,9 @@ import {
   ArrowRightOnRectangleIcon,
   Bars3Icon,
   XMarkIcon,
-  SparklesIcon
+  SparklesIcon,
+  HomeModernIcon,
+  UserCircleIcon
 } from '@heroicons/react/24/outline';
 import { signOut } from 'next-auth/react';
 
@@ -26,8 +29,11 @@ const sidebarItems = [
   { name: 'Galeria', href: '/admin/galeria', icon: PhotoIcon },
   { name: 'Locais', href: '/admin/locais', icon: MapPinIcon },
   { name: 'Comodidades', href: '/admin/comodidades', icon: SquaresPlusIcon },
+  { name: 'Quartos', href: '/admin/quartos', icon: HomeModernIcon },
   { name: 'FAQs', href: '/admin/faqs', icon: QuestionMarkCircleIcon },
-  { name: 'Hóspedes', href: '/admin/hospedes', icon: UsersIcon },
+  { name: 'Usuários', href: '/admin/usuarios', icon: UsersIcon },
+  { name: 'Hóspedes', href: '/admin/hospedes', icon: ClipboardDocumentCheckIcon },
+  { name: 'Pré-cadastros', href: '/admin/pre-cadastros', icon: ClipboardDocumentCheckIcon },
   { name: 'Informações', href: '/admin/guest-info', icon: ClipboardDocumentCheckIcon },
   { name: 'Área Kids', href: '/admin/kids', icon: SparklesIcon },
   { name: 'Configurações', href: '/admin/configuracoes', icon: CogIcon },
@@ -40,6 +46,7 @@ export default function AdminLayout({
 }) {
   const { data: session, status } = useSession();
   const router = useRouter();
+  const pathname = usePathname();
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
   useEffect(() => {
@@ -49,6 +56,11 @@ export default function AdminLayout({
       router.push('/');
     }
   }, [status, session, router]);
+
+  // Fecha sidebar ao mudar de página
+  useEffect(() => {
+    setSidebarOpen(false);
+  }, [pathname]);
 
   if (status === 'loading') {
     return (
@@ -62,21 +74,25 @@ export default function AdminLayout({
     return null;
   }
 
+  // Encontrar o item atual para mostrar no header mobile
+  const currentItem = sidebarItems.find(item => item.href === pathname) || sidebarItems[0];
+
   return (
     <div className="min-h-screen bg-gray-100">
       {/* Mobile Sidebar Overlay */}
       {sidebarOpen && (
         <div
-          className="fixed inset-0 bg-black/50 z-40 lg:hidden"
+          className="fixed inset-0 bg-black/50 z-[60] lg:hidden"
           onClick={() => setSidebarOpen(false)}
         />
       )}
 
       {/* Sidebar */}
-      <aside className={`fixed top-0 left-0 h-full w-64 bg-gray-900 text-white z-50 transform transition-transform duration-300 ${
+      <aside className={`fixed top-0 left-0 h-full w-64 bg-gray-900 text-white z-[70] transform transition-transform duration-300 overflow-hidden flex flex-col ${
         sidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'
       }`}>
-        <div className="p-4 border-b border-gray-800">
+        {/* Header do Sidebar */}
+        <div className="p-4 border-b border-gray-800 flex-shrink-0">
           <div className="flex items-center justify-between">
             <Link href="/admin" className="text-xl font-bold text-amber-400">
               Admin Panel
@@ -91,37 +107,66 @@ export default function AdminLayout({
           <p className="text-gray-400 text-sm mt-1">Casa da Pampulha</p>
         </div>
 
-        <nav className="p-4 space-y-1">
-          {sidebarItems.map((item) => (
-            <Link
-              key={item.name}
-              href={item.href}
-              className="flex items-center space-x-3 px-4 py-3 rounded-lg hover:bg-gray-800 transition-colors text-gray-300 hover:text-white"
-            >
-              <item.icon className="w-5 h-5" />
-              <span>{item.name}</span>
-            </Link>
-          ))}
+        {/* Navigation com scroll */}
+        <nav className="flex-1 p-4 space-y-1 overflow-y-auto">
+          {sidebarItems.map((item) => {
+            const isActive = pathname === item.href;
+            return (
+              <Link
+                key={item.name}
+                href={item.href}
+                className={`flex items-center space-x-3 px-4 py-3 rounded-lg transition-colors ${
+                  isActive
+                    ? 'bg-amber-600 text-white'
+                    : 'text-gray-300 hover:bg-gray-800 hover:text-white'
+                }`}
+              >
+                <item.icon className="w-5 h-5 flex-shrink-0" />
+                <span>{item.name}</span>
+              </Link>
+            );
+          })}
         </nav>
 
-        <div className="absolute bottom-0 left-0 right-0 p-4 border-t border-gray-800">
-          <div className="flex items-center justify-between mb-4">
-            <div>
-              <p className="font-medium text-white">{session?.user?.name}</p>
-              <p className="text-sm text-gray-400">{session?.user?.email}</p>
+        {/* Footer do Sidebar */}
+        <div className="p-4 border-t border-gray-800 flex-shrink-0">
+          <div className="flex items-center gap-3 mb-4">
+            {session?.user?.image ? (
+              <Image
+                src={session.user.image}
+                alt={session.user.name || 'Avatar'}
+                width={40}
+                height={40}
+                className="rounded-full object-cover"
+              />
+            ) : (
+              <div className="w-10 h-10 rounded-full bg-gray-700 flex items-center justify-center">
+                <UserCircleIcon className="w-6 h-6 text-gray-400" />
+              </div>
+            )}
+            <div className="flex-1 min-w-0">
+              <p className="font-medium text-white truncate">{session?.user?.name}</p>
+              <p className="text-xs text-gray-400 truncate">{session?.user?.email}</p>
             </div>
           </div>
-          <div className="flex space-x-2">
+          <div className="flex gap-2">
             <Link
               href="/"
-              className="flex-1 flex items-center justify-center space-x-2 px-4 py-2 bg-gray-800 rounded-lg hover:bg-gray-700 transition-colors text-sm"
+              className="flex-1 flex items-center justify-center gap-2 px-3 py-2 bg-gray-800 rounded-lg hover:bg-gray-700 transition-colors text-sm"
             >
               <HomeIcon className="w-4 h-4" />
-              <span>Ver Site</span>
+              <span>Site</span>
+            </Link>
+            <Link
+              href="/admin/perfil"
+              className="flex items-center justify-center px-3 py-2 bg-gray-800 rounded-lg hover:bg-gray-700 transition-colors text-sm"
+            >
+              <UserCircleIcon className="w-4 h-4" />
             </Link>
             <button
               onClick={() => signOut({ callbackUrl: '/' })}
-              className="flex items-center justify-center px-4 py-2 bg-red-600 rounded-lg hover:bg-red-700 transition-colors text-sm"
+              className="flex items-center justify-center px-3 py-2 bg-red-600 rounded-lg hover:bg-red-700 transition-colors text-sm"
+              title="Sair"
             >
               <ArrowRightOnRectangleIcon className="w-4 h-4" />
             </button>
@@ -130,25 +175,26 @@ export default function AdminLayout({
       </aside>
 
       {/* Main Content */}
-      <div className="lg:ml-64">
-        {/* Top Bar */}
-        <header className="bg-white shadow-sm border-b border-gray-200 sticky top-0 z-30">
-          <div className="flex items-center justify-between px-4 py-3">
+      <div className="lg:ml-64 min-h-screen flex flex-col">
+        {/* Top Bar - Mobile Only */}
+        <header className="bg-white shadow-sm border-b border-gray-200 sticky top-0 z-40 lg:hidden">
+          <div className="flex items-center px-4 py-3">
             <button
               onClick={() => setSidebarOpen(true)}
-              className="lg:hidden p-2 rounded-lg hover:bg-gray-100"
+              className="p-2 -ml-2 rounded-lg hover:bg-gray-100"
             >
               <Bars3Icon className="w-6 h-6 text-gray-600" />
             </button>
-            <div className="flex-1 lg:hidden text-center">
-              <span className="font-bold text-gray-800">Admin</span>
+            <div className="flex-1 flex items-center justify-center gap-2">
+              <currentItem.icon className="w-5 h-5 text-amber-600" />
+              <span className="font-semibold text-gray-800">{currentItem.name}</span>
             </div>
-            <div className="lg:flex-1" />
+            <div className="w-10" /> {/* Spacer para centralizar */}
           </div>
         </header>
 
         {/* Page Content */}
-        <main className="p-4 lg:p-8 mt-12">
+        <main className="flex-1 p-4 lg:p-8">
           {children}
         </main>
       </div>

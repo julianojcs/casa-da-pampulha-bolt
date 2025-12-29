@@ -10,6 +10,7 @@ import {
   XMarkIcon
 } from '@heroicons/react/24/outline';
 import toast from 'react-hot-toast';
+import { CloudinaryUpload } from '@/components/CloudinaryUpload';
 
 interface Place {
   _id: string;
@@ -205,86 +206,146 @@ export default function AdminLocaisPage() {
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-amber-600"></div>
           </div>
         ) : filteredPlaces.length > 0 ? (
-          <div className="overflow-x-auto">
-            <table className="w-full">
-              <thead className="bg-gray-50 border-b border-gray-200">
-                <tr>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Local
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Categoria
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Distância
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Status
-                  </th>
-                  <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Ações
-                  </th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-gray-200">
-                {filteredPlaces.map((place) => (
-                  <tr key={place._id} className="hover:bg-gray-50">
-                    <td className="px-6 py-4">
-                      <div className="flex items-center space-x-3">
-                        {place.image && (
-                          <div className="relative w-12 h-12 rounded-lg overflow-hidden flex-shrink-0">
-                            <Image
-                              src={place.image}
-                              alt={place.name}
-                              fill
-                              className="object-cover"
-                            />
+          <>
+            {/* Desktop Table */}
+            <div className="hidden md:block overflow-x-auto">
+              <table className="w-full">
+                <thead className="bg-gray-50 border-b border-gray-200">
+                  <tr>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Local
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Categoria
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Distância
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Status
+                    </th>
+                    <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Ações
+                    </th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-gray-200">
+                  {filteredPlaces.map((place) => (
+                    <tr key={place._id} className="hover:bg-gray-50">
+                      <td className="px-6 py-4">
+                        <div className="flex items-center space-x-3">
+                          {place.image && (
+                            <div className="relative w-12 h-12 rounded-lg overflow-hidden flex-shrink-0">
+                              <Image
+                                src={place.image}
+                                alt={place.name}
+                                fill
+                                className="object-cover"
+                              />
+                            </div>
+                          )}
+                          <div>
+                            <p className="font-medium text-gray-800">{place.name}</p>
+                            <p className="text-sm text-gray-500 truncate max-w-xs">{place.address}</p>
                           </div>
-                        )}
-                        <div>
-                          <p className="font-medium text-gray-800">{place.name}</p>
-                          <p className="text-sm text-gray-500 truncate max-w-xs">{place.address}</p>
+                        </div>
+                      </td>
+                      <td className="px-6 py-4">
+                        <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                          {categories.find(c => c.value === place.category)?.label || place.category}
+                        </span>
+                      </td>
+                      <td className="px-6 py-4 text-sm text-gray-600">
+                        {place.distance || place.distanceCar || place.distanceWalk || '-'}
+                      </td>
+                      <td className="px-6 py-4">
+                        <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                          place.isActive
+                            ? 'bg-green-100 text-green-800'
+                            : 'bg-gray-100 text-gray-800'
+                        }`}>
+                          {place.isActive ? 'Ativo' : 'Inativo'}
+                        </span>
+                      </td>
+                      <td className="px-6 py-4 text-right">
+                        <div className="flex items-center justify-end space-x-2">
+                          <button
+                            onClick={() => openModal(place)}
+                            className="p-2 text-gray-400 hover:text-blue-600 transition-colors"
+                          >
+                            <PencilIcon className="w-5 h-5" />
+                          </button>
+                          <button
+                            onClick={() => handleDelete(place._id)}
+                            className="p-2 text-gray-400 hover:text-red-600 transition-colors"
+                          >
+                            <TrashIcon className="w-5 h-5" />
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+
+            {/* Mobile Cards */}
+            <div className="md:hidden divide-y divide-gray-200">
+              {filteredPlaces.map((place) => (
+                <div key={place._id} className="p-4 hover:bg-gray-50">
+                  <div className="flex items-start gap-3">
+                    {place.image && (
+                      <div className="relative w-16 h-16 rounded-lg overflow-hidden flex-shrink-0">
+                        <Image
+                          src={place.image}
+                          alt={place.name}
+                          fill
+                          className="object-cover"
+                        />
+                      </div>
+                    )}
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-start justify-between gap-2">
+                        <div className="min-w-0">
+                          <p className="font-medium text-gray-800 truncate">{place.name}</p>
+                          <p className="text-sm text-gray-500 truncate">{place.address}</p>
+                        </div>
+                        <div className="flex items-center gap-1 flex-shrink-0">
+                          <button
+                            onClick={() => openModal(place)}
+                            className="p-2 text-gray-400 hover:text-blue-600"
+                          >
+                            <PencilIcon className="w-5 h-5" />
+                          </button>
+                          <button
+                            onClick={() => handleDelete(place._id)}
+                            className="p-2 text-gray-400 hover:text-red-600"
+                          >
+                            <TrashIcon className="w-5 h-5" />
+                          </button>
                         </div>
                       </div>
-                    </td>
-                    <td className="px-6 py-4">
-                      <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
-                        {categories.find(c => c.value === place.category)?.label || place.category}
-                      </span>
-                    </td>
-                    <td className="px-6 py-4 text-sm text-gray-600">
-                      {place.distance || place.distanceCar || place.distanceWalk || '-'}
-                    </td>
-                    <td className="px-6 py-4">
-                      <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                        place.isActive
-                          ? 'bg-green-100 text-green-800'
-                          : 'bg-gray-100 text-gray-800'
-                      }`}>
-                        {place.isActive ? 'Ativo' : 'Inativo'}
-                      </span>
-                    </td>
-                    <td className="px-6 py-4 text-right">
-                      <div className="flex items-center justify-end space-x-2">
-                        <button
-                          onClick={() => openModal(place)}
-                          className="p-2 text-gray-400 hover:text-blue-600 transition-colors"
-                        >
-                          <PencilIcon className="w-5 h-5" />
-                        </button>
-                        <button
-                          onClick={() => handleDelete(place._id)}
-                          className="p-2 text-gray-400 hover:text-red-600 transition-colors"
-                        >
-                          <TrashIcon className="w-5 h-5" />
-                        </button>
+                      <div className="flex flex-wrap gap-2 mt-2">
+                        <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                          {categories.find(c => c.value === place.category)?.label || place.category}
+                        </span>
+                        <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${
+                          place.isActive ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'
+                        }`}>
+                          {place.isActive ? 'Ativo' : 'Inativo'}
+                        </span>
+                        {(place.distance || place.distanceCar || place.distanceWalk) && (
+                          <span className="text-xs text-gray-500">
+                            {place.distance || place.distanceCar || place.distanceWalk}
+                          </span>
+                        )}
                       </div>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </>
         ) : (
           <div className="text-center py-12">
             <p className="text-gray-500">Nenhum local encontrado.</p>
@@ -416,14 +477,16 @@ export default function AdminLocaisPage() {
 
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
-                    URL da Imagem
+                    Imagem
                   </label>
-                  <input
-                    type="text"
-                    placeholder="/images/local.jpg"
+                  <CloudinaryUpload
+                    folder="local-guide"
                     value={formData.image}
-                    onChange={(e) => setFormData(prev => ({ ...prev, image: e.target.value }))}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-amber-500"
+                    onChange={(url) => setFormData(prev => ({ ...prev, image: url }))}
+                    label=""
+                    placeholder="Clique para fazer upload da imagem"
+                    previewClassName="h-40 w-full"
+                    maxSizeKB={2048}
                   />
                 </div>
 

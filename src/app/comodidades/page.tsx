@@ -76,16 +76,23 @@ export default function ComodidadesPage() {
         </div>
       </section>
 
-      {/* Categories */}
+      {/* Categories - Horizontal Scroll */}
       {categories.length > 2 && (
-        <section className="py-8 bg-white border-b">
+        <section className="py-6 bg-white border-b">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="flex flex-wrap justify-center gap-2">
+            <div
+              className="flex gap-2 overflow-x-auto scrollbar-hide pb-2 -mx-4 px-4 sm:-mx-0 sm:px-0"
+              style={{
+                scrollbarWidth: 'none',
+                msOverflowStyle: 'none',
+                WebkitOverflowScrolling: 'touch'
+              }}
+            >
               {categories.map((category) => (
                 <button
                   key={category}
                   onClick={() => setSelectedCategory(category)}
-                  className={`px-4 py-2 rounded-full text-sm font-medium transition-all ${
+                  className={`px-4 py-2 rounded-full text-sm font-medium transition-all whitespace-nowrap flex-shrink-0 ${
                     selectedCategory === category
                       ? 'bg-teal-500 text-white'
                       : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
@@ -94,8 +101,16 @@ export default function ComodidadesPage() {
                   {category}
                 </button>
               ))}
+              {/* Elemento para garantir visualização parcial do último */}
+              <div className="w-4 flex-shrink-0" aria-hidden="true" />
             </div>
           </div>
+          {/* CSS para esconder scrollbar */}
+          <style jsx>{`
+            .scrollbar-hide::-webkit-scrollbar {
+              display: none;
+            }
+          `}</style>
         </section>
       )}
 

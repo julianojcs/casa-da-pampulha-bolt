@@ -188,11 +188,11 @@ const propertyData = {
 const hostData = { name: "Anfitrião da Casa da Pampulha", bio: "Somos uma família apaixonada por receber bem.", photo: "/images/host.jpg", role: "Proprietário", languages: ["Português", "Inglês"], responseTime: "dentro de uma hora", responseRate: "100%", isSuperhost: true, joinedDate: new Date("2020-01-01") };
 
 const amenitiesData = [
-  { name: "Piscina Aquecida", description: "Piscina com aquecimento solar", icon: "FaSwimmingPool", category: "Lazer", order: 1, isActive: true },
+  { name: "Piscina Aquecida", description: "Piscina com aquecimento", icon: "FaSwimmingPool", category: "Lazer", order: 1, isActive: true },
   { name: "Internet Wi-Fi", description: "Alta velocidade", icon: "FaWifi", category: "Conveniência", order: 2, isActive: true },
   { name: "Ar Condicionado", description: "Em todos os quartos", icon: "FaSnowflake", category: "Conforto", order: 3, isActive: true },
   { name: "Estacionamento", description: "Para 5 veículos", icon: "FaParking", category: "Conveniência", order: 4, isActive: true },
-  { name: "Smart TV", description: "Em todos os ambientes", icon: "FaTv", category: "Entretenimento", order: 5, isActive: true },
+  { name: "Smart TV", description: "Com Apps de streaming", icon: "FaTv", category: "Entretenimento", order: 5, isActive: true },
   { name: "Playground", description: "Para as crianças", icon: "FaChild", category: "Lazer", order: 6, isActive: true }
 ];
 

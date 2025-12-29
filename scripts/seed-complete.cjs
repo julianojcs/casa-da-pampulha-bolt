@@ -108,41 +108,49 @@ const faqsData = [
   {
     question: "Tem estacionamento disponível no local?",
     answer: "Sim! Nosso estacionamento comporta até 5 carros com total segurança.",
+    category: "Estacionamento",
     order: 1
   },
   {
     question: "Posso levar meu pet?",
     answer: "Infelizmente não aceitamos PETs em nossa propriedade.",
+    category: "Regras da Casa",
     order: 2
   },
   {
     question: "Como posso me conectar à rede Wi-Fi?",
     answer: "Temos duas redes de Wi-Fi disponíveis com velocidade de até 500MB. As senhas serão enviadas para o chat do aplicativo ou WhatsApp após a confirmação da reserva.",
+    category: "Wi-Fi",
     order: 3
   },
   {
     question: "Tem roupa de cama e banho disponível?",
     answer: "Sim! Fornecemos gratuitamente 1 toalha de banho, 1 lençol, 1 virol, 1 fronha e 1 travesseiro para cada hóspede. Cada banheiro é arrumado com 2 toalhas de rosto e tapete de chão. Também fornecemos 1 toalha de piscina por quarto (4 no total).",
+    category: "Roupas de Cama e Banho",
     order: 4
   },
   {
     question: "Tem cobertores disponíveis?",
     answer: "Sim! Fornecemos gratuitamente 1 cobertor por hóspede.",
+    category: "Roupas de Cama e Banho",
     order: 5
   },
   {
     question: "Como funciona a lavanderia?",
     answer: "A casa possui uma lavanderia para fins particulares. Caso tenha interesse em utilizar (máquina de lavar e secar roupa), é necessário solicitar antes do check-in e uma taxa de R$200,00 será cobrada.",
+    category: "Lavanderia",
     order: 6
   },
   {
     question: "Qual o horário de funcionamento da piscina?",
     answer: "O horário de funcionamento da piscina é das 08h00 às 19h00 (finais de semana e feriados até 22h00). Por razões de segurança, não é permitido nadar após o anoitecer.",
+    category: "Piscina",
     order: 7
   },
   {
     question: "Posso receber visitas durante a estadia?",
     answer: "Não é permitido receber visitantes. Casos excepcionais poderão ser previamente autorizados pelo anfitrião.",
+    category: "Regras da Casa",
     order: 8
   },
 ];

@@ -76,22 +76,29 @@ export default function PlaceCard({ places }: PlaceCardProps) {
 
   return (
     <div>
-      {/* Filters */}
-      <div className="bg-white rounded-xl shadow-lg p-6 mb-8">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+      {/* Filters - Horizontal Scroll on Mobile */}
+      <div className="bg-white rounded-xl shadow-lg p-4 sm:p-6 mb-8">
+        <div className="space-y-4">
           {/* Category Filter */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
               Categoria
             </label>
-            <div className="flex flex-wrap gap-2">
+            <div
+              className="flex gap-2 overflow-x-auto scrollbar-hide pb-2 -mx-4 px-4 sm:-mx-0 sm:px-0"
+              style={{
+                scrollbarWidth: 'none',
+                msOverflowStyle: 'none',
+                WebkitOverflowScrolling: 'touch'
+              }}
+            >
               {placeCategories.map((cat) => {
                 const Icon = categoryIcons[cat.id];
                 return (
                   <button
                     key={cat.id}
                     onClick={() => setSelectedCategory(cat.id as Category)}
-                    className={`flex items-center space-x-1 px-3 py-2 rounded-lg text-sm transition-colors ${
+                    className={`flex items-center space-x-1 px-3 py-2 rounded-lg text-sm transition-colors whitespace-nowrap flex-shrink-0 ${
                       selectedCategory === cat.id
                         ? 'bg-amber-600 text-white'
                         : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
@@ -102,59 +109,76 @@ export default function PlaceCard({ places }: PlaceCardProps) {
                   </button>
                 );
               })}
+              <div className="w-4 flex-shrink-0" aria-hidden="true" />
             </div>
           </div>
 
-          {/* Rating Filter */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Classificação Mínima
-            </label>
-            <div className="flex gap-2">
-              {[0, 3, 4, 5].map((rating) => (
-                <button
-                  key={rating}
-                  onClick={() => setMinRating(rating)}
-                  className={`flex items-center space-x-1 px-3 py-2 rounded-lg text-sm transition-colors ${
-                    minRating === rating
-                      ? 'bg-amber-600 text-white'
-                      : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                  }`}
-                >
-                  {rating === 0 ? 'Todos' : (
-                    <>
-                      <span>{rating}+</span>
-                      <StarIcon className="h-4 w-4" />
-                    </>
-                  )}
-                </button>
-              ))}
+          {/* Rating and Distance Filters */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            {/* Rating Filter */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Classificação Mínima
+              </label>
+              <div
+                className="flex gap-2 overflow-x-auto scrollbar-hide pb-1"
+                style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
+              >
+                {[0, 3, 4, 5].map((rating) => (
+                  <button
+                    key={rating}
+                    onClick={() => setMinRating(rating)}
+                    className={`flex items-center space-x-1 px-3 py-2 rounded-lg text-sm transition-colors whitespace-nowrap flex-shrink-0 ${
+                      minRating === rating
+                        ? 'bg-amber-600 text-white'
+                        : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                    }`}
+                  >
+                    {rating === 0 ? 'Todos' : (
+                      <>
+                        <span>{rating}+</span>
+                        <StarIcon className="h-4 w-4" />
+                      </>
+                    )}
+                  </button>
+                ))}
+              </div>
             </div>
-          </div>
 
-          {/* Distance Filter */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Distância Máxima
-            </label>
-            <div className="flex gap-2">
-              {[null, 2, 5, 10].map((distance) => (
-                <button
-                  key={distance ?? 'all'}
-                  onClick={() => setMaxDistance(distance)}
-                  className={`px-3 py-2 rounded-lg text-sm transition-colors ${
-                    maxDistance === distance
-                      ? 'bg-amber-600 text-white'
-                      : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                  }`}
-                >
-                  {distance === null ? 'Todos' : `${distance} km`}
-                </button>
-              ))}
+            {/* Distance Filter */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Distância Máxima
+              </label>
+              <div
+                className="flex gap-2 overflow-x-auto scrollbar-hide pb-1"
+                style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
+              >
+                {[null, 2, 5, 10].map((distance) => (
+                  <button
+                    key={distance ?? 'all'}
+                    onClick={() => setMaxDistance(distance)}
+                    className={`px-3 py-2 rounded-lg text-sm transition-colors whitespace-nowrap flex-shrink-0 ${
+                      maxDistance === distance
+                        ? 'bg-amber-600 text-white'
+                        : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                    }`}
+                  >
+                    {distance === null ? 'Todos' : `${distance} km`}
+                  </button>
+                ))}
+              </div>
             </div>
           </div>
         </div>
       </div>
+
+      {/* CSS para esconder scrollbar */}
+      <style jsx>{`
+        .scrollbar-hide::-webkit-scrollbar {
+          display: none;
+        }
+      `}</style>
 
       {/* Results Count */}
       <p className="text-gray-600 mb-4">

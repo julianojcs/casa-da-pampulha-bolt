@@ -1,0 +1,55 @@
+[{
+  "_id": {
+    "$oid": "694e1a7e59bd36cd0622bbfc"
+  },
+  "name": "Luciana Costa",
+  "role": "Anfitriã",
+  "bio": "Mora em Belo Horizonte e é formada em Medicina pela UFMG, foi professora adjunta do Departamento de Anatomia e Imagem da Faculdade de Medicina da UFMG. Fala português, inglês e espanhol. Apaixonada por viagens, após uma experiência com o Airbnb no exterior, começou a compartilhar sua casa como um hobby e logo no início tomou paixão pela 'arte de receber'.",
+  "photo": "https://res.cloudinary.com/dkhldcufo/image/upload/v1766959533/hosts/anfitria.jpg",
+  "languages": [
+    "Português",
+    "Inglês",
+    "Espanhol"
+  ],
+  "responseTime": "Dentro de uma hora",
+  "responseRate": "100%",
+  "isSuperhost": true,
+  "joinedDate": {
+    "$date": "2020-01-01T00:00:00.000Z"
+  },
+  "isActive": true,
+  "__v": 0,
+  "createdAt": {
+    "$date": "2025-12-26T05:17:50.927Z"
+  },
+  "updatedAt": {
+    "$date": "2025-12-26T05:17:50.927Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "694e1a7e59bd36cd0622bbfd"
+  },
+  "name": "Juliano Costa",
+  "role": "Coanfitrião",
+  "bio": "Após longos anos morando em Vila Velha/ES, resolveu retornar a BH em 2022, para ficar mais perto da família, quando foi convidado pela sua irmã, Luciana, a aceitar esse grande desafio que seria ser seu coanfitrião na Casa da Pampulha. Fala português e inglês. Formado em Ciência da Computação pela PUC Minas e atuando na área de segurança pública, assim como sua irmã, encontrou na hospedagem a sua vocação.",
+  "photo": "https://res.cloudinary.com/dkhldcufo/image/upload/v1766959537/hosts/coanfitriao.jpg",
+  "languages": [
+    "Português",
+    "Inglês"
+  ],
+  "responseTime": "Dentro de uma hora",
+  "responseRate": "100%",
+  "isSuperhost": true,
+  "joinedDate": {
+    "$date": "2022-01-01T00:00:00.000Z"
+  },
+  "isActive": true,
+  "__v": 0,
+  "createdAt": {
+    "$date": "2025-12-26T05:17:50.927Z"
+  },
+  "updatedAt": {
+    "$date": "2025-12-26T05:17:50.927Z"
+  }
+}]

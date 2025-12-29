@@ -11,6 +11,7 @@ const GuestRegistrationSchema = new Schema<GuestRegistrationDocument>(
     documentType: { type: String, required: true },
     document: { type: String },
     documentImage: { type: String },
+    avatar: { type: String },
     nationality: { type: String },
     birthDate: { type: Date },
     address: { type: String },
@@ -33,6 +34,7 @@ const GuestRegistrationSchema = new Schema<GuestRegistrationDocument>(
       plate: { type: String }
     }],
     agreedToRules: { type: Boolean, required: true },
+    isActive: { type: Boolean, default: true },
   },
   { timestamps: true }
 );

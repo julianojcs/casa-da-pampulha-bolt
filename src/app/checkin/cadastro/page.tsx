@@ -3,12 +3,89 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import toast from 'react-hot-toast';
-import { UserGroupIcon, PlusIcon, XMarkIcon } from '@heroicons/react/24/outline';
+import { UserGroupIcon, PlusIcon, XMarkIcon, TruckIcon } from '@heroicons/react/24/outline';
 
 interface Guest {
   name: string;
   age: number;
   document?: string;
+}
+
+interface Vehicle {
+  plate: string;
+  model: string;
+  color: string;
+}
+
+// Opções de DDI
+const DDI_OPTIONS = [
+  { code: '+55', country: 'Brasil', flag: '🇧🇷' },
+  { code: '+1', country: 'EUA/Canadá', flag: '🇺🇸' },
+  { code: '+44', country: 'Reino Unido', flag: '🇬🇧' },
+  { code: '+351', country: 'Portugal', flag: '🇵🇹' },
+  { code: '+34', country: 'Espanha', flag: '🇪🇸' },
+  { code: '+33', country: 'França', flag: '🇫🇷' },
+  { code: '+49', country: 'Alemanha', flag: '🇩🇪' },
+  { code: '+39', country: 'Itália', flag: '🇮🇹' },
+  { code: '+54', country: 'Argentina', flag: '🇦🇷' },
+  { code: '+56', country: 'Chile', flag: '🇨🇱' },
+  { code: '+57', country: 'Colômbia', flag: '🇨🇴' },
+  { code: '+52', country: 'México', flag: '🇲🇽' },
+  { code: '+81', country: 'Japão', flag: '🇯🇵' },
+  { code: '+86', country: 'China', flag: '🇨🇳' },
+];
+
+// Funções de máscara
+function maskCPF(value: string): string {
+  return value
+    .replace(/\D/g, '')
+    .replace(/(\d{3})(\d)/, '$1.$2')
+    .replace(/(\d{3})(\d)/, '$1.$2')
+    .replace(/(\d{3})(\d{1,2})/, '$1-$2')
+    .replace(/(-\d{2})\d+?$/, '$1')
+    .slice(0, 14);
+}
+
+function maskRG(value: string): string {
+  // RG pode ter formatos diferentes por estado, mantemos mais flexível
+  return value
+    .replace(/\D/g, '')
+    .replace(/(\d{2})(\d)/, '$1.$2')
+    .replace(/(\d{3})(\d)/, '$1.$2')
+    .replace(/(\d{3})(\d{1})/, '$1-$2')
+    .slice(0, 12);
+}
+
+function maskPassport(value: string): string {
+  // Passaporte brasileiro: 2 letras + 6 números
+  return value
+    .toUpperCase()
+    .replace(/[^A-Z0-9]/g, '')
+    .slice(0, 8);
+}
+
+function maskPhone(value: string): string {
+  // Telefone brasileiro: (31) 99999-9999
+  return value
+    .replace(/\D/g, '')
+    .replace(/(\d{2})(\d)/, '($1) $2')
+    .replace(/(\d{5})(\d)/, '$1-$2')
+    .replace(/(-\d{4})\d+?$/, '$1')
+    .slice(0, 15);
+}
+
+function maskVehiclePlate(value: string): string {
+  // Placa Mercosul ou antiga: ABC1D23 ou ABC-1234
+  return value
+    .toUpperCase()
+    .replace(/[^A-Z0-9]/g, '')
+    .slice(0, 7);
+}
+
+function formatPlateDisplay(value: string): string {
+  // Formata para exibição: ABC-1D23 ou ABC-1234
+  if (value.length <= 3) return value;
+  return value.slice(0, 3) + '-' + value.slice(3);
 }
 
 export default function CadastroPage() {
@@ -17,23 +94,78 @@ export default function CadastroPage() {
   const [formData, setFormData] = useState({
     name: '',
     email: '',
+    phoneDDI: '+55',
     phone: '',
     documentType: 'CPF',
     document: '',
     checkInDate: '',
     checkOutDate: '',
     specialRequests: '',
-    vehiclePlate: '',
     agreedToRules: false,
   });
+  const [vehicles, setVehicles] = useState<Vehicle[]>([]);
   const [additionalGuests, setAdditionalGuests] = useState<Guest[]>([]);
+
+  // Aplicar máscara ao documento baseado no tipo
+  const applyDocumentMask = (value: string, type: string): string => {
+    switch (type) {
+      case 'CPF':
+        return maskCPF(value);
+      case 'RG':
+        return maskRG(value);
+      case 'Passaporte':
+        return maskPassport(value);
+      default:
+        return value;
+    }
+  };
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value, type } = e.target;
-    setFormData(prev => ({
-      ...prev,
-      [name]: type === 'checkbox' ? (e.target as HTMLInputElement).checked : value,
-    }));
+
+    if (name === 'document') {
+      // Aplicar máscara baseada no tipo de documento
+      const maskedValue = applyDocumentMask(value, formData.documentType);
+      setFormData(prev => ({ ...prev, document: maskedValue }));
+    } else if (name === 'phone') {
+      // Aplicar máscara de telefone
+      const maskedValue = maskPhone(value);
+      setFormData(prev => ({ ...prev, phone: maskedValue }));
+    } else if (name === 'documentType') {
+      // Ao mudar tipo de documento, limpar o valor e reaplicar máscara
+      const rawValue = formData.document.replace(/\D/g, '');
+      const maskedValue = applyDocumentMask(rawValue, value);
+      setFormData(prev => ({
+        ...prev,
+        documentType: value,
+        document: maskedValue,
+      }));
+    } else {
+      setFormData(prev => ({
+        ...prev,
+        [name]: type === 'checkbox' ? (e.target as HTMLInputElement).checked : value,
+      }));
+    }
+  };
+
+  // Veículos
+  const addVehicle = () => {
+    setVehicles(prev => [...prev, { plate: '', model: '', color: '' }]);
+  };
+
+  const removeVehicle = (index: number) => {
+    setVehicles(prev => prev.filter((_, i) => i !== index));
+  };
+
+  const updateVehicle = (index: number, field: keyof Vehicle, value: string) => {
+    setVehicles(prev => prev.map((vehicle, i) =>
+      i === index
+        ? {
+            ...vehicle,
+            [field]: field === 'plate' ? maskVehiclePlate(value) : value,
+          }
+        : vehicle
+    ));
   };
 
   const addGuest = () => {
@@ -50,6 +182,20 @@ export default function CadastroPage() {
     ));
   };
 
+  // Placeholder do documento baseado no tipo
+  const getDocumentPlaceholder = () => {
+    switch (formData.documentType) {
+      case 'CPF':
+        return '000.000.000-00';
+      case 'RG':
+        return '00.000.000-0';
+      case 'Passaporte':
+        return 'AB123456';
+      default:
+        return 'Número do documento';
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -61,11 +207,16 @@ export default function CadastroPage() {
     setIsSubmitting(true);
 
     try {
+      // Formatar telefone completo com DDI
+      const fullPhone = `${formData.phoneDDI} ${formData.phone}`;
+
       const response = await fetch('/api/guests', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           ...formData,
+          phone: fullPhone,
+          vehicles: vehicles.filter(v => v.plate.trim() !== ''),
           guests: additionalGuests,
         }),
       });
@@ -109,7 +260,7 @@ export default function CadastroPage() {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="md:col-span-2">
                   <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Nome Completo *
+                    Nome Completo <span className="text-red-500">*</span>
                   </label>
                   <input
                     type="text"
@@ -124,7 +275,7 @@ export default function CadastroPage() {
 
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
-                    E-mail *
+                    E-mail <span className="text-red-500">*</span>
                   </label>
                   <input
                     type="email"
@@ -139,17 +290,31 @@ export default function CadastroPage() {
 
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Telefone *
+                    Telefone <span className="text-red-500">*</span>
                   </label>
-                  <input
-                    type="tel"
-                    name="phone"
-                    value={formData.phone}
-                    onChange={handleInputChange}
-                    required
-                    className="input-field"
-                    placeholder="(31) 99999-9999"
-                  />
+                  <div className="flex gap-2">
+                    <select
+                      name="phoneDDI"
+                      value={formData.phoneDDI}
+                      onChange={handleInputChange}
+                      className="input-field w-32"
+                    >
+                      {DDI_OPTIONS.map((ddi) => (
+                        <option key={ddi.code} value={ddi.code}>
+                          {ddi.flag} {ddi.code}
+                        </option>
+                      ))}
+                    </select>
+                    <input
+                      type="tel"
+                      name="phone"
+                      value={formData.phone}
+                      onChange={handleInputChange}
+                      required
+                      className="input-field flex-1"
+                      placeholder="(31) 99999-9999"
+                    />
+                  </div>
                 </div>
 
                 <div>
@@ -170,7 +335,7 @@ export default function CadastroPage() {
 
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Número do Documento *
+                    Número do Documento <span className="text-red-500">*</span>
                   </label>
                   <input
                     type="text"
@@ -179,13 +344,13 @@ export default function CadastroPage() {
                     onChange={handleInputChange}
                     required
                     className="input-field"
-                    placeholder="000.000.000-00"
+                    placeholder={getDocumentPlaceholder()}
                   />
                 </div>
 
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Data de Check-in *
+                    Data de Check-in <span className="text-red-500">*</span>
                   </label>
                   <input
                     type="date"
@@ -199,7 +364,7 @@ export default function CadastroPage() {
 
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Data de Check-out *
+                    Data de Check-out <span className="text-red-500">*</span>
                   </label>
                   <input
                     type="date"
@@ -210,21 +375,83 @@ export default function CadastroPage() {
                     className="input-field"
                   />
                 </div>
-
-                <div className="md:col-span-2">
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Placa do Veículo
-                  </label>
-                  <input
-                    type="text"
-                    name="vehiclePlate"
-                    value={formData.vehiclePlate}
-                    onChange={handleInputChange}
-                    className="input-field"
-                    placeholder="ABC-1234 (opcional)"
-                  />
-                </div>
               </div>
+            </div>
+
+            {/* Vehicles */}
+            <div className="bg-white p-6 rounded-xl shadow-lg">
+              <div className="flex items-center justify-between mb-6">
+                <h2 className="text-xl font-semibold text-gray-800 flex items-center gap-2">
+                  <TruckIcon className="h-6 w-6 text-amber-600" />
+                  Veículos
+                </h2>
+                <button
+                  type="button"
+                  onClick={addVehicle}
+                  className="flex items-center gap-1 text-amber-600 hover:text-amber-700 font-medium"
+                >
+                  <PlusIcon className="h-5 w-5" />
+                  Adicionar
+                </button>
+              </div>
+
+              {vehicles.length === 0 ? (
+                <p className="text-gray-500 text-center py-4">
+                  Clique em &quot;Adicionar&quot; para incluir veículos (opcional)
+                </p>
+              ) : (
+                <div className="space-y-4">
+                  {vehicles.map((vehicle, index) => (
+                    <div key={index} className="flex items-start gap-4 p-4 bg-gray-50 rounded-lg">
+                      <div className="flex-1 grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-1">
+                            Placa
+                          </label>
+                          <input
+                            type="text"
+                            value={formatPlateDisplay(vehicle.plate)}
+                            onChange={(e) => updateVehicle(index, 'plate', e.target.value)}
+                            className="input-field uppercase"
+                            placeholder="ABC-1D23"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-1">
+                            Modelo
+                          </label>
+                          <input
+                            type="text"
+                            value={vehicle.model}
+                            onChange={(e) => updateVehicle(index, 'model', e.target.value)}
+                            className="input-field"
+                            placeholder="Ex: Honda Civic"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-1">
+                            Cor
+                          </label>
+                          <input
+                            type="text"
+                            value={vehicle.color}
+                            onChange={(e) => updateVehicle(index, 'color', e.target.value)}
+                            className="input-field"
+                            placeholder="Ex: Prata"
+                          />
+                        </div>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => removeVehicle(index)}
+                        className="text-red-500 hover:text-red-700 p-2"
+                      >
+                        <XMarkIcon className="h-5 w-5" />
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
 
             {/* Additional Guests */}

@@ -1,0 +1,304 @@
+[dotenv@17.2.3] injecting env (25) from .env -- tip: 📡 add observability to secrets: https://dotenvx.com/ops
+🚀 Iniciando upload de imagens para o Cloudinary...
+
+📂 Pastas de destino:
+   - gallery: Imagens da galeria
+   - gallery/thumbnails: Miniaturas da galeria
+   - hosts: Fotos dos anfitriões
+   - local-guide: Imagens do guia local
+   - logo: Logos e imagens institucionais
+   - guests: Avatares dos hóspedes
+
+✅ Cloudinary configurado: dkhldcufo
+
+
+📋 Verificando imagens existentes no Cloudinary...
+   gallery: 1 imagens
+   gallery/thumbnails: 0 imagens
+   hosts: 0 imagens
+   local-guide: 0 imagens
+   logo: 0 imagens
+   guests: 1 imagens
+
+   Total de imagens existentes: 2
+
+📁 Processando pasta: gallery
+   Imagens encontradas: 105
+   ✅ /gallery/20230205_012010.jpg -> gallery/20230205_012010
+   ✅ /gallery/20230220_144452.jpg -> gallery/20230220_144452
+   ✅ /gallery/20230220_144520.jpg -> gallery/20230220_144520
+   ✅ /gallery/20230220_144525.jpg -> gallery/20230220_144525
+   ✅ /gallery/20230220_144535.jpg -> gallery/20230220_144535
+   ✅ /gallery/20230220_144542.jpg -> gallery/20230220_144542
+   ✅ /gallery/20231225_160149.jpg -> gallery/20231225_160149
+   ✅ /gallery/20231225_160209.jpg -> gallery/20231225_160209
+   ✅ /gallery/20231225_160221.jpg -> gallery/20231225_160221
+   ✅ /gallery/20231225_160419.jpg -> gallery/20231225_160419
+   ✅ /gallery/20231225_160702.jpg -> gallery/20231225_160702
+   ✅ /gallery/20231225_160727.jpg -> gallery/20231225_160727
+   ✅ /gallery/20231225_160732.jpg -> gallery/20231225_160732
+   ✅ /gallery/20231225_174638.jpg -> gallery/20231225_174638
+   ✅ /gallery/20240118_144304.jpg -> gallery/20240118_144304
+   ✅ /gallery/20240118_194536.jpg -> gallery/20240118_194536
+   ✅ /gallery/20240118_194552.jpg -> gallery/20240118_194552
+   ✅ /gallery/20240118_194556.jpg -> gallery/20240118_194556
+   ✅ /gallery/20240118_194625.jpg -> gallery/20240118_194625
+   ✅ /gallery/20240118_194727.jpg -> gallery/20240118_194727
+   ✅ /gallery/20240119_113211.jpg -> gallery/20240119_113211
+   ✅ /gallery/20240119_113240.jpg -> gallery/20240119_113240
+   ✅ /gallery/20240119_113256.jpg -> gallery/20240119_113256
+   ✅ /gallery/20240119_113320.jpg -> gallery/20240119_113320
+   ✅ /gallery/20240119_113332.jpg -> gallery/20240119_113332
+   ✅ /gallery/20240119_113348.jpg -> gallery/20240119_113348
+   ✅ /gallery/20240119_113433.jpg -> gallery/20240119_113433
+   ✅ /gallery/20240119_113453.jpg -> gallery/20240119_113453
+   ✅ /gallery/20240119_113506.jpg -> gallery/20240119_113506
+   ✅ /gallery/20240119_113514.jpg -> gallery/20240119_113514
+   ✅ /gallery/20240119_113558.jpg -> gallery/20240119_113558
+   ✅ /gallery/20240119_113609.jpg -> gallery/20240119_113609
+   ✅ /gallery/20240119_113657.jpg -> gallery/20240119_113657
+   ✅ /gallery/20240119_113706.jpg -> gallery/20240119_113706
+   ✅ /gallery/20240119_113716.jpg -> gallery/20240119_113716
+   ✅ /gallery/20240119_113731.jpg -> gallery/20240119_113731
+   ✅ /gallery/20240119_113737.jpg -> gallery/20240119_113737
+   ✅ /gallery/20240119_113745.jpg -> gallery/20240119_113745
+   ✅ /gallery/20240119_113828.jpg -> gallery/20240119_113828
+   ✅ /gallery/20240119_113840.jpg -> gallery/20240119_113840
+   ✅ /gallery/20240119_113853.jpg -> gallery/20240119_113853
+   ✅ /gallery/20240119_113916.jpg -> gallery/20240119_113916
+   ✅ /gallery/20240119_113925.jpg -> gallery/20240119_113925
+   ✅ /gallery/20240119_113941.jpg -> gallery/20240119_113941
+   ✅ /gallery/20240119_113956.jpg -> gallery/20240119_113956
+   ✅ /gallery/20240119_114009.jpg -> gallery/20240119_114009
+   ✅ /gallery/20240119_114019.jpg -> gallery/20240119_114019
+   ✅ /gallery/20240119_114034.jpg -> gallery/20240119_114034
+   ✅ /gallery/20240119_114039.jpg -> gallery/20240119_114039
+   ✅ /gallery/20240119_114048.jpg -> gallery/20240119_114048
+   ✅ /gallery/20240119_114059.jpg -> gallery/20240119_114059
+   ✅ /gallery/20240119_114107.jpg -> gallery/20240119_114107
+   ✅ /gallery/20240119_114115.jpg -> gallery/20240119_114115
+   ✅ /gallery/20240119_114125.jpg -> gallery/20240119_114125
+   ✅ /gallery/20240119_114141.jpg -> gallery/20240119_114141
+   ✅ /gallery/20240119_114149.jpg -> gallery/20240119_114149
+   ✅ /gallery/20240119_114200.jpg -> gallery/20240119_114200
+   ✅ /gallery/20240119_114208.jpg -> gallery/20240119_114208
+   ✅ /gallery/20240119_114214.jpg -> gallery/20240119_114214
+   ✅ /gallery/20240119_114222.jpg -> gallery/20240119_114222
+   ✅ /gallery/20240119_114237.jpg -> gallery/20240119_114237
+   ✅ /gallery/20240119_114259.jpg -> gallery/20240119_114259
+   ✅ /gallery/20240119_114304.jpg -> gallery/20240119_114304
+   ✅ /gallery/20240119_114312.jpg -> gallery/20240119_114312
+   ✅ /gallery/20240119_114318.jpg -> gallery/20240119_114318
+   ✅ /gallery/20240119_114322.jpg -> gallery/20240119_114322
+   ✅ /gallery/20240119_114334.jpg -> gallery/20240119_114334
+   ✅ /gallery/20240119_114342.jpg -> gallery/20240119_114342
+   ✅ /gallery/20240119_114351.jpg -> gallery/20240119_114351
+   ✅ /gallery/20240119_114400.jpg -> gallery/20240119_114400
+   ✅ /gallery/20240119_114408.jpg -> gallery/20240119_114408
+   ✅ /gallery/20240119_114419.jpg -> gallery/20240119_114419
+   ✅ /gallery/20240119_114425.jpg -> gallery/20240119_114425
+   ✅ /gallery/20240119_114440.jpg -> gallery/20240119_114440
+   ✅ /gallery/20240119_114457.jpg -> gallery/20240119_114457
+   ✅ /gallery/20240119_114502.jpg -> gallery/20240119_114502
+   ✅ /gallery/20240119_114517.jpg -> gallery/20240119_114517
+   ✅ /gallery/20240119_114524.jpg -> gallery/20240119_114524
+   ✅ /gallery/20240119_114528.jpg -> gallery/20240119_114528
+   ✅ /gallery/20240119_114537.jpg -> gallery/20240119_114537
+   ✅ /gallery/20240119_114551.jpg -> gallery/20240119_114551
+   ✅ /gallery/20240119_114600.jpg -> gallery/20240119_114600
+   ✅ /gallery/20240119_114603.jpg -> gallery/20240119_114603
+   ✅ /gallery/20240119_114621.jpg -> gallery/20240119_114621
+   ✅ /gallery/20240119_114643.jpg -> gallery/20240119_114643
+   ✅ /gallery/20240119_114651.jpg -> gallery/20240119_114651
+   ✅ /gallery/20240119_114700.jpg -> gallery/20240119_114700
+   ✅ /gallery/20240119_114705.jpg -> gallery/20240119_114705
+   ✅ /gallery/20240119_114717.jpg -> gallery/20240119_114717
+   ✅ /gallery/20240119_114828.jpg -> gallery/20240119_114828
+   ✅ /gallery/20240119_114847.jpg -> gallery/20240119_114847
+   ✅ /gallery/20240119_114900.jpg -> gallery/20240119_114900
+   ✅ /gallery/20240119_114910.jpg -> gallery/20240119_114910
+   ✅ /gallery/20240119_114922.jpg -> gallery/20240119_114922
+   ✅ /gallery/20240119_114923.jpg -> gallery/20240119_114923
+   ✅ /gallery/20240119_114929.jpg -> gallery/20240119_114929
+   ✅ /gallery/20240119_114935.jpg -> gallery/20240119_114935
+   ✅ /gallery/20240204_132813.jpg -> gallery/20240204_132813
+   ✅ /gallery/20240204_132814.jpg -> gallery/20240204_132814
+   ✅ /gallery/20240204_132815.jpg -> gallery/20240204_132815
+   ✅ /gallery/20240204_132816.jpg -> gallery/20240204_132816
+   ✅ /gallery/20240204_132817.jpg -> gallery/20240204_132817
+   ✅ /gallery/20240204_132818.jpg -> gallery/20240204_132818
+   ✅ /gallery/20240204_132819.jpg -> gallery/20240204_132819
+   ✅ /gallery/20240204_132820.jpg -> gallery/20240204_132820
+
+📁 Processando pasta: gallery/thumbnails
+   Imagens encontradas: 104
+   ✅ /gallery/thumbnails/20230205_012010 Pequena.jpeg -> gallery/thumbnails/20230205_012010 Pequena
+   ✅ /gallery/thumbnails/20230220_144452 Pequena.jpeg -> gallery/thumbnails/20230220_144452 Pequena
+   ✅ /gallery/thumbnails/20230220_144520 Pequena.jpeg -> gallery/thumbnails/20230220_144520 Pequena
+   ✅ /gallery/thumbnails/20230220_144525 Pequena.jpeg -> gallery/thumbnails/20230220_144525 Pequena
+   ✅ /gallery/thumbnails/20230220_144535 Pequena.jpeg -> gallery/thumbnails/20230220_144535 Pequena
+   ✅ /gallery/thumbnails/20230220_144542 Pequena.jpeg -> gallery/thumbnails/20230220_144542 Pequena
+   ✅ /gallery/thumbnails/20231225_160149 Pequena.jpeg -> gallery/thumbnails/20231225_160149 Pequena
+   ✅ /gallery/thumbnails/20231225_160209 Pequena.jpeg -> gallery/thumbnails/20231225_160209 Pequena
+   ✅ /gallery/thumbnails/20231225_160221 Pequena.jpeg -> gallery/thumbnails/20231225_160221 Pequena
+   ✅ /gallery/thumbnails/20231225_160419 Pequena.jpeg -> gallery/thumbnails/20231225_160419 Pequena
+   ✅ /gallery/thumbnails/20231225_160702 Pequena.jpeg -> gallery/thumbnails/20231225_160702 Pequena
+   ✅ /gallery/thumbnails/20231225_160727 Pequena.jpeg -> gallery/thumbnails/20231225_160727 Pequena
+   ✅ /gallery/thumbnails/20231225_160732 Pequena.jpeg -> gallery/thumbnails/20231225_160732 Pequena
+   ✅ /gallery/thumbnails/20231225_174638 Pequena.jpeg -> gallery/thumbnails/20231225_174638 Pequena
+   ✅ /gallery/thumbnails/20240118_144304 Pequena.jpeg -> gallery/thumbnails/20240118_144304 Pequena
+   ✅ /gallery/thumbnails/20240118_194536 Pequena.jpeg -> gallery/thumbnails/20240118_194536 Pequena
+   ✅ /gallery/thumbnails/20240118_194552 Pequena.jpeg -> gallery/thumbnails/20240118_194552 Pequena
+   ✅ /gallery/thumbnails/20240118_194556 Pequena.jpeg -> gallery/thumbnails/20240118_194556 Pequena
+   ✅ /gallery/thumbnails/20240118_194625 Pequena.jpeg -> gallery/thumbnails/20240118_194625 Pequena
+   ✅ /gallery/thumbnails/20240118_194727 Pequena.jpeg -> gallery/thumbnails/20240118_194727 Pequena
+   ✅ /gallery/thumbnails/20240119_113211 Pequena.jpeg -> gallery/thumbnails/20240119_113211 Pequena
+   ✅ /gallery/thumbnails/20240119_113240 Pequena.jpeg -> gallery/thumbnails/20240119_113240 Pequena
+   ✅ /gallery/thumbnails/20240119_113256 Pequena.jpeg -> gallery/thumbnails/20240119_113256 Pequena
+   ✅ /gallery/thumbnails/20240119_113320 Pequena.jpeg -> gallery/thumbnails/20240119_113320 Pequena
+   ✅ /gallery/thumbnails/20240119_113332 Pequena.jpeg -> gallery/thumbnails/20240119_113332 Pequena
+   ✅ /gallery/thumbnails/20240119_113348 Pequena.jpeg -> gallery/thumbnails/20240119_113348 Pequena
+   ✅ /gallery/thumbnails/20240119_113433 Pequena.jpeg -> gallery/thumbnails/20240119_113433 Pequena
+   ✅ /gallery/thumbnails/20240119_113453 Pequena.jpeg -> gallery/thumbnails/20240119_113453 Pequena
+   ✅ /gallery/thumbnails/20240119_113506 Pequena.jpeg -> gallery/thumbnails/20240119_113506 Pequena
+   ✅ /gallery/thumbnails/20240119_113514 Pequena.jpeg -> gallery/thumbnails/20240119_113514 Pequena
+   ✅ /gallery/thumbnails/20240119_113558 Pequena.jpeg -> gallery/thumbnails/20240119_113558 Pequena
+   ✅ /gallery/thumbnails/20240119_113609 Pequena.jpeg -> gallery/thumbnails/20240119_113609 Pequena
+   ✅ /gallery/thumbnails/20240119_113657 Pequena.jpeg -> gallery/thumbnails/20240119_113657 Pequena
+   ✅ /gallery/thumbnails/20240119_113706 Pequena.jpeg -> gallery/thumbnails/20240119_113706 Pequena
+   ✅ /gallery/thumbnails/20240119_113716 Pequena.jpeg -> gallery/thumbnails/20240119_113716 Pequena
+   ✅ /gallery/thumbnails/20240119_113731 Pequena.jpeg -> gallery/thumbnails/20240119_113731 Pequena
+   ✅ /gallery/thumbnails/20240119_113737 Pequena.jpeg -> gallery/thumbnails/20240119_113737 Pequena
+   ✅ /gallery/thumbnails/20240119_113745 Pequena.jpeg -> gallery/thumbnails/20240119_113745 Pequena
+   ✅ /gallery/thumbnails/20240119_113828 Pequena.jpeg -> gallery/thumbnails/20240119_113828 Pequena
+   ✅ /gallery/thumbnails/20240119_113840 Pequena.jpeg -> gallery/thumbnails/20240119_113840 Pequena
+   ✅ /gallery/thumbnails/20240119_113853 Pequena.jpeg -> gallery/thumbnails/20240119_113853 Pequena
+   ✅ /gallery/thumbnails/20240119_113916 Pequena.jpeg -> gallery/thumbnails/20240119_113916 Pequena
+   ✅ /gallery/thumbnails/20240119_113925 Pequena.jpeg -> gallery/thumbnails/20240119_113925 Pequena
+   ✅ /gallery/thumbnails/20240119_113941 Pequena.jpeg -> gallery/thumbnails/20240119_113941 Pequena
+   ✅ /gallery/thumbnails/20240119_113956 Pequena.jpeg -> gallery/thumbnails/20240119_113956 Pequena
+   ✅ /gallery/thumbnails/20240119_114009 Pequena.jpeg -> gallery/thumbnails/20240119_114009 Pequena
+   ✅ /gallery/thumbnails/20240119_114019 Pequena.jpeg -> gallery/thumbnails/20240119_114019 Pequena
+   ✅ /gallery/thumbnails/20240119_114034 Pequena.jpeg -> gallery/thumbnails/20240119_114034 Pequena
+   ✅ /gallery/thumbnails/20240119_114039 Pequena.jpeg -> gallery/thumbnails/20240119_114039 Pequena
+   ✅ /gallery/thumbnails/20240119_114048 Pequena.jpeg -> gallery/thumbnails/20240119_114048 Pequena
+   ✅ /gallery/thumbnails/20240119_114059 Pequena.jpeg -> gallery/thumbnails/20240119_114059 Pequena
+   ✅ /gallery/thumbnails/20240119_114107 Pequena.jpeg -> gallery/thumbnails/20240119_114107 Pequena
+   ✅ /gallery/thumbnails/20240119_114115 Pequena.jpeg -> gallery/thumbnails/20240119_114115 Pequena
+   ✅ /gallery/thumbnails/20240119_114125 Pequena.jpeg -> gallery/thumbnails/20240119_114125 Pequena
+   ✅ /gallery/thumbnails/20240119_114141 Pequena.jpeg -> gallery/thumbnails/20240119_114141 Pequena
+   ✅ /gallery/thumbnails/20240119_114149 Pequena.jpeg -> gallery/thumbnails/20240119_114149 Pequena
+   ✅ /gallery/thumbnails/20240119_114200 Pequena.jpeg -> gallery/thumbnails/20240119_114200 Pequena
+   ✅ /gallery/thumbnails/20240119_114208 Pequena.jpeg -> gallery/thumbnails/20240119_114208 Pequena
+   ✅ /gallery/thumbnails/20240119_114214 Pequena.jpeg -> gallery/thumbnails/20240119_114214 Pequena
+   ✅ /gallery/thumbnails/20240119_114222 Pequena.jpeg -> gallery/thumbnails/20240119_114222 Pequena
+   ✅ /gallery/thumbnails/20240119_114237 Pequena.jpeg -> gallery/thumbnails/20240119_114237 Pequena
+   ✅ /gallery/thumbnails/20240119_114259 Pequena.jpeg -> gallery/thumbnails/20240119_114259 Pequena
+   ✅ /gallery/thumbnails/20240119_114304 Pequena.jpeg -> gallery/thumbnails/20240119_114304 Pequena
+   ✅ /gallery/thumbnails/20240119_114312 Pequena.jpeg -> gallery/thumbnails/20240119_114312 Pequena
+   ✅ /gallery/thumbnails/20240119_114318 Pequena.jpeg -> gallery/thumbnails/20240119_114318 Pequena
+   ✅ /gallery/thumbnails/20240119_114322 Pequena.jpeg -> gallery/thumbnails/20240119_114322 Pequena
+   ✅ /gallery/thumbnails/20240119_114334 Pequena.jpeg -> gallery/thumbnails/20240119_114334 Pequena
+   ✅ /gallery/thumbnails/20240119_114342 Pequena.jpeg -> gallery/thumbnails/20240119_114342 Pequena
+   ✅ /gallery/thumbnails/20240119_114351 Pequena.jpeg -> gallery/thumbnails/20240119_114351 Pequena
+   ✅ /gallery/thumbnails/20240119_114400 Pequena.jpeg -> gallery/thumbnails/20240119_114400 Pequena
+   ✅ /gallery/thumbnails/20240119_114408 Pequena.jpeg -> gallery/thumbnails/20240119_114408 Pequena
+   ✅ /gallery/thumbnails/20240119_114419 Pequena.jpeg -> gallery/thumbnails/20240119_114419 Pequena
+   ✅ /gallery/thumbnails/20240119_114425 Pequena.jpeg -> gallery/thumbnails/20240119_114425 Pequena
+   ✅ /gallery/thumbnails/20240119_114440 Pequena.jpeg -> gallery/thumbnails/20240119_114440 Pequena
+   ✅ /gallery/thumbnails/20240119_114457 Pequena.jpeg -> gallery/thumbnails/20240119_114457 Pequena
+   ✅ /gallery/thumbnails/20240119_114502 Pequena.jpeg -> gallery/thumbnails/20240119_114502 Pequena
+   ✅ /gallery/thumbnails/20240119_114517 Pequena.jpeg -> gallery/thumbnails/20240119_114517 Pequena
+   ✅ /gallery/thumbnails/20240119_114524 Pequena.jpeg -> gallery/thumbnails/20240119_114524 Pequena
+   ✅ /gallery/thumbnails/20240119_114528 Pequena.jpeg -> gallery/thumbnails/20240119_114528 Pequena
+   ✅ /gallery/thumbnails/20240119_114537 Pequena.jpeg -> gallery/thumbnails/20240119_114537 Pequena
+   ✅ /gallery/thumbnails/20240119_114551 Pequena.jpeg -> gallery/thumbnails/20240119_114551 Pequena
+   ✅ /gallery/thumbnails/20240119_114600 Pequena.jpeg -> gallery/thumbnails/20240119_114600 Pequena
+   ✅ /gallery/thumbnails/20240119_114603 Pequena.jpeg -> gallery/thumbnails/20240119_114603 Pequena
+   ✅ /gallery/thumbnails/20240119_114621 Pequena.jpeg -> gallery/thumbnails/20240119_114621 Pequena
+   ✅ /gallery/thumbnails/20240119_114643 Pequena.jpeg -> gallery/thumbnails/20240119_114643 Pequena
+   ✅ /gallery/thumbnails/20240119_114651 Pequena.jpeg -> gallery/thumbnails/20240119_114651 Pequena
+   ✅ /gallery/thumbnails/20240119_114700 Pequena.jpeg -> gallery/thumbnails/20240119_114700 Pequena
+   ✅ /gallery/thumbnails/20240119_114705 Pequena.jpeg -> gallery/thumbnails/20240119_114705 Pequena
+   ✅ /gallery/thumbnails/20240119_114717 Pequena.jpeg -> gallery/thumbnails/20240119_114717 Pequena
+   ✅ /gallery/thumbnails/20240119_114828 Pequena.jpeg -> gallery/thumbnails/20240119_114828 Pequena
+   ✅ /gallery/thumbnails/20240119_114847 Pequena.jpeg -> gallery/thumbnails/20240119_114847 Pequena
+   ✅ /gallery/thumbnails/20240119_114900 Pequena.jpeg -> gallery/thumbnails/20240119_114900 Pequena
+   ✅ /gallery/thumbnails/20240119_114910 Pequena.jpeg -> gallery/thumbnails/20240119_114910 Pequena
+   ✅ /gallery/thumbnails/20240119_114922 Pequena.jpeg -> gallery/thumbnails/20240119_114922 Pequena
+   ✅ /gallery/thumbnails/20240119_114923 Pequena.jpeg -> gallery/thumbnails/20240119_114923 Pequena
+   ✅ /gallery/thumbnails/20240119_114929 Pequena.jpeg -> gallery/thumbnails/20240119_114929 Pequena
+   ✅ /gallery/thumbnails/20240119_114935 Pequena.jpeg -> gallery/thumbnails/20240119_114935 Pequena
+   ✅ /gallery/thumbnails/20240204_132813 Pequena.jpeg -> gallery/thumbnails/20240204_132813 Pequena
+   ✅ /gallery/thumbnails/20240204_132814 Pequena.jpeg -> gallery/thumbnails/20240204_132814 Pequena
+   ✅ /gallery/thumbnails/20240204_132815 Pequena.jpeg -> gallery/thumbnails/20240204_132815 Pequena
+   ✅ /gallery/thumbnails/20240204_132817 Pequena.jpeg -> gallery/thumbnails/20240204_132817 Pequena
+   ✅ /gallery/thumbnails/20240204_132818 Pequena.jpeg -> gallery/thumbnails/20240204_132818 Pequena
+   ✅ /gallery/thumbnails/20240204_132819 Pequena.jpeg -> gallery/thumbnails/20240204_132819 Pequena
+   ✅ /gallery/thumbnails/20240204_132820 Pequena.jpeg -> gallery/thumbnails/20240204_132820 Pequena
+
+📁 Processando pasta: images
+   Imagens encontradas: 49
+   ✅ /images/AABB.png -> local-guide/AABB
+   ✅ /images/Academia_Smart_Fit_Pampulha.png -> local-guide/Academia_Smart_Fit_Pampulha
+   ✅ /images/Anella_Restaurante.png -> local-guide/Anella_Restaurante
+   ✅ /images/Ao_Gosto_Carnes_Nobres_E_Exoticas.png -> local-guide/Ao_Gosto_Carnes_Nobres_E_Exoticas
+   ✅ /images/Arena_MRV.png -> local-guide/Arena_MRV
+   ✅ /images/Arena_Marco_Zero_BH.png -> local-guide/Arena_Marco_Zero_BH
+   ✅ /images/Barnabe_Bar_E_Espetaria.png -> local-guide/Barnabe_Bar_E_Espetaria
+   ✅ /images/Caipira_Xique_Restaurante.png -> local-guide/Caipira_Xique_Restaurante
+   ✅ /images/Califa_Beach_Sports.png -> local-guide/Califa_Beach_Sports
+   ✅ /images/Casa_do_Baile.png -> local-guide/Casa_do_Baile
+   ✅ /images/Chopp_da_Fabrica_Pampulha.png -> local-guide/Chopp_da_Fabrica_Pampulha
+   ✅ /images/Cozinha_Japonesa_Oriental.png -> local-guide/Cozinha_Japonesa_Oriental
+   ✅ /images/Divino_Restaurante.png -> local-guide/Divino_Restaurante
+   ✅ /images/Drogaria_Araujo.png -> local-guide/Drogaria_Araujo
+   ✅ /images/Estacao_08_BIKE_BH.png -> local-guide/Estacao_08_BIKE_BH
+   ✅ /images/Grill_E_Restaurante_Dom_Toro.png -> local-guide/Grill_E_Restaurante_Dom_Toro
+   ✅ /images/Jardim_Zoologico_De_Belo_Horizonte.png -> local-guide/Jardim_Zoologico_De_Belo_Horizonte
+   ✅ /images/Lagoa_Rock_Bar.png -> local-guide/Lagoa_Rock_Bar
+   ✅ /images/Lagoa_da_Pampulha.png -> local-guide/Lagoa_da_Pampulha
+   ✅ /images/Lagoas_Frutas_Caldo_De_Cana.png -> local-guide/Lagoas_Frutas_Caldo_De_Cana
+   ✅ /images/Lanchonete_Pampulha.png -> local-guide/Lanchonete_Pampulha
+   ✅ /images/Marco_Zero_da_Pampulha.png -> local-guide/Marco_Zero_da_Pampulha
+   ✅ /images/McDonalds.png -> local-guide/McDonalds
+   ✅ /images/Mercado_Central_de_Belo_Horizonte.png -> local-guide/Mercado_Central_de_Belo_Horizonte
+   ✅ /images/Mineirao.png -> local-guide/Mineirao
+   ✅ /images/Museu_Casa_Kubitschek.png -> local-guide/Museu_Casa_Kubitschek
+   ✅ /images/Museu_de_Arte_da_Pampulha.png -> local-guide/Museu_de_Arte_da_Pampulha
+   ✅ /images/Museu_de_Arte_da_Pampulha_1.png -> local-guide/Museu_de_Arte_da_Pampulha_1
+   ✅ /images/Padaria_E_Panificadora_Portugal.png -> local-guide/Padaria_E_Panificadora_Portugal
+   ✅ /images/Parque_Ecologico_da_Pampulha.png -> local-guide/Parque_Ecologico_da_Pampulha
+   ✅ /images/Parque_Guanabara.png -> local-guide/Parque_Guanabara
+   ✅ /images/Ponto_do_Acai_Fruto_D_Amazonia.png -> local-guide/Ponto_do_Acai_Fruto_D_Amazonia
+   ✅ /images/Posto_Ipiranga.png -> local-guide/Posto_Ipiranga
+   ✅ /images/Restaurante_Paladino.png -> local-guide/Restaurante_Paladino
+   ✅ /images/Restaurante_Xapuri.png -> local-guide/Restaurante_Xapuri
+   ✅ /images/Sacolao_Total.png -> local-guide/Sacolao_Total
+   ✅ /images/Santuario_Arquidiocesano_Sao_Francisco_de_Assis.png -> local-guide/Santuario_Arquidiocesano_Sao_Francisco_de_Assis
+   ✅ /images/Santuario_Arquidiocesano_Sao_Francisco_de_Assis_1.png -> local-guide/Santuario_Arquidiocesano_Sao_Francisco_de_Assis_1
+   ✅ /images/Seu_Pai_Bar_E_Drinkeria.png -> local-guide/Seu_Pai_Bar_E_Drinkeria
+   ✅ /images/Supermercados_BH.png -> local-guide/Supermercados_BH
+   ✅ /images/Supernosso_Pampulha.png -> local-guide/Supernosso_Pampulha
+   ✅ /images/Territorio_do_Galo.png -> local-guide/Territorio_do_Galo
+   ✅ /images/Toca_da_Raposa_Cruzeiro_Esporte_Clube.png -> local-guide/Toca_da_Raposa_Cruzeiro_Esporte_Clube
+   ✅ /images/Zero_Grau_Distribuidora_de_Bebidas.png -> local-guide/Zero_Grau_Distribuidora_de_Bebidas
+   ✅ /images/anfitria.png -> hosts/anfitria
+   ✅ /images/cama_e_banho.png -> local-guide/cama_e_banho
+   ✅ /images/coanfitriao.jpg -> hosts/coanfitriao
+   ✅ /images/logo.png -> logo/logo
+   ✅ /images/logo_full.png -> logo/logo_full
+
+✅ Mapeamentos salvos em: /Users/juliano.jcs/Dev/casa-da-pampulha-bolt/scripts/cloudinary-mappings.json
+
+============================================================
+📊 Resumo do Upload:
+============================================================
+   Total de imagens enviadas: 258
+   Total de mapeamentos: 258
+============================================================
+
+🎉 Upload concluído!
+
+📝 Próximo passo: Execute o script de atualização do banco de dados:
+   node scripts/update-db-image-paths.cjs

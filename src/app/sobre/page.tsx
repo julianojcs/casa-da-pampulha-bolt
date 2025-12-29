@@ -41,8 +41,9 @@ export default function SobrePage() {
     try {
       const response = await fetch('/api/property');
       const data = await response.json();
-      if (data && data.length > 0) {
-        setProperty(data[0]);
+      console.log('Propriedade carregada:', data);
+      if (data) {
+        setProperty(data);
       }
     } catch (error) {
       console.error('Erro ao carregar propriedade:', error);
@@ -72,13 +73,15 @@ export default function SobrePage() {
       {/* Hero Section */}
       <section className="relative h-[60vh] min-h-[400px]">
         <div className="absolute inset-0">
-          <Image
-            src={property?.heroImage || '/gallery/20240119_114828.jpg'}
-            alt="Casa da Pampulha"
-            fill
-            className="object-cover"
-            priority
-          />
+          {property &&
+            <Image
+              src={property.heroImage}
+              alt="Casa da Pampulha"
+              fill
+              className="object-cover"
+              priority
+            />
+          }
           <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent" />
         </div>
         <div className="absolute bottom-0 left-0 right-0 p-8">
@@ -90,15 +93,15 @@ export default function SobrePage() {
               <span className="text-white ml-2">Superhost</span>
             </div>
             <h1 className="text-4xl md:text-6xl font-display font-bold text-white mb-4">
-              {property?.name || 'Casa da Pampulha'}
+              {property?.name}
             </h1>
             <p className="text-xl text-white/90 mb-4">
-              {property?.tagline || 'Sua casa de férias perfeita em Belo Horizonte'}
+              {property?.tagline}
             </p>
             <div className="flex items-center text-white/80">
               <FaMapMarkerAlt className="mr-2" />
               <span>
-                {property?.address || 'Pampulha'}, {property?.city || 'Belo Horizonte'} - {property?.state || 'MG'}
+                {property?.address}, {property?.city} - {property?.state}
               </span>
             </div>
           </div>

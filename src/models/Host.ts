@@ -1,13 +1,14 @@
-import mongoose, { Schema, Document } from 'mongoose';
+import { Schema } from 'mongoose';
 import { IHost } from '@/types';
 
-export interface HostDocument extends Omit<IHost, '_id'>, Document {}
-
-const HostSchema = new Schema<HostDocument>(
+/**
+ * HostSchema - Schema for host data embedded in User documents
+ * Note: The Host collection has been deprecated. Host data is now
+ * stored as a subdocument in the User.host field.
+ */
+const HostSchema = new Schema<Omit<IHost, '_id'>>(
   {
-    name: { type: String, required: true },
     bio: { type: String, required: true },
-    photo: { type: String, required: true },
     role: { type: String, required: true },
     languages: [{ type: String }],
     responseTime: { type: String, required: true },
@@ -15,7 +16,8 @@ const HostSchema = new Schema<HostDocument>(
     isSuperhost: { type: Boolean, default: false },
     joinedDate: { type: Date, required: true },
   },
-  { timestamps: true }
+  { _id: false }
 );
 
-export const Host = mongoose.models.Host || mongoose.model<HostDocument>('Host', HostSchema);
+// Export schema for embedding in User.host
+export { HostSchema };

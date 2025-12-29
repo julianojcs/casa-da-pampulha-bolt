@@ -1,5 +1,5 @@
 import mongoose, { Schema, Document } from 'mongoose';
-import { IPlace, Category } from '@/types';
+import { IPlace } from '@/types';
 
 export interface PlaceDocument extends Omit<IPlace, '_id'>, Document {}
 

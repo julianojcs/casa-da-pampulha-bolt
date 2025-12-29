@@ -99,7 +99,7 @@ export default async function CheckinPage() {
                   return (
                     <div key={item._id} className="bg-white p-4 rounded-lg shadow-md">
                       <div className="flex items-start space-x-3">
-                        <Icon className="h-6 w-6 text-amber-600 mt-1" />
+                        <Icon className="h-6 w-6 min-h-6 min-w-6 flex-shrink-0 text-amber-600 mt-1" />
                         <div>
                           <h3 className="font-semibold text-gray-800">{item.title}</h3>
                           <p className="text-gray-600 text-sm whitespace-pre-line">{item.content}</p>
@@ -111,7 +111,7 @@ export default async function CheckinPage() {
               ) : (
                 <div className="bg-white p-4 rounded-lg shadow-md">
                   <div className="flex items-start space-x-3">
-                    <KeyIcon className="h-6 w-6 text-amber-600 mt-1" />
+                    <KeyIcon className="h-6 w-6 min-h-6 min-w-6 flex-shrink-0 text-amber-600 mt-1" />
                     <div>
                       <h3 className="font-semibold text-gray-800">Acesso à Propriedade</h3>
                       <p className="text-gray-600 text-sm">
@@ -143,7 +143,7 @@ export default async function CheckinPage() {
                   return (
                     <div key={item._id} className="bg-white p-4 rounded-lg shadow-md">
                       <div className="flex items-start space-x-3">
-                        <Icon className="h-6 w-6 text-amber-600 mt-1" />
+                        <Icon className="h-6 w-6 min-h-6 min-w-6 flex-shrink-0 text-amber-600 mt-1" />
                         <div>
                           <h3 className="font-semibold text-gray-800">{item.title}</h3>
                           <p className="text-gray-600 text-sm whitespace-pre-line">{item.content}</p>
@@ -156,7 +156,7 @@ export default async function CheckinPage() {
                 <>
                   <div className="bg-white p-4 rounded-lg shadow-md">
                     <div className="flex items-start space-x-3">
-                      <HomeModernIcon className="h-6 w-6 text-amber-600 mt-1" />
+                      <HomeModernIcon className="h-6 w-6 min-h-6 min-w-6 flex-shrink-0 text-amber-600 mt-1" />
                       <div>
                         <h3 className="font-semibold text-gray-800">Deixe a casa organizada</h3>
                         <p className="text-gray-600 text-sm">
@@ -167,7 +167,7 @@ export default async function CheckinPage() {
                   </div>
                   <div className="bg-white p-4 rounded-lg shadow-md">
                     <div className="flex items-start space-x-3">
-                      <KeyIcon className="h-6 w-6 text-amber-600 mt-1" />
+                      <KeyIcon className="h-6 w-6 min-h-6 min-w-6 flex-shrink-0 text-amber-600 mt-1" />
                       <div>
                         <h3 className="font-semibold text-gray-800">Devolução das Chaves</h3>
                         <p className="text-gray-600 text-sm">
@@ -199,7 +199,7 @@ export default async function CheckinPage() {
             rules.map((rule: { _id: string; title: string; content: string }) => (
               <div key={rule._id} className="bg-white p-6 rounded-lg shadow-md">
                 <div className="flex items-center space-x-3 mb-3">
-                  <NoSymbolIcon className="h-6 w-6 text-red-500" />
+                  <NoSymbolIcon className="h-6 w-6 min-h-6 min-w-6 flex-shrink-0 text-red-500" />
                   <h3 className="font-semibold text-gray-800">{rule.title}</h3>
                 </div>
                 <p className="text-gray-600 text-sm">{rule.content}</p>
@@ -209,7 +209,7 @@ export default async function CheckinPage() {
             <>
               <div className="bg-white p-6 rounded-lg shadow-md">
                 <div className="flex items-center space-x-3 mb-3">
-                  <NoSymbolIcon className="h-6 w-6 text-red-500" />
+                  <NoSymbolIcon className="h-6 w-6 min-h-6 min-w-6 flex-shrink-0 text-red-500" />
                   <h3 className="font-semibold text-gray-800">Proibido Fumar</h3>
                 </div>
                 <p className="text-gray-600 text-sm">
@@ -218,7 +218,7 @@ export default async function CheckinPage() {
               </div>
               <div className="bg-white p-6 rounded-lg shadow-md">
                 <div className="flex items-center space-x-3 mb-3">
-                  <NoSymbolIcon className="h-6 w-6 text-red-500" />
+                  <NoSymbolIcon className="h-6 w-6 min-h-6 min-w-6 flex-shrink-0 text-red-500" />
                   <h3 className="font-semibold text-gray-800">Não são permitidos animais</h3>
                 </div>
                 <p className="text-gray-600 text-sm">
@@ -236,7 +236,7 @@ export default async function CheckinPage() {
               </div>
               <div className="bg-white p-6 rounded-lg shadow-md">
                 <div className="flex items-center space-x-3 mb-3">
-                  <ShieldExclamationIcon className="h-6 w-6 text-amber-500" />
+                  <ShieldExclamationIcon className="h-6 w-6 min-h-6 min-w-6 flex-shrink-0 text-amber-500" />
                   <h3 className="font-semibold text-gray-800">Horário de silêncio</h3>
                 </div>
                 <p className="text-gray-600 text-sm">
@@ -245,7 +245,7 @@ export default async function CheckinPage() {
               </div>
               <div className="bg-white p-6 rounded-lg shadow-md">
                 <div className="flex items-center space-x-3 mb-3">
-                  <NoSymbolIcon className="h-6 w-6 text-red-500" />
+                  <NoSymbolIcon className="h-6 w-6 min-h-6 min-w-6 flex-shrink-0 text-red-500" />
                   <h3 className="font-semibold text-gray-800">Não é permitido receber visitas</h3>
                 </div>
                 <p className="text-gray-600 text-sm">
@@ -254,7 +254,7 @@ export default async function CheckinPage() {
               </div>
               <div className="bg-white p-6 rounded-lg shadow-md">
                 <div className="flex items-center space-x-3 mb-3">
-                  <ShieldExclamationIcon className="h-6 w-6 text-amber-500" />
+                  <ShieldExclamationIcon className="h-6 w-6 min-h-6 min-w-6 flex-shrink-0 text-amber-500" />
                   <h3 className="font-semibold text-gray-800">Regras da Piscina</h3>
                 </div>
                 <p className="text-gray-600 text-sm">
@@ -279,7 +279,7 @@ export default async function CheckinPage() {
               return (
                 <div key={item._id} className="bg-white p-6 rounded-lg shadow-md">
                   <div className="flex items-start space-x-3">
-                    <Icon className="h-6 w-6 text-amber-600 mt-1" />
+                    <Icon className="h-6 w-6 min-h-6 min-w-6 flex-shrink-0 text-amber-600 mt-1" />
                     <div>
                       <h3 className="font-semibold text-gray-800 mb-2">{item.title}</h3>
                       <p className="text-gray-600 text-sm whitespace-pre-line">{item.content}</p>

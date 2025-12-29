@@ -14,7 +14,7 @@ const FALLBACK_SOCIALS = [
   { icon: FaInstagram, href: 'https://instagram.com', label: 'Instagram' },
   { icon: FaFacebook, href: 'https://facebook.com', label: 'Facebook' },
   { icon: FaWhatsapp, href: 'https://wa.me/5531999999999', label: 'WhatsApp' },
-  { icon: FaAirbnb, href: 'https://www.airbnb.com.br/rooms/1028115044709052736', label: 'Airbnb' },
+  { icon: FaAirbnb, href: 'https://www.airbnb.com.br', label: 'Airbnb' },
 ];
 
 const quickLinks = [
@@ -88,7 +88,9 @@ export default function Footer() {
           <div className="space-y-4">
             <div className="flex items-center space-x-2">
               <HomeIcon className="h-8 w-8 text-amber-500" />
-              <span className="font-display text-xl font-bold">Casa da Pampulha</span>
+              <span className="font-display text-xl font-bold">
+                {contactInfo?.name || 'Casa da Pampulha'}
+              </span>
             </div>
             <p className="text-gray-400 text-sm">
               Sua casa de férias perfeita em Belo Horizonte. Desfrute de conforto,
@@ -131,31 +133,37 @@ export default function Footer() {
           <div>
             <h3 className="text-lg font-semibold mb-4">Contato</h3>
             <ul className="space-y-3">
-              <li className="flex items-start space-x-3">
-                <MapPinIcon className="h-5 w-5 text-amber-500 mt-0.5" />
-                <span className="text-gray-400 text-sm">
-                  {contactInfo?.address || 'Pampulha, Belo Horizonte'}<br />
-                  {contactInfo?.city || 'Minas Gerais'}, {contactInfo?.country || 'Brasil'}
-                </span>
-              </li>
-              <li className="flex items-center space-x-3">
-                <PhoneIcon className="h-5 w-5 text-amber-500" />
-                <a
-                  href={`tel:${contactInfo?.phone || '+5531999999999'}`}
-                  className="text-gray-400 hover:text-amber-500 text-sm"
-                >
-                  {contactInfo?.phone || '+55 (31) 99999-9999'}
-                </a>
-              </li>
-              <li className="flex items-center space-x-3">
-                <EnvelopeIcon className="h-5 w-5 text-amber-500" />
-                <a
-                  href={`mailto:${contactInfo?.email || 'contato@casadapampulha.com.br'}`}
-                  className="text-gray-400 hover:text-amber-500 text-sm"
-                >
-                  {contactInfo?.email || 'contato@casadapampulha.com.br'}
-                </a>
-              </li>
+              {(contactInfo?.address ||contactInfo?.city || contactInfo?.country) && (
+                <li className="flex items-start space-x-3">
+                  <MapPinIcon className="h-5 w-5 text-amber-500 mt-0.5" />
+                  <span className="text-gray-400 text-sm">
+                    {contactInfo?.address || 'Pampulha, Belo Horizonte'}<br />
+                    {contactInfo?.city || 'Minas Gerais'}, {contactInfo?.country || 'Brasil'}
+                  </span>
+                </li>
+              )}
+              {contactInfo?.phone && (
+                <li className="flex items-center space-x-3">
+                  <PhoneIcon className="h-5 w-5 text-amber-500" />
+                  <a
+                    href={`tel:${contactInfo?.phone}`}
+                    className="text-gray-400 hover:text-amber-500 text-sm"
+                  >
+                    {contactInfo?.phone || 'Não disponível'}
+                  </a>
+                </li>
+              )}
+              {contactInfo?.email && (
+                <li className="flex items-center space-x-3">
+                  <EnvelopeIcon className="h-5 w-5 text-amber-500" />
+                  <a
+                    href={`mailto:${contactInfo?.email}`}
+                    className="text-gray-400 hover:text-amber-500 text-sm"
+                  >
+                    {contactInfo?.email}
+                  </a>
+                </li>
+              )}
             </ul>
           </div>
 
@@ -165,15 +173,17 @@ export default function Footer() {
             <p className="text-gray-400 text-sm mb-4">
               Faça sua reserva diretamente pelo Airbnb ou entre em contato conosco.
             </p>
-            <a
-              href={contactInfo?.airbnbUrl || 'https://www.airbnb.com.br/rooms/1028115044709052736'}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center space-x-2 bg-amber-600 hover:bg-amber-700 text-white px-4 py-2 rounded-lg transition-colors"
-            >
-              <FaAirbnb className="h-5 w-5" />
-              <span>Ver no Airbnb</span>
-            </a>
+            {contactInfo?.airbnbUrl && (
+              <a
+                href={contactInfo?.airbnbUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center space-x-2 bg-amber-600 hover:bg-amber-700 text-white px-4 py-2 rounded-lg transition-colors"
+              >
+                <FaAirbnb className="h-5 w-5" />
+                <span>Ver no Airbnb</span>
+              </a>
+            )}
           </div>
         </div>
       </div>
@@ -183,7 +193,7 @@ export default function Footer() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
           <div className="flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
             <p className="text-gray-400 text-sm">
-              © {currentYear} Casa da Pampulha. Todos os direitos reservados.
+              © {currentYear} Join Digital Solutions. Todos os direitos reservados.
             </p>
             <div className="flex space-x-6">
               <Link href="/politica-privacidade" className="text-gray-400 hover:text-amber-500 text-sm">
