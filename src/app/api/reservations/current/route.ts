@@ -5,6 +5,8 @@ import connectDB from '@/lib/mongodb';
 import { Reservation, User } from '@/models';
 import { IReservation } from '@/types';
 
+export const dynamic = 'force-dynamic';
+
 interface ReservationDoc extends IReservation {
   _id: string;
 }

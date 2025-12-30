@@ -4,6 +4,7 @@ import { User } from '@/models/User';
 import { Reservation } from '@/models/Reservation';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
+import { IUser, IReservation } from '@/types';
 
 // GET - Listar todos os hóspedes (usuários com role='guest')
 export async function GET() {
@@ -28,16 +29,19 @@ export async function GET() {
     // Buscar reservas para cada hóspede (mais recente primeiro)
     const guestsWithReservations = await Promise.all(
       guests.map(async (guest) => {
-        const reservation = await Reservation.findOne({ userId: guest._id.toString() })
+        const typedGuest = guest as unknown as IUser;
+        const reservation = await Reservation.findOne({ userId: typedGuest._id!.toString() })
           .sort({ checkInDate: -1 })
           .lean();
 
+        const typedReservation = reservation as IReservation | null;
+
         return {
-          ...guest,
+          ...typedGuest,
           // Use reservation dates if available, otherwise fall back to user's dates
-          checkInDate: reservation?.checkInDate || guest.checkInDate,
-          checkOutDate: reservation?.checkOutDate || guest.checkOutDate,
-          reservationStatus: reservation?.status || null,
+          checkInDate: typedReservation?.checkInDate || typedGuest.checkInDate,
+          checkOutDate: typedReservation?.checkOutDate || typedGuest.checkOutDate,
+          reservationStatus: typedReservation?.status || null,
         };
       })
     );

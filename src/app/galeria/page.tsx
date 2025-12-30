@@ -2,6 +2,7 @@ import dbConnect from '@/lib/mongodb';
 import { GalleryItem } from '@/models/GalleryItem';
 import GalleryGrid from '@/components/GalleryGrid';
 import { galleryCategories } from '@/types';
+import { Suspense } from 'react';
 
 export const metadata = {
   title: 'Galeria | Casa da Pampulha',
@@ -31,10 +32,12 @@ export default async function GaleriaPage() {
 
       {/* Gallery */}
       <section className="container-section">
-        <GalleryGrid
-          items={items}
-          categories={galleryCategories as unknown as string[]}
-        />
+        <Suspense fallback={<div className="flex justify-center py-8"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-amber-600"></div></div>}>
+          <GalleryGrid
+            items={items}
+            categories={galleryCategories as unknown as string[]}
+          />
+        </Suspense>
       </section>
     </div>
   );
