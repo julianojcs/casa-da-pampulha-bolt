@@ -12,17 +12,153 @@ import {
   DocumentTextIcon,
   ChevronRightIcon,
   HomeIcon,
+  ClockIcon,
+  CheckCircleIcon,
 } from '@heroicons/react/24/outline';
+
+interface PropertyInfo {
+  whatsapp?: string;
+  airbnbUrl?: string;
+}
+
+interface Reservation {
+  _id: string;
+  checkInDate: string;
+  checkOutDate: string;
+  checkInTime?: string;
+  checkOutTime?: string;
+  status: 'pending' | 'upcoming' | 'current' | 'completed' | 'cancelled';
+  guestName?: string;
+  numberOfGuests?: number;
+}
 
 export default function HospedeDashboardPage() {
   const { data: session, status } = useSession();
   const router = useRouter();
+  const [property, setProperty] = useState<PropertyInfo | null>(null);
+  const [currentReservation, setCurrentReservation] = useState<Reservation | null>(null);
+  const [nextReservation, setNextReservation] = useState<Reservation | null>(null);
+  const [loadingReservations, setLoadingReservations] = useState(true);
 
   useEffect(() => {
     if (status === 'unauthenticated') {
       router.push('/login');
     }
   }, [status, router]);
+
+  useEffect(() => {
+    // Buscar dados da propriedade para WhatsApp
+    fetch('/api/property')
+      .then(res => res.json())
+      .then(data => setProperty(data))
+      .catch(() => {});
+  }, []);
+
+  useEffect(() => {
+    // Buscar reservas do usuário
+    if (status === 'authenticated') {
+      fetchReservations();
+    }
+  }, [status]);
+
+  const fetchReservations = async () => {
+    try {
+      const response = await fetch('/api/user/reservations');
+      const data = await response.json();
+
+      if (response.ok && data.reservations) {
+        const now = new Date();
+        const reservations = data.reservations as Reservation[];
+
+        // Encontrar reserva atual (em andamento)
+        const current = reservations.find(r => {
+          const checkIn = new Date(r.checkInDate);
+          const checkOut = new Date(r.checkOutDate);
+          return r.status === 'current' || (now >= checkIn && now <= checkOut && r.status !== 'cancelled');
+        });
+
+        // Encontrar próxima reserva
+        const upcoming = reservations
+          .filter(r => {
+            const checkIn = new Date(r.checkInDate);
+            return checkIn > now && (r.status === 'upcoming' || r.status === 'pending');
+          })
+          .sort((a, b) => new Date(a.checkInDate).getTime() - new Date(b.checkInDate).getTime())[0];
+
+        setCurrentReservation(current || null);
+        setNextReservation(upcoming || null);
+      }
+    } catch (error) {
+      console.error('Erro ao buscar reservas:', error);
+    } finally {
+      setLoadingReservations(false);
+    }
+  };
+
+  const getWhatsAppUrl = (): string | null => {
+    if (!property?.whatsapp) return null;
+    const digits = property.whatsapp.replace(/\D/g, '');
+    return `https://wa.me/${digits}`;
+  };
+
+  const formatDate = (dateStr: string) => {
+    return new Date(dateStr).toLocaleDateString('pt-BR', {
+      day: '2-digit',
+      month: 'short',
+      year: 'numeric',
+    });
+  };
+
+  const getDaysUntil = (dateStr: string) => {
+    const now = new Date();
+    const target = new Date(dateStr);
+    const diff = Math.ceil((target.getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
+    return diff;
+  };
+
+  const getReservationDisplay = () => {
+    if (loadingReservations) {
+      return {
+        title: 'Carregando...',
+        subtitle: '',
+        status: 'loading',
+      };
+    }
+
+    if (currentReservation) {
+      const daysLeft = getDaysUntil(currentReservation.checkOutDate);
+      return {
+        title: 'Reserva em Andamento',
+        subtitle: `Check-out em ${daysLeft} dia${daysLeft !== 1 ? 's' : ''} - ${formatDate(currentReservation.checkOutDate)}`,
+        status: 'current',
+        reservation: currentReservation,
+      };
+    }
+
+    if (nextReservation) {
+      const daysUntil = getDaysUntil(nextReservation.checkInDate);
+      const statusLabel = nextReservation.status === 'pending' ? 'Pendente' : 'Confirmada';
+      return {
+        title: `Próxima Reserva (${statusLabel})`,
+        subtitle: daysUntil === 0
+          ? 'Check-in hoje!'
+          : daysUntil === 1
+            ? 'Check-in amanhã'
+            : `Check-in em ${daysUntil} dias - ${formatDate(nextReservation.checkInDate)}`,
+        status: nextReservation.status,
+        reservation: nextReservation,
+      };
+    }
+
+    return {
+      title: 'Nenhuma reserva',
+      subtitle: 'Você não tem reservas ativas',
+      status: 'none',
+    };
+  };
+
+  const reservationDisplay = getReservationDisplay();
+  const whatsappUrl = getWhatsAppUrl();
 
   if (status === 'loading') {
     return (
@@ -91,21 +227,50 @@ export default function HospedeDashboardPage() {
             </div>
           </div>
 
-          {/* Quick Info */}
-          <div className="mt-6 grid grid-cols-2 gap-4">
-            <div className="bg-white/10 rounded-xl p-4">
+          {/* Reservation Info */}
+          <div className="mt-6 grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className={`rounded-xl p-4 ${
+              reservationDisplay.status === 'current'
+                ? 'bg-green-500/30'
+                : reservationDisplay.status === 'pending'
+                  ? 'bg-amber-300/30'
+                  : reservationDisplay.status === 'upcoming'
+                    ? 'bg-blue-500/30'
+                    : 'bg-white/10'
+            }`}>
               <div className="flex items-center gap-2 text-amber-100 text-sm mb-1">
-                <CalendarIcon className="h-4 w-4" />
-                Próxima Reserva
+                {reservationDisplay.status === 'current' ? (
+                  <CheckCircleIcon className="h-4 w-4" />
+                ) : (
+                  <CalendarIcon className="h-4 w-4" />
+                )}
+                {reservationDisplay.title}
               </div>
-              <p className="font-medium">Nenhuma reserva</p>
+              <p className="font-medium">{reservationDisplay.subtitle}</p>
+              {reservationDisplay.reservation && (
+                <div className="mt-2 text-sm text-amber-100">
+                  <div className="flex items-center gap-2">
+                    <ClockIcon className="h-4 w-4" />
+                    <span>
+                      {formatDate(reservationDisplay.reservation.checkInDate)} → {formatDate(reservationDisplay.reservation.checkOutDate)}
+                    </span>
+                  </div>
+                </div>
+              )}
             </div>
             <div className="bg-white/10 rounded-xl p-4">
               <div className="flex items-center gap-2 text-amber-100 text-sm mb-1">
                 <HomeIcon className="h-4 w-4" />
-                Status
+                Status da Conta
               </div>
               <p className="font-medium">Conta Ativa</p>
+              <Link
+                href="/hospede/reservas"
+                className="mt-2 inline-flex items-center gap-1 text-sm text-amber-100 hover:text-white"
+              >
+                Ver todas as reservas
+                <ChevronRightIcon className="h-4 w-4" />
+              </Link>
             </div>
           </div>
         </div>
@@ -147,12 +312,16 @@ export default function HospedeDashboardPage() {
             >
               Ver FAQ
             </Link>
-            <Link
-              href="/contato"
-              className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors text-sm"
-            >
-              WhatsApp
-            </Link>
+            {whatsappUrl && (
+              <a
+                href={whatsappUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors text-sm"
+              >
+                WhatsApp
+              </a>
+            )}
           </div>
         </div>
       </div>

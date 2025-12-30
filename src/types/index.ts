@@ -193,6 +193,34 @@ export interface IUser {
   updatedAt?: Date;
 }
 
+// Reservation types
+export type ReservationStatus = 'pending' | 'upcoming' | 'current' | 'completed' | 'cancelled';
+export type ReservationSource = 'airbnb' | 'direct' | 'other';
+
+export interface IReservation {
+  _id?: string;
+  userId: string;
+  guestName: string;
+  guestEmail?: string;
+  guestPhone: string;
+  guestCountry?: string;
+  checkInDate: Date;
+  checkInTime: string;
+  checkOutDate: Date;
+  checkOutTime: string;
+  numberOfGuests?: number;
+  notes?: string;
+  status: ReservationStatus;
+  source?: ReservationSource;
+  confirmationCode?: string;
+  totalAmount?: number;
+  isPaid?: boolean;
+  preRegistrationId?: string;
+  createdBy: string;
+  createdAt?: Date;
+  updatedAt?: Date;
+}
+
 export interface IGuestRegistration {
   _id?: string;
   name: string;

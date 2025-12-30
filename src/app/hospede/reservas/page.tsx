@@ -35,12 +35,17 @@ interface Reservation {
   createdAt: string;
 }
 
+interface PropertyInfo {
+  airbnbUrl?: string;
+}
+
 export default function ReservasPage() {
   const { data: session, status } = useSession();
   const router = useRouter();
 
   const [loading, setLoading] = useState(true);
   const [reservations, setReservations] = useState<Reservation[]>([]);
+  const [property, setProperty] = useState<PropertyInfo | null>(null);
   const [selectedReservation, setSelectedReservation] = useState<Reservation | null>(
     null
   );
@@ -50,8 +55,21 @@ export default function ReservasPage() {
       router.push('/login');
     } else if (status === 'authenticated') {
       fetchReservations();
+      fetchProperty();
     }
   }, [status, router]);
+
+  const fetchProperty = async () => {
+    try {
+      const response = await fetch('/api/property');
+      const data = await response.json();
+      if (response.ok) {
+        setProperty(data);
+      }
+    } catch (error) {
+      // silently fail
+    }
+  };
 
   const fetchReservations = async () => {
     try {
@@ -86,6 +104,14 @@ export default function ReservasPage() {
         label: 'Cancelada',
         color: 'bg-red-100 text-red-800',
         icon: XCircleIcon,
+      };
+    }
+
+    if (reservation.status === 'pending') {
+      return {
+        label: 'Pendente',
+        color: 'bg-amber-100 text-amber-800',
+        icon: ClockIcon,
       };
     }
 
@@ -128,7 +154,7 @@ export default function ReservasPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 py-20 px-4">
+    <div className="min-h-screen bg-gray-50 pt-24 pb-8 px-4">
       <div className="max-w-4xl mx-auto">
         {/* Header */}
         <div className="flex items-center gap-4 mb-8">
@@ -155,12 +181,20 @@ export default function ReservasPage() {
               <p className="text-gray-500 mb-4">
                 Você ainda não possui reservas registradas no sistema
               </p>
-              <Link
-                href="/contato"
-                className="inline-block px-4 py-2 bg-amber-600 text-white rounded-lg hover:bg-amber-700 transition-colors"
-              >
-                Fazer uma Reserva
-              </Link>
+              {property?.airbnbUrl ? (
+                <a
+                  href={property.airbnbUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-block px-4 py-2 bg-amber-600 text-white rounded-lg hover:bg-amber-700 transition-colors"
+                >
+                  Fazer uma Reserva
+                </a>
+              ) : (
+                <p className="text-sm text-gray-400 italic">
+                  Link de reserva não disponível. Entre em contato com o anfitrião.
+                </p>
+              )}
             </div>
           ) : (
             reservations.map((reservation) => {

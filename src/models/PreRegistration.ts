@@ -11,6 +11,21 @@ export interface IPreRegistration {
   expiresAt: Date;
   registeredUserId?: string;
   notes?: string;
+  // Campos de check-in/out
+  checkInDate?: Date;
+  checkInTime?: string;
+  checkOutDate?: Date;
+  checkOutTime?: string;
+  // Campos de hóspedes
+  adultsCount?: number;
+  childrenCount?: number;
+  petsCount?: number;
+  // Campos financeiros
+  reservationValue?: number;
+  // Campos de perfil
+  hasReviews?: boolean;
+  isHost?: boolean;
+  originCountry?: string;
   createdBy: string;
   createdAt?: Date;
   updatedAt?: Date;
@@ -32,6 +47,21 @@ const PreRegistrationSchema = new Schema<PreRegistrationDocument>(
     expiresAt: { type: Date, required: true },
     registeredUserId: { type: String },
     notes: { type: String },
+    // Campos de check-in/out
+    checkInDate: { type: Date },
+    checkInTime: { type: String },
+    checkOutDate: { type: Date },
+    checkOutTime: { type: String },
+    // Campos de hóspedes
+    adultsCount: { type: Number, default: 1 },
+    childrenCount: { type: Number, default: 0 },
+    petsCount: { type: Number, default: 0 },
+    // Campos financeiros
+    reservationValue: { type: Number },
+    // Campos de perfil
+    hasReviews: { type: Boolean, default: false },
+    isHost: { type: Boolean, default: false },
+    originCountry: { type: String },
     createdBy: { type: String, required: true },
   },
   { timestamps: true }

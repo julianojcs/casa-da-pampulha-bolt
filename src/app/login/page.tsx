@@ -1,26 +1,51 @@
 'use client';
 
-import { useState, Suspense } from 'react';
+import { useState, Suspense, useEffect } from 'react';
 import { signIn } from 'next-auth/react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import toast from 'react-hot-toast';
 import Link from 'next/link';
-import { LockClosedIcon, EnvelopeIcon } from '@heroicons/react/24/outline';
+import { LockClosedIcon, EnvelopeIcon, ExclamationTriangleIcon, PaperAirplaneIcon, CheckCircleIcon } from '@heroicons/react/24/outline';
 
 function LoginForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const callbackUrl = searchParams.get('callbackUrl') || '/';
+  const successMessage = searchParams.get('success');
+  const errorMessage = searchParams.get('error');
 
   const [isLoading, setIsLoading] = useState(false);
+  const [isResending, setIsResending] = useState(false);
+  const [emailNotVerified, setEmailNotVerified] = useState(false);
+  const [showSuccessMessage, setShowSuccessMessage] = useState<string | null>(null);
   const [formData, setFormData] = useState({
     email: '',
     password: '',
   });
 
+  // Exibir mensagens de success/error da URL
+  useEffect(() => {
+    if (successMessage) {
+      setShowSuccessMessage(successMessage);
+      // Remover parâmetro da URL após exibir
+      const url = new URL(window.location.href);
+      url.searchParams.delete('success');
+      window.history.replaceState({}, '', url.toString());
+    }
+    if (errorMessage) {
+      toast.error(errorMessage);
+      // Remover parâmetro da URL após exibir
+      const url = new URL(window.location.href);
+      url.searchParams.delete('error');
+      window.history.replaceState({}, '', url.toString());
+    }
+  }, [successMessage, errorMessage]);
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
+    setEmailNotVerified(false);
+    setShowSuccessMessage(null);
 
     try {
       const result = await signIn('credentials', {
@@ -30,7 +55,11 @@ function LoginForm() {
       });
 
       if (result?.error) {
-        toast.error(result.error);
+        if (result.error === 'EMAIL_NOT_VERIFIED') {
+          setEmailNotVerified(true);
+        } else {
+          toast.error(result.error);
+        }
       } else {
         toast.success('Login realizado com sucesso!');
         router.push(callbackUrl);
@@ -40,6 +69,29 @@ function LoginForm() {
       toast.error('Erro ao fazer login');
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  const handleResendVerification = async () => {
+    setIsResending(true);
+    try {
+      const response = await fetch('/api/auth/resend-verification', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: formData.email }),
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        toast.success('E-mail de verificação reenviado! Verifique sua caixa de entrada.');
+      } else {
+        toast.error(data.error || 'Erro ao reenviar e-mail');
+      }
+    } catch (error) {
+      toast.error('Erro ao reenviar e-mail de verificação');
+    } finally {
+      setIsResending(false);
     }
   };
 
@@ -57,6 +109,48 @@ function LoginForm() {
               Acesse sua conta para ver informações restritas
             </p>
           </div>
+
+          {/* Success Message from Email Verification */}
+          {showSuccessMessage && (
+            <div className="mb-6 p-4 bg-green-50 border border-green-200 rounded-xl">
+              <div className="flex items-center gap-3">
+                <CheckCircleIcon className="h-6 w-6 text-green-600 flex-shrink-0" />
+                <p className="text-green-800 font-medium">{showSuccessMessage}</p>
+              </div>
+            </div>
+          )}
+
+          {/* Email Not Verified Alert */}
+          {emailNotVerified && (
+            <div className="mb-6 p-4 bg-amber-50 border border-amber-200 rounded-xl">
+              <div className="flex items-start gap-3">
+                <ExclamationTriangleIcon className="h-6 w-6 text-amber-600 flex-shrink-0 mt-0.5" />
+                <div className="flex-1">
+                  <h3 className="font-semibold text-amber-800">E-mail não verificado</h3>
+                  <p className="text-sm text-amber-700 mt-1">
+                    Para acessar sua conta, você precisa confirmar seu e-mail.
+                    Verifique sua caixa de entrada (e spam) pelo link de verificação.
+                  </p>
+                  <div className="mt-4 flex flex-col gap-2">
+                    <button
+                      onClick={handleResendVerification}
+                      disabled={isResending}
+                      className="flex items-center justify-center gap-2 w-full py-2 px-4 bg-amber-600 text-white rounded-lg hover:bg-amber-700 transition-colors disabled:opacity-50"
+                    >
+                      <PaperAirplaneIcon className="h-4 w-4" />
+                      {isResending ? 'Reenviando...' : 'Reenviar e-mail de verificação'}
+                    </button>
+                    <Link
+                      href={`/verify-email?email=${encodeURIComponent(formData.email)}`}
+                      className="text-center text-sm text-amber-700 hover:text-amber-800 underline"
+                    >
+                      Já tenho o código de verificação
+                    </Link>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
 
           {/* Form */}
           <form onSubmit={handleSubmit} className="space-y-6">

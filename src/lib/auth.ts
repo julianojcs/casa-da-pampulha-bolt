@@ -18,19 +18,29 @@ export const authOptions: NextAuthOptions = {
 
         await dbConnect();
 
+        // Buscar usuário sem filtrar por isActive para poder dar feedback apropriado
         const user = await User.findOne({
-          email: credentials.email.toLowerCase(),
-          isActive: true
+          email: credentials.email.toLowerCase()
         });
 
         if (!user) {
-          throw new Error('Usuário não encontrado');
+          throw new Error('Usuário não encontrado ou senha incorreta');
         }
 
         const isPasswordValid = await user.comparePassword(credentials.password);
 
         if (!isPasswordValid) {
-          throw new Error('Senha incorreta');
+          throw new Error('Usuário não encontrado ou senha incorreta');
+        }
+
+        // Verificar se o email foi confirmado
+        if (!user.emailVerified) {
+          throw new Error('EMAIL_NOT_VERIFIED');
+        }
+
+        // Verificar se a conta está ativa
+        if (!user.isActive) {
+          throw new Error('Sua conta está desativada. Entre em contato com o administrador.');
         }
 
         // Check if guest access is still valid

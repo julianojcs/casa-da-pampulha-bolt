@@ -7,8 +7,13 @@ import {
   PencilIcon,
   TrashIcon,
   MagnifyingGlassIcon,
-  XMarkIcon
+  XMarkIcon,
+  EyeIcon,
+  MapPinIcon,
+  ClockIcon,
+  MapIcon
 } from '@heroicons/react/24/outline';
+import { StarIcon } from '@heroicons/react/24/solid';
 import toast from 'react-hot-toast';
 import { CloudinaryUpload } from '@/components/CloudinaryUpload';
 
@@ -59,6 +64,41 @@ export default function AdminLocaisPage() {
   const [editingPlace, setEditingPlace] = useState<Place | null>(null);
   const [formData, setFormData] = useState<Omit<Place, '_id'>>(emptyPlace);
   const [saving, setSaving] = useState(false);
+  const [previewPlace, setPreviewPlace] = useState<Place | null>(null);
+
+  // Função para extrair número da distância
+  const parseDistance = (place: Place): number => {
+    const distStr = place.distance || place.distanceCar || place.distanceWalk || '';
+    const match = distStr.match(/([\d,.]+)/);
+    if (match) {
+      const num = parseFloat(match[1].replace(',', '.'));
+      // Se for em metros (ex: "500m"), converter para km
+      if (distStr.toLowerCase().includes('m') && !distStr.toLowerCase().includes('km')) {
+        return num / 1000;
+      }
+      // Se for minutos a pé, estimar distância (5km/h = 83m/min)
+      if (distStr.toLowerCase().includes('min')) {
+        return (num * 83) / 1000;
+      }
+      return num;
+    }
+    return 999; // Sem distância vai pro final
+  };
+
+  const renderStars = (rating: number) => {
+    return (
+      <div className="flex">
+        {[1, 2, 3, 4, 5].map((star) => (
+          <StarIcon
+            key={star}
+            className={`h-4 w-4 ${
+              star <= rating ? 'text-amber-400' : 'text-gray-300'
+            }`}
+          />
+        ))}
+      </div>
+    );
+  };
 
   useEffect(() => {
     fetchPlaces();
@@ -150,12 +190,14 @@ export default function AdminLocaisPage() {
     }
   };
 
-  const filteredPlaces = places.filter(place => {
-    const matchesSearch = place.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         place.description.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesCategory = !categoryFilter || place.category === categoryFilter;
-    return matchesSearch && matchesCategory;
-  });
+  const filteredPlaces = places
+    .filter(place => {
+      const matchesSearch = place.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                           place.description.toLowerCase().includes(searchTerm.toLowerCase());
+      const matchesCategory = !categoryFilter || place.category === categoryFilter;
+      return matchesSearch && matchesCategory;
+    })
+    .sort((a, b) => parseDistance(a) - parseDistance(b));
 
   return (
     <div>
@@ -235,14 +277,20 @@ export default function AdminLocaisPage() {
                       <td className="px-6 py-4">
                         <div className="flex items-center space-x-3">
                           {place.image && (
-                            <div className="relative w-12 h-12 rounded-lg overflow-hidden flex-shrink-0">
+                            <button
+                              onClick={() => setPreviewPlace(place)}
+                              className="relative w-12 h-12 rounded-lg overflow-hidden flex-shrink-0 group cursor-pointer"
+                            >
                               <Image
                                 src={place.image}
                                 alt={place.name}
                                 fill
-                                className="object-cover"
+                                className="object-cover group-hover:scale-110 transition-transform"
                               />
-                            </div>
+                              <div className="absolute inset-0 bg-black/0 group-hover:bg-black/30 transition-colors flex items-center justify-center">
+                                <EyeIcon className="h-5 w-5 text-white opacity-0 group-hover:opacity-100 transition-opacity" />
+                              </div>
+                            </button>
                           )}
                           <div>
                             <p className="font-medium text-gray-800">{place.name}</p>
@@ -295,14 +343,20 @@ export default function AdminLocaisPage() {
                 <div key={place._id} className="p-4 hover:bg-gray-50">
                   <div className="flex items-start gap-3">
                     {place.image && (
-                      <div className="relative w-16 h-16 rounded-lg overflow-hidden flex-shrink-0">
+                      <button
+                        onClick={() => setPreviewPlace(place)}
+                        className="relative w-16 h-16 rounded-lg overflow-hidden flex-shrink-0 group"
+                      >
                         <Image
                           src={place.image}
                           alt={place.name}
                           fill
-                          className="object-cover"
+                          className="object-cover group-hover:scale-110 transition-transform"
                         />
-                      </div>
+                        <div className="absolute inset-0 bg-black/0 group-hover:bg-black/30 transition-colors flex items-center justify-center">
+                          <EyeIcon className="h-5 w-5 text-white opacity-0 group-hover:opacity-100 transition-opacity" />
+                        </div>
+                      </button>
                     )}
                     <div className="flex-1 min-w-0">
                       <div className="flex items-start justify-between gap-2">
@@ -311,6 +365,12 @@ export default function AdminLocaisPage() {
                           <p className="text-sm text-gray-500 truncate">{place.address}</p>
                         </div>
                         <div className="flex items-center gap-1 flex-shrink-0">
+                          <button
+                            onClick={() => setPreviewPlace(place)}
+                            className="p-2 text-gray-400 hover:text-green-600"
+                          >
+                            <EyeIcon className="w-5 h-5" />
+                          </button>
                           <button
                             onClick={() => openModal(place)}
                             className="p-2 text-gray-400 hover:text-blue-600"
@@ -533,6 +593,107 @@ export default function AdminLocaisPage() {
                 </button>
               </div>
             </form>
+          </div>
+        </div>
+      )}
+
+      {/* Preview Modal */}
+      {previewPlace && (
+        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4" onClick={() => setPreviewPlace(null)}>
+          <div className="bg-white rounded-2xl shadow-xl max-w-md w-full overflow-hidden" onClick={(e) => e.stopPropagation()}>
+            {/* Image */}
+            <div className="relative h-48">
+              {previewPlace.image ? (
+                <Image
+                  src={previewPlace.image}
+                  alt={previewPlace.name}
+                  fill
+                  className="object-cover"
+                />
+              ) : (
+                <div className="w-full h-full bg-gray-200 flex items-center justify-center">
+                  <MapPinIcon className="h-12 w-12 text-gray-400" />
+                </div>
+              )}
+              <button
+                onClick={() => setPreviewPlace(null)}
+                className="absolute top-3 right-3 bg-white/90 hover:bg-white rounded-full p-1.5 transition-colors"
+              >
+                <XMarkIcon className="h-5 w-5 text-gray-600" />
+              </button>
+              <div className="absolute top-3 left-3">
+                <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-white/90 text-gray-700">
+                  {categories.find(c => c.value === previewPlace.category)?.label}
+                </span>
+              </div>
+            </div>
+
+            {/* Content */}
+            <div className="p-4">
+              <div className="flex items-start justify-between mb-2">
+                <h3 className="text-lg font-semibold text-gray-800">
+                  {previewPlace.name}
+                </h3>
+                {renderStars(previewPlace.rating)}
+              </div>
+
+              <p className="text-gray-600 text-sm mb-3">
+                {previewPlace.description}
+              </p>
+
+              <div className="space-y-2 text-sm text-gray-500">
+                <div className="flex items-center space-x-2">
+                  <MapPinIcon className="h-4 w-4 text-amber-500" />
+                  <span>{previewPlace.address}</span>
+                </div>
+
+                {previewPlace.distance && (
+                  <div className="flex items-center space-x-2">
+                    <MapIcon className="h-4 w-4 text-amber-500" />
+                    <span>{previewPlace.distance}</span>
+                  </div>
+                )}
+
+                <div className="flex items-center space-x-4">
+                  {previewPlace.distanceWalk && (
+                    <div className="flex items-center space-x-1">
+                      <ClockIcon className="h-4 w-4 text-green-500" />
+                      <span>🚶 {previewPlace.distanceWalk}</span>
+                    </div>
+                  )}
+                  {previewPlace.distanceCar && (
+                    <div className="flex items-center space-x-1">
+                      <ClockIcon className="h-4 w-4 text-blue-500" />
+                      <span>🚗 {previewPlace.distanceCar}</span>
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              <div className="flex gap-2 mt-4 pt-4 border-t">
+                {previewPlace.mapUrl && (
+                  <a
+                    href={previewPlace.mapUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex-1 inline-flex items-center justify-center space-x-1 px-4 py-2 text-amber-600 border border-amber-600 hover:bg-amber-50 rounded-lg text-sm font-medium transition-colors"
+                  >
+                    <MapPinIcon className="h-4 w-4" />
+                    <span>Ver no Mapa</span>
+                  </a>
+                )}
+                <button
+                  onClick={() => {
+                    setPreviewPlace(null);
+                    openModal(previewPlace);
+                  }}
+                  className="flex-1 inline-flex items-center justify-center space-x-1 px-4 py-2 bg-amber-500 hover:bg-amber-600 text-white rounded-lg text-sm font-medium transition-colors"
+                >
+                  <PencilIcon className="h-4 w-4" />
+                  <span>Editar</span>
+                </button>
+              </div>
+            </div>
           </div>
         </div>
       )}

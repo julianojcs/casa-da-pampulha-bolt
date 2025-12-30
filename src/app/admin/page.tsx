@@ -1,20 +1,45 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import Image from 'next/image';
 import {
   PhotoIcon,
   MapPinIcon,
   UsersIcon,
   QuestionMarkCircleIcon,
   HomeIcon,
-  EyeIcon
+  EyeIcon,
+  CalendarDaysIcon,
+  UserIcon,
+  PhoneIcon,
+  ClockIcon,
 } from '@heroicons/react/24/outline';
+import { formatPhone } from '@/lib/helpers';
 
 interface Stats {
   places: number;
   gallery: number;
   faqs: number;
   guests: number;
+}
+
+interface ReservationData {
+  _id: string;
+  guestName: string;
+  guestPhone: string;
+  checkInDate: string;
+  checkInTime: string;
+  checkOutDate: string;
+  checkOutTime: string;
+  numberOfGuests?: number;
+  status: string;
+  guest?: {
+    _id: string;
+    name: string;
+    email: string;
+    phone?: string;
+    avatar?: string;
+  };
 }
 
 export default function AdminDashboard() {
@@ -25,6 +50,8 @@ export default function AdminDashboard() {
     guests: 0,
   });
   const [loading, setLoading] = useState(true);
+  const [currentReservation, setCurrentReservation] = useState<ReservationData | null>(null);
+  const [nextReservation, setNextReservation] = useState<ReservationData | null>(null);
 
   const [property, setProperty] = useState<any>(null);
   const [airbnbUrl, setAirbnbUrl] = useState<string>('https://www.airbnb.com.br');
@@ -32,6 +59,7 @@ export default function AdminDashboard() {
   useEffect(() => {
     fetchStats();
     fetchProperty();
+    fetchCurrentReservation();
   }, []);
 
   const fetchStats = async () => {
@@ -60,6 +88,18 @@ export default function AdminDashboard() {
       console.error('Erro ao carregar estatísticas:', error);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const fetchCurrentReservation = async () => {
+    try {
+      const res = await fetch('/api/reservations/current');
+      if (!res.ok) return;
+      const data = await res.json();
+      setCurrentReservation(data.current || null);
+      setNextReservation(data.next || null);
+    } catch (error) {
+      console.error('Erro ao carregar reserva atual:', error);
     }
   };
 
@@ -106,12 +146,132 @@ export default function AdminDashboard() {
     },
   ];
 
+  const formatDate = (date: Date | string) => {
+    return new Date(date).toLocaleDateString('pt-BR', {
+      day: '2-digit',
+      month: '2-digit',
+      year: 'numeric',
+    });
+  };
+
+  const getDaysRemaining = (date: Date | string) => {
+    const now = new Date();
+    now.setHours(0, 0, 0, 0); // Reset to start of day
+    const target = new Date(date);
+    target.setHours(0, 0, 0, 0); // Reset to start of day
+    const diff = Math.round((target.getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
+    return diff;
+  };
+
   return (
     <div>
       <div className="mb-8">
         <h1 className="text-3xl font-bold text-gray-800">Dashboard</h1>
         <p className="text-gray-500 mt-1">Visão geral do seu site</p>
       </div>
+
+      {/* Reserva Atual (Hero) */}
+      {currentReservation && (
+        <div className="bg-gradient-to-r from-amber-500 to-amber-600 rounded-2xl p-6 text-white shadow-lg mb-8">
+          <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center gap-2">
+              <CalendarDaysIcon className="h-6 w-6" />
+              <h2 className="text-xl font-bold">Reserva em Andamento</h2>
+            </div>
+            <a
+              href="/admin/reservas"
+              className="text-sm bg-white/20 hover:bg-white/30 px-3 py-1 rounded-lg transition-colors"
+            >
+              Ver todas
+            </a>
+          </div>
+          <div className="grid md:grid-cols-2 gap-6">
+            <div className="flex items-center gap-4">
+              {currentReservation.guest?.avatar ? (
+                <Image
+                  src={currentReservation.guest.avatar}
+                  alt={currentReservation.guestName}
+                  width={64}
+                  height={64}
+                  className="w-16 h-16 rounded-full object-cover border-2 border-white/30"
+                />
+              ) : (
+                <div className="w-16 h-16 rounded-full bg-white/20 flex items-center justify-center">
+                  <UserIcon className="h-8 w-8" />
+                </div>
+              )}
+              <div>
+                <h3 className="text-xl font-semibold">{currentReservation.guestName}</h3>
+                <p className="text-amber-100 flex items-center gap-1">
+                  <PhoneIcon className="h-4 w-4" />
+                  {formatPhone(currentReservation.guestPhone)}
+                </p>
+              </div>
+            </div>
+            <div className="space-y-2">
+              <div className="flex items-center gap-2">
+                <ClockIcon className="h-5 w-5" />
+                <span>
+                  Check-in: {formatDate(currentReservation.checkInDate)} às {currentReservation.checkInTime}
+                </span>
+              </div>
+              <div className="flex items-center gap-2">
+                <ClockIcon className="h-5 w-5" />
+                <span>
+                  Check-out: {formatDate(currentReservation.checkOutDate)} às {currentReservation.checkOutTime}
+                </span>
+              </div>
+            </div>
+          </div>
+          {getDaysRemaining(currentReservation.checkOutDate) <= 1 && (
+            <div className="mt-4 bg-white/20 rounded-lg p-3 text-sm">
+              ⚠️ Check-out {getDaysRemaining(currentReservation.checkOutDate) === 0 ? 'hoje' : 'amanhã'}!
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* Próxima Reserva (quando não há atual) */}
+      {!currentReservation && nextReservation && (
+        <div className="bg-gradient-to-r from-blue-500 to-blue-600 rounded-2xl p-6 text-white shadow-lg mb-8">
+          <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center gap-2">
+              <CalendarDaysIcon className="h-6 w-6" />
+              <h2 className="text-xl font-bold">Próxima Reserva</h2>
+              <span className="text-blue-100 text-sm">
+                (em {getDaysRemaining(nextReservation.checkInDate)} dias)
+              </span>
+            </div>
+            <a
+              href="/admin/reservas"
+              className="text-sm bg-white/20 hover:bg-white/30 px-3 py-1 rounded-lg transition-colors"
+            >
+              Ver todas
+            </a>
+          </div>
+          <div className="flex items-center gap-4">
+            {nextReservation.guest?.avatar ? (
+              <Image
+                src={nextReservation.guest.avatar}
+                alt={nextReservation.guestName}
+                width={48}
+                height={48}
+                className="w-12 h-12 rounded-full object-cover border-2 border-white/30"
+              />
+            ) : (
+              <div className="w-12 h-12 rounded-full bg-white/20 flex items-center justify-center">
+                <UserIcon className="h-6 w-6" />
+              </div>
+            )}
+            <div>
+              <h3 className="text-lg font-semibold">{nextReservation.guestName}</h3>
+              <p className="text-blue-100">
+                {formatDate(nextReservation.checkInDate)} - {formatDate(nextReservation.checkOutDate)}
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Stats Grid */}
       <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">

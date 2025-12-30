@@ -7,7 +7,6 @@ import {
   TrashIcon,
   XMarkIcon,
   MagnifyingGlassIcon,
-  EyeIcon,
   UserCircleIcon
 } from '@heroicons/react/24/outline';
 import Image from 'next/image';
@@ -317,19 +316,28 @@ export default function AdminHospedesPage() {
                   <tr key={guest._id} className="hover:bg-gray-50">
                     <td className="px-6 py-4">
                       <div className="flex items-center gap-3">
-                        {guest.avatar ? (
-                          <Image
-                            src={guest.avatar}
-                            alt={guest.name}
-                            width={40}
-                            height={40}
-                            className="h-10 w-10 rounded-full object-cover"
-                          />
-                        ) : (
-                          <div className="h-10 w-10 rounded-full bg-amber-100 flex items-center justify-center">
-                            <UserCircleIcon className="h-6 w-6 text-amber-600" />
-                          </div>
-                        )}
+                        <button
+                          onClick={() => {
+                            setViewingGuest(guest);
+                            setIsViewModalOpen(true);
+                          }}
+                          className="flex-shrink-0 cursor-pointer hover:opacity-80 transition-opacity"
+                          title="Visualizar"
+                        >
+                          {guest.avatar ? (
+                            <Image
+                              src={guest.avatar}
+                              alt={guest.name}
+                              width={40}
+                              height={40}
+                              className="h-10 w-10 rounded-full object-cover"
+                            />
+                          ) : (
+                            <div className="h-10 w-10 rounded-full bg-amber-100 flex items-center justify-center">
+                              <UserCircleIcon className="h-6 w-6 text-amber-600" />
+                            </div>
+                          )}
+                        </button>
                         <div>
                           <div className="font-medium text-gray-900">{guest.name}</div>
                           <div className="text-sm text-gray-500">{guest.document}</div>
@@ -348,16 +356,6 @@ export default function AdminHospedesPage() {
                     </td>
                     <td className="px-6 py-4 text-right">
                       <div className="flex items-center justify-end gap-2">
-                        <button
-                          onClick={() => {
-                            setViewingGuest(guest);
-                            setIsViewModalOpen(true);
-                          }}
-                          className="p-1.5 text-blue-600 hover:text-blue-800 hover:bg-blue-50 rounded"
-                          title="Visualizar"
-                        >
-                          <EyeIcon className="h-5 w-5" />
-                        </button>
                         <button
                           onClick={() => openModal(guest)}
                           className="p-1.5 text-amber-600 hover:text-amber-800 hover:bg-amber-50 rounded"
@@ -392,19 +390,28 @@ export default function AdminHospedesPage() {
               <div key={guest._id} className="p-4 hover:bg-gray-50">
                 <div className="flex items-start justify-between gap-3">
                   <div className="flex items-center gap-3 flex-1 min-w-0">
-                    {guest.avatar ? (
-                      <Image
-                        src={guest.avatar}
-                        alt={guest.name}
-                        width={48}
-                        height={48}
-                        className="h-12 w-12 rounded-full object-cover flex-shrink-0"
-                      />
-                    ) : (
-                      <div className="h-12 w-12 rounded-full bg-amber-100 flex items-center justify-center flex-shrink-0">
-                        <UserCircleIcon className="h-7 w-7 text-amber-600" />
-                      </div>
-                    )}
+                    <button
+                      onClick={() => {
+                        setViewingGuest(guest);
+                        setIsViewModalOpen(true);
+                      }}
+                      className="flex-shrink-0 cursor-pointer hover:opacity-80 transition-opacity"
+                      title="Visualizar"
+                    >
+                      {guest.avatar ? (
+                        <Image
+                          src={guest.avatar}
+                          alt={guest.name}
+                          width={48}
+                          height={48}
+                          className="h-12 w-12 rounded-full object-cover"
+                        />
+                      ) : (
+                        <div className="h-12 w-12 rounded-full bg-amber-100 flex items-center justify-center">
+                          <UserCircleIcon className="h-7 w-7 text-amber-600" />
+                        </div>
+                      )}
+                    </button>
                     <div className="min-w-0 flex-1">
                       <div className="font-medium text-gray-900 truncate">{guest.name}</div>
                       <div className="text-sm text-gray-500 truncate">{guest.email}</div>
@@ -424,16 +431,6 @@ export default function AdminHospedesPage() {
                     </div>
                   </div>
                   <div className="flex items-center gap-1 flex-shrink-0">
-                    <button
-                      onClick={() => {
-                        setViewingGuest(guest);
-                        setIsViewModalOpen(true);
-                      }}
-                      className="p-2 text-blue-600 hover:text-blue-800 hover:bg-blue-50 rounded"
-                      title="Visualizar"
-                    >
-                      <EyeIcon className="h-5 w-5" />
-                    </button>
                     <button
                       onClick={() => openModal(guest)}
                       className="p-2 text-amber-600 hover:text-amber-800 hover:bg-amber-50 rounded"
@@ -658,7 +655,7 @@ export default function AdminHospedesPage() {
                       setFormData({ ...formData, phone: formatted });
                       setErrors((prev) => ({ ...prev, phone: '' }));
                     }}
-                    placeholder="+55(27)98133-0708"
+                    placeholder="+55(XX)XXXXX-XXXX"
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500"
                   />
                   {errors.phone && <p className="text-sm text-red-600 mt-1">{errors.phone}</p>}

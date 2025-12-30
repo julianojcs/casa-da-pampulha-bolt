@@ -17,6 +17,10 @@ import {
 import toast from 'react-hot-toast';
 import { formatPhone } from '@/lib/helpers';
 
+interface PropertyInfo {
+  whatsapp?: string;
+}
+
 function CadastroContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -26,6 +30,7 @@ function CadastroContent() {
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [property, setProperty] = useState<PropertyInfo | null>(null);
   const [preRegistration, setPreRegistration] = useState<{
     name: string;
     email?: string;
@@ -39,6 +44,20 @@ function CadastroContent() {
     password: '',
     confirmPassword: '',
   });
+
+  // Buscar dados da propriedade para WhatsApp
+  useEffect(() => {
+    fetch('/api/property')
+      .then(res => res.json())
+      .then(data => setProperty(data))
+      .catch(() => {});
+  }, []);
+
+  const getWhatsAppUrl = () => {
+    if (!property?.whatsapp) return 'https://wa.me/5531999999999';
+    const digits = property.whatsapp.replace(/\D/g, '');
+    return `https://wa.me/${digits}`;
+  };
 
   // Se tiver token, verificar pré-cadastro automaticamente
   useEffect(() => {
@@ -212,7 +231,7 @@ function CadastroContent() {
                     onChange={(e) =>
                       setFormData({ ...formData, phone: formatPhone(e.target.value) })
                     }
-                    placeholder="+55 (27) 98888-8888"
+                    placeholder="+55 (27) 9XXXX-XXXX"
                     className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent"
                   />
                 </div>
@@ -232,9 +251,14 @@ function CadastroContent() {
               <div className="text-center text-sm text-gray-500">
                 <p>
                   Não tem pré-cadastro?{' '}
-                  <Link href="/contato" className="text-amber-600 hover:underline">
+                  <a
+                    href={getWhatsAppUrl()}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-amber-600 hover:underline"
+                  >
                     Entre em contato
-                  </Link>
+                  </a>
                 </p>
               </div>
             </div>

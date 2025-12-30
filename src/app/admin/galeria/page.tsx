@@ -9,11 +9,31 @@ import {
   MagnifyingGlassIcon,
   XMarkIcon,
   PhotoIcon,
-  VideoCameraIcon
+  VideoCameraIcon,
+  Bars3Icon,
+  PlayIcon
 } from '@heroicons/react/24/outline';
 import toast from 'react-hot-toast';
 import { CloudinaryUpload } from '@/components/CloudinaryUpload';
-import { CLOUDINARY_FOLDERS } from '@/lib/cloudinary';
+import { CLOUDINARY_FOLDERS, getYouTubeThumbnail } from '@/lib/cloudinary';
+import {
+  DndContext,
+  closestCenter,
+  KeyboardSensor,
+  PointerSensor,
+  useSensor,
+  useSensors,
+  DragEndEvent,
+} from '@dnd-kit/core';
+import {
+  arrayMove,
+  SortableContext,
+  sortableKeyboardCoordinates,
+  useSortable,
+  rectSortingStrategy,
+} from '@dnd-kit/sortable';
+import { CSS } from '@dnd-kit/utilities';
+import { Tooltip } from 'react-tooltip';
 
 interface GalleryItem {
   _id: string;
@@ -52,6 +72,126 @@ const emptyItem: Omit<GalleryItem, '_id'> = {
   order: 0,
   isActive: true,
 };
+
+// Componente SortableGalleryItem
+function SortableGalleryItem({
+  item,
+  onEdit,
+  onDelete,
+  disabled
+}: {
+  item: GalleryItem;
+  onEdit: () => void;
+  onDelete: () => void;
+  disabled?: boolean;
+}) {
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition,
+    isDragging,
+  } = useSortable({ id: item._id, disabled });
+
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+    opacity: isDragging ? 0.5 : 1,
+  };
+
+  return (
+    <div
+      ref={setNodeRef}
+      style={style}
+      className={`relative group rounded-lg overflow-hidden border border-gray-200 ${isDragging ? 'ring-2 ring-purple-500 shadow-lg z-10' : ''}`}
+    >
+      {/* Drag Handle */}
+      <button
+        {...attributes}
+        {...listeners}
+        className={`absolute top-2 right-2 z-10 cursor-grab active:cursor-grabbing bg-white/90 rounded p-1.5 shadow-sm text-gray-400 hover:text-gray-600 transition-colors ${disabled ? 'opacity-30 cursor-not-allowed' : ''}`}
+        data-tooltip-id="drag-tooltip"
+        data-tooltip-content="Arraste para reordenar"
+        disabled={disabled}
+      >
+        <Bars3Icon className="h-4 w-4" />
+      </button>
+
+      <div className="aspect-video relative">
+        {item.type === 'video' ? (
+          (() => {
+            const ytThumb = getYouTubeThumbnail(item.src);
+            return ytThumb ? (
+              <Image
+                src={ytThumb}
+                alt={item.title}
+                fill
+                className="object-cover"
+              />
+            ) : (
+              <div className="w-full h-full bg-gray-800 flex items-center justify-center">
+                <VideoCameraIcon className="w-12 h-12 text-gray-400" />
+              </div>
+            );
+          })()
+        ) : (
+          <Image
+            src={item.thumbnail || item.src}
+            alt={item.title}
+            fill
+            className="object-cover"
+          />
+        )}
+        {/* Play icon overlay for videos (always visible, below actions) */}
+        {item.type === 'video' && (
+          <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-0">
+            <div className="bg-black/50 rounded-full p-3 group-hover:scale-110 transition-transform">
+              <PlayIcon className="h-8 w-8 text-white" />
+            </div>
+          </div>
+        )}
+
+        {/* Actions - z-10 to be above play icon */}
+        <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity z-10">
+          <div className="flex space-x-2">
+            <button
+              onClick={onEdit}
+              className="p-2 bg-white rounded-full text-gray-800 hover:bg-blue-500 hover:text-white transition-colors"
+            >
+              <PencilIcon className="w-5 h-5" />
+            </button>
+            <button
+              onClick={onDelete}
+              className="p-2 bg-white rounded-full text-gray-800 hover:bg-red-500 hover:text-white transition-colors"
+            >
+              <TrashIcon className="w-5 h-5" />
+            </button>
+          </div>
+        </div>
+
+        {/* Type Badge */}
+        <div className="absolute top-2 left-2">
+          {item.type === 'video' ? (
+            <span className="bg-red-500 text-white text-xs px-2 py-1 rounded-full">Vídeo</span>
+          ) : (
+            <span className="bg-blue-500 text-white text-xs px-2 py-1 rounded-full">Foto</span>
+          )}
+        </div>
+
+        {/* Order Badge */}
+        <div className="absolute bottom-2 left-2">
+          <span className="bg-black/70 text-white text-xs px-2 py-1 rounded">#{item.order}</span>
+        </div>
+      </div>
+
+      <div className="p-3">
+        <p className="font-medium text-gray-800 text-sm truncate">{item.title}</p>
+        <p className="text-xs text-gray-500">{item.category}</p>
+      </div>
+    </div>
+  );
+}
 
 export default function AdminGaleriaPage() {
   const [items, setItems] = useState<GalleryItem[]>([]);
@@ -149,6 +289,60 @@ export default function AdminGaleriaPage() {
     }
   };
 
+  const handleReorder = async (reorderedItems: GalleryItem[]) => {
+    try {
+      const response = await fetch('/api/admin/reorder', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          model: 'gallery',
+          items: reorderedItems.map((item) => ({ _id: item._id, order: item.order })),
+        }),
+      });
+
+      if (!response.ok) throw new Error('Erro ao reordenar');
+
+      toast.success('Ordem atualizada!');
+      setItems(reorderedItems);
+    } catch (error) {
+      toast.error('Erro ao reordenar itens');
+    }
+  };
+
+  const sensors = useSensors(
+    useSensor(PointerSensor, {
+      activationConstraint: {
+        distance: 8,
+      },
+    }),
+    useSensor(KeyboardSensor, {
+      coordinateGetter: sortableKeyboardCoordinates,
+    })
+  );
+
+  const handleDragEnd = async (event: DragEndEvent) => {
+    const { active, over } = event;
+
+    if (over && active.id !== over.id) {
+      const oldIndex = filteredItems.findIndex((item) => item._id === active.id);
+      const newIndex = filteredItems.findIndex((item) => item._id === over.id);
+
+      const newItems = arrayMove(filteredItems, oldIndex, newIndex).map((item, index) => ({
+        ...item,
+        order: index + 1,
+      }));
+
+      // Atualizar items mantendo os não filtrados
+      const updatedItems = items.map(item => {
+        const updated = newItems.find(i => i._id === item._id);
+        return updated || item;
+      });
+
+      setItems(updatedItems);
+      await handleReorder(newItems);
+    }
+  };
+
   const categories = Array.from(new Set(items.map(i => i.category)));
 
   const filteredItems = items
@@ -208,62 +402,32 @@ export default function AdminGaleriaPage() {
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600"></div>
           </div>
         ) : filteredItems.length > 0 ? (
-          <div className="grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-            {filteredItems.map((item) => (
-              <div
-                key={item._id}
-                className="relative group rounded-lg overflow-hidden border border-gray-200"
+          <>
+            <DndContext
+              sensors={sensors}
+              collisionDetection={closestCenter}
+              onDragEnd={handleDragEnd}
+            >
+              <SortableContext
+                items={filteredItems.map((item) => item._id)}
+                strategy={rectSortingStrategy}
+                disabled={!!categoryFilter || !!searchTerm}
               >
-                <div className="aspect-video relative">
-                  {item.type === 'video' ? (
-                    <div className="w-full h-full bg-gray-800 flex items-center justify-center">
-                      <VideoCameraIcon className="w-12 h-12 text-gray-400" />
-                    </div>
-                  ) : (
-                    <Image
-                      src={item.thumbnail || item.src}
-                      alt={item.title}
-                      fill
-                      className="object-cover"
+                <div className="grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                  {filteredItems.map((item) => (
+                    <SortableGalleryItem
+                      key={item._id}
+                      item={item}
+                      onEdit={() => openModal(item)}
+                      onDelete={() => handleDelete(item._id)}
+                      disabled={!!categoryFilter || !!searchTerm}
                     />
-                  )}
-                  <div className="absolute inset-0 bg-black/0 group-hover:bg-black/40 transition-colors" />
-
-                  {/* Actions */}
-                  <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-                    <div className="flex space-x-2">
-                      <button
-                        onClick={() => openModal(item)}
-                        className="p-2 bg-white rounded-full text-gray-800 hover:bg-blue-500 hover:text-white transition-colors"
-                      >
-                        <PencilIcon className="w-5 h-5" />
-                      </button>
-                      <button
-                        onClick={() => handleDelete(item._id)}
-                        className="p-2 bg-white rounded-full text-gray-800 hover:bg-red-500 hover:text-white transition-colors"
-                      >
-                        <TrashIcon className="w-5 h-5" />
-                      </button>
-                    </div>
-                  </div>
-
-                  {/* Type Badge */}
-                  <div className="absolute top-2 left-2">
-                    {item.type === 'video' ? (
-                      <span className="bg-red-500 text-white text-xs px-2 py-1 rounded-full">Vídeo</span>
-                    ) : (
-                      <span className="bg-blue-500 text-white text-xs px-2 py-1 rounded-full">Foto</span>
-                    )}
-                  </div>
+                  ))}
                 </div>
-
-                <div className="p-3">
-                  <p className="font-medium text-gray-800 text-sm truncate">{item.title}</p>
-                  <p className="text-xs text-gray-500">{item.category}</p>
-                </div>
-              </div>
-            ))}
-          </div>
+              </SortableContext>
+            </DndContext>
+            <Tooltip id="drag-tooltip" place="top" />
+          </>
         ) : (
           <div className="text-center py-12">
             <PhotoIcon className="w-12 h-12 mx-auto text-gray-400 mb-4" />

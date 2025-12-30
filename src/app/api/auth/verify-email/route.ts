@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import dbConnect from '@/lib/mongodb';
 import { User } from '@/models/User';
+import { PreRegistration } from '@/models/PreRegistration';
+import { Reservation } from '@/models/Reservation';
 
 export const dynamic = 'force-dynamic';
 
@@ -34,6 +36,37 @@ export async function GET(request: NextRequest) {
     user.emailVerificationToken = undefined;
     user.emailVerificationExpires = undefined;
     await user.save();
+
+    // Buscar pré-cadastro associado ao usuário e confirmar reservas pendentes
+    try {
+      const preRegistration = await PreRegistration.findOne({
+        registeredUserId: user._id.toString(),
+      });
+
+      if (preRegistration) {
+        // Buscar e confirmar reservas pendentes associadas ao pré-cadastro
+        const pendingReservations = await Reservation.find({
+          preRegistrationId: preRegistration._id.toString(),
+          status: 'pending',
+        });
+
+        for (const reservation of pendingReservations) {
+          reservation.userId = user._id.toString();
+          reservation.status = 'upcoming';
+          reservation.notes = reservation.notes?.replace('[Pré-reserva]', '[Confirmada]') || '[Confirmada]';
+          await reservation.save();
+        }
+
+        // Atualizar status do pré-cadastro para completed
+        preRegistration.status = 'completed';
+        await preRegistration.save();
+
+        console.log(`Reservas confirmadas para usuário ${user.email}: ${pendingReservations.length}`);
+      }
+    } catch (reservationError) {
+      console.error('Erro ao confirmar reservas:', reservationError);
+      // Não bloqueia a verificação se houver erro nas reservas
+    }
 
     // Redirecionar para login com mensagem de sucesso
     return NextResponse.redirect(

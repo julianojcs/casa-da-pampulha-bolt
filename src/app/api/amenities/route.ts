@@ -23,7 +23,13 @@ export async function GET(request: NextRequest) {
 
     const amenities = await Amenity.find(query).sort({ order: 1 });
 
-    return NextResponse.json(amenities);
+    return NextResponse.json(amenities, {
+      headers: {
+        'Cache-Control': 'no-cache, no-store, must-revalidate',
+        'Pragma': 'no-cache',
+        'Expires': '0'
+      }
+    });
   } catch (error) {
     console.error('Error fetching amenities:', error);
     return NextResponse.json(

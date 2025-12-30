@@ -5,9 +5,11 @@ import {
   PlusIcon,
   PencilIcon,
   TrashIcon,
-  XMarkIcon
+  XMarkIcon,
+  Bars3Icon
 } from '@heroicons/react/24/outline';
 import toast from 'react-hot-toast';
+import { SortableContainer, SortableCard } from '@/components/SortableTable';
 
 interface FAQ {
   _id: string;
@@ -120,6 +122,27 @@ export default function AdminFAQsPage() {
     }
   };
 
+  const handleReorder = async (reorderedItems: FAQ[]) => {
+    try {
+      const response = await fetch('/api/admin/reorder', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          model: 'faqs',
+          items: reorderedItems.map((item) => ({ _id: item._id, order: item.order })),
+        }),
+      });
+
+      if (!response.ok) throw new Error('Erro ao reordenar');
+
+      toast.success('Ordem atualizada!');
+      setFaqs(reorderedItems);
+    } catch (error) {
+      toast.error('Erro ao reordenar FAQs');
+      throw error;
+    }
+  };
+
   const sortedFaqs = [...faqs].sort((a, b) => a.order - b.order);
 
   return (
@@ -145,49 +168,56 @@ export default function AdminFAQsPage() {
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-teal-600"></div>
           </div>
         ) : sortedFaqs.length > 0 ? (
-          <div className="divide-y divide-gray-200">
-            {sortedFaqs.map((faq) => (
-              <div
-                key={faq._id}
-                className="p-6 hover:bg-gray-50 transition-colors"
-              >
-                <div className="flex items-start justify-between gap-4">
-                  <div className="flex-1">
-                    <div className="flex items-center gap-2 mb-2">
-                      <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-teal-100 text-teal-800">
-                        {faq.category}
-                      </span>
-                      {!faq.isActive && (
-                        <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
-                          Inativo
-                        </span>
-                      )}
+          <SortableContainer
+            items={sortedFaqs}
+            onReorder={handleReorder}
+          >
+            {(items) => (
+              <div className="divide-y divide-gray-200">
+                {items.map((faq) => (
+                  <SortableCard key={faq._id} id={faq._id}>
+                    <div className="p-6 pl-14 hover:bg-gray-50 transition-colors">
+                      <div className="flex items-start justify-between gap-4">
+                        <div className="flex-1">
+                          <div className="flex items-center gap-2 mb-2">
+                            <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-teal-100 text-teal-800">
+                              {faq.category}
+                            </span>
+                            <span className="text-xs text-gray-400">#{faq.order}</span>
+                            {!faq.isActive && (
+                              <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
+                                Inativo
+                              </span>
+                            )}
+                          </div>
+                          <h3 className="text-lg font-medium text-gray-800 mb-2">
+                            {faq.question}
+                          </h3>
+                          <p className="text-gray-600 text-sm">
+                            {faq.answer}
+                          </p>
+                        </div>
+                        <div className="flex items-center space-x-2 flex-shrink-0">
+                          <button
+                            onClick={() => openModal(faq)}
+                            className="p-2 text-gray-400 hover:text-blue-600 transition-colors"
+                          >
+                            <PencilIcon className="w-5 h-5" />
+                          </button>
+                          <button
+                            onClick={() => handleDelete(faq._id)}
+                            className="p-2 text-gray-400 hover:text-red-600 transition-colors"
+                          >
+                            <TrashIcon className="w-5 h-5" />
+                          </button>
+                        </div>
+                      </div>
                     </div>
-                    <h3 className="text-lg font-medium text-gray-800 mb-2">
-                      {faq.question}
-                    </h3>
-                    <p className="text-gray-600 text-sm">
-                      {faq.answer}
-                    </p>
-                  </div>
-                  <div className="flex items-center space-x-2 flex-shrink-0">
-                    <button
-                      onClick={() => openModal(faq)}
-                      className="p-2 text-gray-400 hover:text-blue-600 transition-colors"
-                    >
-                      <PencilIcon className="w-5 h-5" />
-                    </button>
-                    <button
-                      onClick={() => handleDelete(faq._id)}
-                      className="p-2 text-gray-400 hover:text-red-600 transition-colors"
-                    >
-                      <TrashIcon className="w-5 h-5" />
-                    </button>
-                  </div>
-                </div>
+                  </SortableCard>
+                ))}
               </div>
-            ))}
-          </div>
+            )}
+          </SortableContainer>
         ) : (
           <div className="text-center py-12">
             <p className="text-gray-500">Nenhuma FAQ encontrada.</p>

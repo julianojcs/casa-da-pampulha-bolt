@@ -9,6 +9,7 @@ import {
 } from '@heroicons/react/24/outline';
 import toast from 'react-hot-toast';
 import { ScrollableFilter } from '@/components/ScrollableFilter';
+import { SortableContainer, SortableRow, SortableCard } from '@/components/SortableTable';
 
 interface GuestInfo {
   _id: string;
@@ -133,9 +134,43 @@ export default function AdminGuestInfoPage() {
     }
   };
 
+  // Define type order for sorting
+  const typeOrder = ['checkin', 'checkout', 'rule', 'instruction'];
+
   const filteredItems = filterType
-    ? items.filter((item) => item.type === filterType)
-    : items;
+    ? items.filter((item) => item.type === filterType).sort((a, b) => a.order - b.order)
+    : items.sort((a, b) => {
+        // Sort by type first, then by order
+        const typeIndexA = typeOrder.indexOf(a.type);
+        const typeIndexB = typeOrder.indexOf(b.type);
+        if (typeIndexA !== typeIndexB) return typeIndexA - typeIndexB;
+        return a.order - b.order;
+      });
+
+  const handleReorder = async (reorderedItems: GuestInfo[]) => {
+    const previousItems = [...items];
+
+    // Atualiza localmente primeiro
+    setItems(reorderedItems);
+
+    try {
+      const response = await fetch('/api/admin/reorder', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          model: 'guest-info',
+          items: reorderedItems.map((item, index) => ({ _id: item._id, order: index + 1 }))
+        }),
+      });
+
+      if (!response.ok) throw new Error('Erro ao salvar ordem');
+      toast.success('Ordem atualizada!');
+    } catch (error) {
+      console.error('Erro ao reordenar:', error);
+      setItems(previousItems);
+      toast.error('Erro ao salvar ordem');
+    }
+  };
 
   const getTypeLabel = (type: string) => {
     const found = types.find((t) => t.value === type);
@@ -200,28 +235,104 @@ export default function AdminGuestInfoPage() {
       <div className="bg-white rounded-xl shadow-sm overflow-hidden">
         {/* Desktop Table */}
         <div className="hidden md:block">
-          <table className="min-w-full divide-y divide-gray-200">
-            <thead className="bg-gray-50">
-              <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Tipo</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Título</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Conteúdo</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Ordem</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Restrito</th>
-                <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">Ações</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-gray-200">
-              {filteredItems.length === 0 ? (
-                <tr>
-                  <td colSpan={6} className="px-6 py-12 text-center">
+          <SortableContainer
+            items={filteredItems}
+            onReorder={handleReorder}
+            disabled={!filterType}
+          >
+            {(sortedItems) => (
+              <table className="min-w-full divide-y divide-gray-200">
+                <thead className="bg-gray-50">
+                  <tr>
+                    <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase w-10"></th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Tipo</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Título</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Conteúdo</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Ordem</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Restrito</th>
+                    <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">Ações</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-gray-200">
+                  {sortedItems.length === 0 ? (
+                    <tr>
+                      <td colSpan={7} className="px-6 py-12 text-center">
+                        <div className="flex flex-col items-center justify-center text-gray-500">
+                          <PlusIcon className="h-12 w-12 text-gray-400 mb-3" />
+                          <p className="text-lg font-medium text-gray-700 mb-1">
+                            {filterType ? 'Nenhum item deste tipo ainda' : 'Nenhuma informação cadastrada'}
+                          </p>
+                          <p className="text-sm text-gray-500 mb-4">
+                            {filterType ? `Clique em "Novo Item" para adicionar ${getTypeLabel(filterType).toLowerCase()}` : 'Comece criando informações de check-in, check-out ou regras da casa'}
+                          </p>
+                          <button
+                            onClick={() => openModal()}
+                            className="text-amber-600 hover:text-amber-700 font-medium text-sm"
+                          >
+                            + Criar primeiro item
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  ) : (
+                    sortedItems.map((item) => (
+                      <SortableRow key={item._id} id={item._id} disabled={!filterType}>
+                        <td className="px-6 py-4">
+                          <span className={`px-2 py-1 text-xs rounded-full ${getTypeBadgeColor(item.type)}`}>
+                            {getTypeLabel(item.type)}
+                          </span>
+                        </td>
+                        <td className="px-6 py-4 font-medium text-gray-900">{item.title}</td>
+                        <td className="px-6 py-4 text-sm text-gray-500 max-w-xs truncate">{item.content}</td>
+                        <td className="px-6 py-4 text-sm text-gray-500">{item.order}</td>
+                        <td className="px-6 py-4">
+                          <span className={`px-2 py-1 text-xs rounded-full ${
+                            item.isRestricted ? 'bg-yellow-100 text-yellow-800' : 'bg-gray-100 text-gray-600'
+                          }`}>
+                            {item.isRestricted ? 'Sim' : 'Não'}
+                          </span>
+                        </td>
+                        <td className="px-6 py-4 text-right space-x-2">
+                          <button
+                            onClick={() => openModal(item)}
+                            className="text-amber-600 hover:text-amber-800"
+                          >
+                            <PencilIcon className="h-5 w-5" />
+                          </button>
+                          <button
+                            onClick={() => handleDelete(item._id)}
+                            className="text-red-600 hover:text-red-800"
+                          >
+                            <TrashIcon className="h-5 w-5" />
+                          </button>
+                        </td>
+                      </SortableRow>
+                    ))
+                  )}
+                </tbody>
+              </table>
+            )}
+          </SortableContainer>
+        </div>
+
+        {/* Mobile Cards */}
+        <div className="md:hidden">
+          <SortableContainer
+            items={filteredItems}
+            onReorder={handleReorder}
+            disabled={!filterType}
+          >
+            {(sortedItems) => (
+              <div className="divide-y divide-gray-200">
+                {sortedItems.length === 0 ? (
+                  <div className="px-6 py-12 text-center">
                     <div className="flex flex-col items-center justify-center text-gray-500">
                       <PlusIcon className="h-12 w-12 text-gray-400 mb-3" />
                       <p className="text-lg font-medium text-gray-700 mb-1">
                         {filterType ? 'Nenhum item deste tipo ainda' : 'Nenhuma informação cadastrada'}
                       </p>
                       <p className="text-sm text-gray-500 mb-4">
-                        {filterType ? `Clique em "Novo Item" para adicionar ${getTypeLabel(filterType).toLowerCase()}` : 'Comece criando informações de check-in, check-out ou regras da casa'}
+                        {filterType ? `Clique em "Novo Item" para adicionar ${getTypeLabel(filterType).toLowerCase()}` : 'Comece criando informações de check-in, check-out ou regras'}
                       </p>
                       <button
                         onClick={() => openModal()}
@@ -230,104 +341,47 @@ export default function AdminGuestInfoPage() {
                         + Criar primeiro item
                       </button>
                     </div>
-                  </td>
-                </tr>
-              ) : (
-                filteredItems.map((item) => (
-                  <tr key={item._id} className="hover:bg-gray-50">
-                    <td className="px-6 py-4">
-                      <span className={`px-2 py-1 text-xs rounded-full ${getTypeBadgeColor(item.type)}`}>
-                        {getTypeLabel(item.type)}
-                      </span>
-                    </td>
-                    <td className="px-6 py-4 font-medium text-gray-900">{item.title}</td>
-                    <td className="px-6 py-4 text-sm text-gray-500 max-w-xs truncate">{item.content}</td>
-                    <td className="px-6 py-4 text-sm text-gray-500">{item.order}</td>
-                    <td className="px-6 py-4">
-                      <span className={`px-2 py-1 text-xs rounded-full ${
-                        item.isRestricted ? 'bg-yellow-100 text-yellow-800' : 'bg-gray-100 text-gray-600'
-                      }`}>
-                        {item.isRestricted ? 'Sim' : 'Não'}
-                      </span>
-                    </td>
-                    <td className="px-6 py-4 text-right space-x-2">
-                      <button
-                        onClick={() => openModal(item)}
-                        className="text-amber-600 hover:text-amber-800"
-                      >
-                        <PencilIcon className="h-5 w-5" />
-                      </button>
-                      <button
-                        onClick={() => handleDelete(item._id)}
-                        className="text-red-600 hover:text-red-800"
-                      >
-                        <TrashIcon className="h-5 w-5" />
-                      </button>
-                    </td>
-                  </tr>
-                ))
-              )}
-            </tbody>
-          </table>
-        </div>
-
-        {/* Mobile Cards */}
-        <div className="md:hidden divide-y divide-gray-200">
-          {filteredItems.length === 0 ? (
-            <div className="px-6 py-12 text-center">
-              <div className="flex flex-col items-center justify-center text-gray-500">
-                <PlusIcon className="h-12 w-12 text-gray-400 mb-3" />
-                <p className="text-lg font-medium text-gray-700 mb-1">
-                  {filterType ? 'Nenhum item deste tipo ainda' : 'Nenhuma informação cadastrada'}
-                </p>
-                <p className="text-sm text-gray-500 mb-4">
-                  {filterType ? `Clique em "Novo Item" para adicionar ${getTypeLabel(filterType).toLowerCase()}` : 'Comece criando informações de check-in, check-out ou regras'}
-                </p>
-                <button
-                  onClick={() => openModal()}
-                  className="text-amber-600 hover:text-amber-700 font-medium text-sm"
-                >
-                  + Criar primeiro item
-                </button>
-              </div>
-            </div>
-          ) : (
-            filteredItems.map((item) => (
-              <div key={item._id} className="p-4 hover:bg-gray-50">
-                <div className="flex items-start justify-between gap-3">
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-2 mb-1 flex-wrap">
-                      <span className={`px-2 py-0.5 text-xs rounded-full ${getTypeBadgeColor(item.type)}`}>
-                        {getTypeLabel(item.type)}
-                      </span>
-                      {item.isRestricted && (
-                        <span className="px-2 py-0.5 text-xs rounded-full bg-yellow-100 text-yellow-800">
-                          Restrito
-                        </span>
-                      )}
-                      <span className="text-xs text-gray-400">Ordem: {item.order}</span>
-                    </div>
-                    <p className="font-medium text-gray-900">{item.title}</p>
-                    <p className="text-sm text-gray-500 mt-1 line-clamp-2">{item.content}</p>
                   </div>
-                  <div className="flex items-center gap-1 flex-shrink-0">
-                    <button
-                      onClick={() => openModal(item)}
-                      className="p-2 text-amber-600 hover:text-amber-800 hover:bg-amber-50 rounded"
-                    >
-                      <PencilIcon className="h-5 w-5" />
-                    </button>
-                    <button
-                      onClick={() => handleDelete(item._id)}
-                      className="p-2 text-red-600 hover:text-red-800 hover:bg-red-50 rounded"
-                    >
-                      <TrashIcon className="h-5 w-5" />
-                    </button>
-                  </div>
-                </div>
+                ) : (
+                  sortedItems.map((item) => (
+                    <SortableCard key={item._id} id={item._id} disabled={!filterType}>
+                      <div className="flex items-start justify-between gap-3 flex-1">
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center gap-2 mb-1 flex-wrap">
+                            <span className={`px-2 py-0.5 text-xs rounded-full ${getTypeBadgeColor(item.type)}`}>
+                              {getTypeLabel(item.type)}
+                            </span>
+                            {item.isRestricted && (
+                              <span className="px-2 py-0.5 text-xs rounded-full bg-yellow-100 text-yellow-800">
+                                Restrito
+                              </span>
+                            )}
+                            <span className="text-xs text-gray-400">Ordem: {item.order}</span>
+                          </div>
+                          <p className="font-medium text-gray-900">{item.title}</p>
+                          <p className="text-sm text-gray-500 mt-1 line-clamp-2">{item.content}</p>
+                        </div>
+                        <div className="flex items-center gap-1 flex-shrink-0">
+                          <button
+                            onClick={() => openModal(item)}
+                            className="p-2 text-amber-600 hover:text-amber-800 hover:bg-amber-50 rounded"
+                          >
+                            <PencilIcon className="h-5 w-5" />
+                          </button>
+                          <button
+                            onClick={() => handleDelete(item._id)}
+                            className="p-2 text-red-600 hover:text-red-800 hover:bg-red-50 rounded"
+                          >
+                            <TrashIcon className="h-5 w-5" />
+                          </button>
+                        </div>
+                      </div>
+                    </SortableCard>
+                  ))
+                )}
               </div>
-            ))
-          )}
+            )}
+          </SortableContainer>
         </div>
       </div>
 

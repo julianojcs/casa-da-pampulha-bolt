@@ -23,6 +23,38 @@ export default function GalleryGrid({ items, categories }: GalleryGridProps) {
   const [isLoadingMore, setIsLoadingMore] = useState(false);
   const loadMoreRef = useRef<HTMLDivElement>(null);
   const filterScrollRef = useRef<HTMLDivElement>(null);
+  const [showLeftArrow, setShowLeftArrow] = useState(false);
+  const [showRightArrow, setShowRightArrow] = useState(false);
+
+  // Verificar se precisa mostrar setas de navegação
+  const checkFilterScroll = useCallback(() => {
+    const container = filterScrollRef.current;
+    if (!container) return;
+
+    setShowLeftArrow(container.scrollLeft > 10);
+    setShowRightArrow(
+      container.scrollLeft < container.scrollWidth - container.clientWidth - 10
+    );
+  }, []);
+
+  // Scroll do filtro
+  const scrollFilter = (direction: 'left' | 'right') => {
+    const container = filterScrollRef.current;
+    if (!container) return;
+
+    const scrollAmount = 150;
+    container.scrollBy({
+      left: direction === 'left' ? -scrollAmount : scrollAmount,
+      behavior: 'smooth',
+    });
+  };
+
+  // Check scroll on mount and resize
+  useEffect(() => {
+    checkFilterScroll();
+    window.addEventListener('resize', checkFilterScroll);
+    return () => window.removeEventListener('resize', checkFilterScroll);
+  }, [checkFilterScroll, categories]);
 
   const filteredItems = selectedCategory === 'Todos'
     ? items
@@ -150,28 +182,27 @@ export default function GalleryGrid({ items, categories }: GalleryGridProps) {
   return (
     <div>
       {/* Category Filter - Horizontal Scroll */}
-      <div className="relative mb-8">
-        {/* Left gradient for desktop */}
-        <div className="absolute left-0 top-0 bottom-2 w-8 bg-gradient-to-r from-white to-transparent pointer-events-none z-10 hidden sm:block opacity-0" id="filter-left-gradient" />
+      <div className="relative mb-8 flex items-center">
+        {/* Left Arrow */}
+        {showLeftArrow && (
+          <button
+            type="button"
+            onClick={() => scrollFilter('left')}
+            className="absolute left-0 z-10 h-full px-1 bg-gradient-to-r from-white via-white to-transparent flex items-center"
+          >
+            <ChevronLeftIcon className="h-5 w-5 text-gray-500 hover:text-amber-600" />
+          </button>
+        )}
+
         <div
           ref={filterScrollRef}
-          className="flex gap-2 overflow-x-auto scrollbar-hide pb-2 scroll-smooth"
+          className="flex gap-2 overflow-x-auto scrollbar-hide pb-2 scroll-smooth px-6"
           style={{
             scrollbarWidth: 'none',
             msOverflowStyle: 'none',
             WebkitOverflowScrolling: 'touch'
           }}
-          onScroll={(e) => {
-            const el = e.currentTarget;
-            const leftGradient = document.getElementById('filter-left-gradient');
-            const rightGradient = document.getElementById('filter-right-gradient');
-            if (leftGradient) {
-              leftGradient.style.opacity = el.scrollLeft > 10 ? '1' : '0';
-            }
-            if (rightGradient) {
-              rightGradient.style.opacity = el.scrollLeft < el.scrollWidth - el.clientWidth - 10 ? '1' : '0';
-            }
-          }}
+          onScroll={checkFilterScroll}
         >
           {categories.map((category) => (
             <button
@@ -189,8 +220,17 @@ export default function GalleryGrid({ items, categories }: GalleryGridProps) {
           {/* Elemento invisível para padding final */}
           <div className="w-1 flex-shrink-0" aria-hidden="true" />
         </div>
-        {/* Right gradient para indicar scroll */}
-        <div id="filter-right-gradient" className="absolute right-0 top-0 bottom-2 w-12 bg-gradient-to-l from-white to-transparent pointer-events-none z-10 transition-opacity" />
+
+        {/* Right Arrow */}
+        {showRightArrow && (
+          <button
+            type="button"
+            onClick={() => scrollFilter('right')}
+            className="absolute right-0 z-10 h-full px-1 bg-gradient-to-l from-white via-white to-transparent flex items-center"
+          >
+            <ChevronRightIcon className="h-5 w-5 text-gray-500 hover:text-amber-600" />
+          </button>
+        )}
       </div>
 
       {/* Gallery Grid */}

@@ -10,8 +10,7 @@ import {
   XMarkIcon,
   UserCircleIcon,
   CheckCircleIcon,
-  XCircleIcon,
-  EyeIcon
+  XCircleIcon
 } from '@heroicons/react/24/outline';
 import toast from 'react-hot-toast';
 import { CloudinaryUpload } from '@/components/CloudinaryUpload';
@@ -340,19 +339,25 @@ export default function AdminUsuariosPage() {
                     <tr key={user._id} className="hover:bg-gray-50">
                       <td className="px-6 py-4">
                         <div className="flex items-center space-x-3">
-                          {user.avatar ? (
-                            <Image
-                              src={user.avatar}
-                              alt={user.name}
-                              width={40}
-                              height={40}
-                              className="rounded-full object-cover"
-                            />
-                          ) : (
-                            <div className="h-10 w-10 rounded-full bg-gray-100 flex items-center justify-center">
-                              <UserCircleIcon className="h-6 w-6 text-gray-400" />
-                            </div>
-                          )}
+                          <button
+                            onClick={() => openViewModal(user)}
+                            className="flex-shrink-0 cursor-pointer hover:opacity-80 transition-opacity"
+                            title="Visualizar"
+                          >
+                            {user.avatar ? (
+                              <Image
+                                src={user.avatar}
+                                alt={user.name}
+                                width={40}
+                                height={40}
+                                className="rounded-full object-cover"
+                              />
+                            ) : (
+                              <div className="h-10 w-10 rounded-full bg-gray-100 flex items-center justify-center">
+                                <UserCircleIcon className="h-6 w-6 text-gray-400" />
+                              </div>
+                            )}
+                          </button>
                           <div>
                             <p className="font-medium text-gray-800">{user.name}</p>
                             <p className="text-sm text-gray-500">{user.email}</p>
@@ -388,13 +393,6 @@ export default function AdminUsuariosPage() {
                       <td className="px-6 py-4 text-right">
                         <div className="flex items-center justify-end space-x-2">
                           <button
-                            onClick={() => openViewModal(user)}
-                            className="p-2 text-gray-400 hover:text-green-600 transition-colors"
-                            title="Visualizar"
-                          >
-                            <EyeIcon className="w-5 h-5" />
-                          </button>
-                          <button
                             onClick={() => openModal(user)}
                             className="p-2 text-gray-400 hover:text-blue-600 transition-colors"
                             title="Editar"
@@ -421,19 +419,25 @@ export default function AdminUsuariosPage() {
                 <div key={user._id} className="p-4 hover:bg-gray-50">
                   <div className="flex items-start justify-between gap-3">
                     <div className="flex items-center gap-3 flex-1 min-w-0">
-                      {user.avatar ? (
-                        <Image
-                          src={user.avatar}
-                          alt={user.name}
-                          width={48}
-                          height={48}
-                          className="rounded-full object-cover flex-shrink-0"
-                        />
-                      ) : (
-                        <div className="h-12 w-12 rounded-full bg-gray-100 flex items-center justify-center flex-shrink-0">
-                          <UserCircleIcon className="h-7 w-7 text-gray-400" />
-                        </div>
-                      )}
+                      <button
+                        onClick={() => openViewModal(user)}
+                        className="flex-shrink-0 cursor-pointer hover:opacity-80 transition-opacity"
+                        title="Visualizar"
+                      >
+                        {user.avatar ? (
+                          <Image
+                            src={user.avatar}
+                            alt={user.name}
+                            width={48}
+                            height={48}
+                            className="rounded-full object-cover"
+                          />
+                        ) : (
+                          <div className="h-12 w-12 rounded-full bg-gray-100 flex items-center justify-center">
+                            <UserCircleIcon className="h-7 w-7 text-gray-400" />
+                          </div>
+                        )}
+                      </button>
                       <div className="min-w-0">
                         <p className="font-medium text-gray-800 truncate">{user.name}</p>
                         <p className="text-sm text-gray-500 truncate">{user.email}</p>
@@ -461,13 +465,6 @@ export default function AdminUsuariosPage() {
                       </div>
                     </div>
                     <div className="flex items-center gap-1 flex-shrink-0">
-                      <button
-                        onClick={() => openViewModal(user)}
-                        className="p-2 text-gray-400 hover:text-green-600 transition-colors"
-                        title="Visualizar"
-                      >
-                        <EyeIcon className="w-5 h-5" />
-                      </button>
                       <button
                         onClick={() => openModal(user)}
                         className="p-2 text-gray-400 hover:text-blue-600 transition-colors"

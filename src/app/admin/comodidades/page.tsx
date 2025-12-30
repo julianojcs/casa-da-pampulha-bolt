@@ -10,6 +10,7 @@ import {
 import toast from 'react-hot-toast';
 import { IconPicker, DynamicIcon } from '@/components/IconPicker';
 import { ScrollableFilter } from '@/components/ScrollableFilter';
+import { SortableContainer, SortableRow, SortableCard } from '@/components/SortableTable';
 
 interface Amenity {
   _id: string;
@@ -53,7 +54,10 @@ export default function AdminComodidadesPage() {
 
   const fetchAmenities = async () => {
     try {
-      const response = await fetch('/api/amenities');
+      const response = await fetch(`/api/amenities?t=${Date.now()}`, {
+        cache: 'no-store',
+        headers: { 'Cache-Control': 'no-cache, no-store, must-revalidate' }
+      });
       const data = await response.json();
       setAmenities(data);
     } catch (error) {
@@ -106,8 +110,8 @@ export default function AdminComodidadesPage() {
       if (!response.ok) throw new Error('Erro ao salvar');
 
       toast.success(editingAmenity ? 'Comodidade atualizada!' : 'Comodidade criada!');
+      await fetchAmenities();
       closeModal();
-      fetchAmenities();
     } catch (error) {
       toast.error('Erro ao salvar comodidade');
     } finally {
@@ -131,6 +135,32 @@ export default function AdminComodidadesPage() {
       toast.error('Erro ao excluir comodidade');
     }
   };
+
+  const handleReorder = async (reorderedItems: Amenity[]) => {
+    try {
+      const response = await fetch('/api/admin/reorder', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          model: 'amenities',
+          items: reorderedItems.map((item) => ({ _id: item._id, order: item.order })),
+        }),
+      });
+
+      if (!response.ok) throw new Error('Erro ao reordenar');
+
+      toast.success('Ordem atualizada!');
+      setAmenities(reorderedItems);
+    } catch (error) {
+      toast.error('Erro ao reordenar comodidades');
+      throw error;
+    }
+  };
+
+  // Filtrar amenities por categoria
+  const filteredAmenities = amenities
+    .filter(a => !filterCategory || a.category === filterCategory)
+    .sort((a, b) => a.order - b.order);
 
   if (loading) {
     return (
@@ -163,103 +193,120 @@ export default function AdminComodidadesPage() {
 
       {/* Lista de Comodidades - Desktop */}
       <div className="hidden md:block bg-white rounded-xl shadow-sm overflow-hidden">
-        <table className="min-w-full divide-y divide-gray-200">
-          <thead className="bg-gray-50">
-            <tr>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Ícone</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Nome</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Categoria</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Ordem</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
-              <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">Ações</th>
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-gray-200">
-            {amenities
-              .filter(a => !filterCategory || a.category === filterCategory)
-              .map((amenity) => (
-              <tr key={amenity._id} className="hover:bg-gray-50">
-                <td className="px-6 py-4">
-                  <div className="flex items-center justify-center w-10 h-10 bg-amber-100 rounded-lg">
-                    <DynamicIcon name={amenity.icon} className="h-5 w-5 text-amber-600" />
-                  </div>
-                </td>
-                <td className="px-6 py-4">
-                  <div className="font-medium text-gray-900">{amenity.name}</div>
-                  <div className="text-sm text-gray-500 line-clamp-1">{amenity.description}</div>
-                </td>
-                <td className="px-6 py-4 text-sm text-gray-500">{amenity.category}</td>
-                <td className="px-6 py-4 text-sm text-gray-500">{amenity.order}</td>
-                <td className="px-6 py-4">
-                  <span className={`px-2 py-1 text-xs rounded-full ${
-                    amenity.isActive ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
-                  }`}>
-                    {amenity.isActive ? 'Ativo' : 'Inativo'}
-                  </span>
-                </td>
-                <td className="px-6 py-4 text-right space-x-2">
-                  <button
-                    onClick={() => openModal(amenity)}
-                    className="text-amber-600 hover:text-amber-800"
-                  >
-                    <PencilIcon className="h-5 w-5" />
-                  </button>
-                  <button
-                    onClick={() => handleDelete(amenity._id)}
-                    className="text-red-600 hover:text-red-800"
-                  >
-                    <TrashIcon className="h-5 w-5" />
-                  </button>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+        <SortableContainer
+          items={filteredAmenities}
+          onReorder={handleReorder}
+          disabled={!!filterCategory}
+        >
+          {(sortedItems) => (
+            <table className="min-w-full divide-y divide-gray-200">
+              <thead className="bg-gray-50">
+                <tr>
+                  <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase w-10"></th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Ícone</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Nome</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Categoria</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Ordem</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
+                  <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">Ações</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-gray-200">
+                {sortedItems.map((amenity) => (
+                  <SortableRow key={amenity._id} id={amenity._id} disabled={!!filterCategory}>
+                    <td className="px-6 py-4">
+                      <div className="flex items-center justify-center w-10 h-10 bg-amber-100 rounded-lg">
+                        <DynamicIcon name={amenity.icon} className="h-5 w-5 text-amber-600" />
+                      </div>
+                    </td>
+                    <td className="px-6 py-4">
+                      <div className="font-medium text-gray-900">{amenity.name}</div>
+                      <div className="text-sm text-gray-500 line-clamp-1">{amenity.description}</div>
+                    </td>
+                    <td className="px-6 py-4 text-sm text-gray-500">{amenity.category}</td>
+                    <td className="px-6 py-4 text-sm text-gray-500">{amenity.order}</td>
+                    <td className="px-6 py-4">
+                      <span className={`px-2 py-1 text-xs rounded-full ${
+                        amenity.isActive ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
+                      }`}>
+                        {amenity.isActive ? 'Ativo' : 'Inativo'}
+                      </span>
+                    </td>
+                    <td className="px-6 py-4 text-right space-x-2">
+                      <button
+                        onClick={() => openModal(amenity)}
+                        className="text-amber-600 hover:text-amber-800"
+                      >
+                        <PencilIcon className="h-5 w-5" />
+                      </button>
+                      <button
+                        onClick={() => handleDelete(amenity._id)}
+                        className="text-red-600 hover:text-red-800"
+                      >
+                        <TrashIcon className="h-5 w-5" />
+                      </button>
+                    </td>
+                  </SortableRow>
+                ))}
+              </tbody>
+            </table>
+          )}
+        </SortableContainer>
       </div>
 
       {/* Lista de Comodidades - Mobile Cards */}
       <div className="md:hidden space-y-4">
-        {amenities
-          .filter(a => !filterCategory || a.category === filterCategory)
-          .map((amenity) => (
-          <div key={amenity._id} className="bg-white rounded-xl shadow-sm p-4">
-            <div className="flex items-start gap-4">
-              <div className="flex items-center justify-center w-12 h-12 bg-amber-100 rounded-lg flex-shrink-0">
-                <DynamicIcon name={amenity.icon} className="h-6 w-6 text-amber-600" />
-              </div>
-              <div className="flex-1 min-w-0">
-                <div className="flex items-center justify-between">
-                  <h3 className="font-medium text-gray-900 truncate">{amenity.name}</h3>
-                  <span className={`px-2 py-1 text-xs rounded-full ${
-                    amenity.isActive ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
-                  }`}>
-                    {amenity.isActive ? 'Ativo' : 'Inativo'}
-                  </span>
-                </div>
-                <p className="text-sm text-gray-500 line-clamp-2 mt-1">{amenity.description}</p>
-                <div className="flex items-center gap-4 mt-2 text-xs text-gray-500">
-                  <span>{amenity.category}</span>
-                  <span>Ordem: {amenity.order}</span>
-                </div>
-              </div>
+        <SortableContainer
+          items={filteredAmenities}
+          onReorder={handleReorder}
+          disabled={!!filterCategory}
+        >
+          {(sortedItems) => (
+            <div className="space-y-4">
+              {sortedItems.map((amenity) => (
+                <SortableCard key={amenity._id} id={amenity._id} disabled={!!filterCategory}>
+                  <div className="bg-white rounded-xl shadow-sm p-4 pl-12">
+                    <div className="flex items-start gap-4">
+                      <div className="flex items-center justify-center w-12 h-12 bg-amber-100 rounded-lg flex-shrink-0">
+                        <DynamicIcon name={amenity.icon} className="h-6 w-6 text-amber-600" />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center justify-between">
+                          <h3 className="font-medium text-gray-900 truncate">{amenity.name}</h3>
+                          <span className={`px-2 py-1 text-xs rounded-full ${
+                            amenity.isActive ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
+                          }`}>
+                            {amenity.isActive ? 'Ativo' : 'Inativo'}
+                          </span>
+                        </div>
+                        <p className="text-sm text-gray-500 line-clamp-2 mt-1">{amenity.description}</p>
+                        <div className="flex items-center gap-4 mt-2 text-xs text-gray-500">
+                          <span>{amenity.category}</span>
+                          <span>Ordem: {amenity.order}</span>
+                        </div>
+                      </div>
+                    </div>
+                    <div className="flex gap-2 mt-4 pt-4 border-t">
+                      <button
+                        onClick={() => openModal(amenity)}
+                        className="flex-1 flex items-center justify-center gap-2 px-3 py-2 text-amber-600 border border-amber-600 rounded-lg hover:bg-amber-50"
+                      >
+                        <PencilIcon className="h-4 w-4" />
+                        Editar
+                      </button>
+                      <button
+                        onClick={() => handleDelete(amenity._id)}
+                        className="px-3 py-2 text-red-600 border border-red-600 rounded-lg hover:bg-red-50"
+                      >
+                        <TrashIcon className="h-4 w-4" />
+                      </button>
+                    </div>
+                  </div>
+                </SortableCard>
+              ))}
             </div>
-            <div className="flex gap-2 mt-4 pt-4 border-t">
-              <button
-                onClick={() => openModal(amenity)}
-                className="flex-1 flex items-center justify-center gap-2 px-3 py-2 text-amber-600 border border-amber-600 rounded-lg hover:bg-amber-50"
-              >
-                <PencilIcon className="h-4 w-4" />
-                Editar
-              </button>
-              <button
-                onClick={() => handleDelete(amenity._id)}
-                className="px-3 py-2 text-red-600 border border-red-600 rounded-lg hover:bg-red-50"
-              >
-                <TrashIcon className="h-4 w-4" />
-              </button>
-            </div>
-          </div>
-        ))}
+          )}
+        </SortableContainer>
       </div>
 
       {/* Modal */}

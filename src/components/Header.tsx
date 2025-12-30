@@ -85,6 +85,11 @@ export default function Header() {
     await signOut({ callbackUrl: '/' });
   };
 
+  // Não renderizar o Header nas páginas do admin (admin tem seu próprio layout)
+  if (pathname?.startsWith('/admin')) {
+    return null;
+  }
+
   return (
     <header
       className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${

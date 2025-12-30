@@ -14,6 +14,7 @@ import {
   EnvelopeIcon,
   PhoneIcon,
   ClockIcon,
+  CalendarIcon,
   UserPlusIcon,
   XMarkIcon,
 } from '@heroicons/react/24/outline';
@@ -39,6 +40,18 @@ export default function PreCadastrosPage() {
     phone: '',
     notes: '',
     expirationDays: 30,
+    checkInDate: '',
+    checkInTime: '15:00',
+    checkOutDate: '',
+    checkOutTime: '11:00',
+    adultsCount: 1,
+    childrenCount: 0,
+    petsCount: 0,
+    reservationValue: 0,
+    reservationValueRaw: '',
+    hasReviews: false,
+    isHost: false,
+    originCountry: '',
   });
 
   useEffect(() => {
@@ -79,11 +92,42 @@ export default function PreCadastrosPage() {
       return;
     }
 
+    // Validar datas
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    if (formData.checkInDate) {
+      const checkIn = new Date(formData.checkInDate);
+      if (checkIn < today) {
+        toast.error('Data de check-in não pode ser anterior a hoje');
+        return;
+      }
+    }
+
+    if (formData.checkOutDate) {
+      const checkOut = new Date(formData.checkOutDate);
+      if (checkOut < today) {
+        toast.error('Data de check-out não pode ser anterior a hoje');
+        return;
+      }
+
+      if (formData.checkInDate && new Date(formData.checkOutDate) <= new Date(formData.checkInDate)) {
+        toast.error('Data de check-out deve ser posterior à data de check-in');
+        return;
+      }
+    }
+
     try {
       const method = editingItem ? 'PUT' : 'POST';
-      const body = editingItem
-        ? { id: editingItem._id, ...formData }
-        : formData;
+
+      // Parse reservationValue from raw input if provided (accept comma)
+      const raw = typeof formData.reservationValueRaw === 'string' && formData.reservationValueRaw.trim() !== ''
+        ? formData.reservationValueRaw
+        : String(formData.reservationValue || '0');
+      const reservationValueNumeric = parseFloat(raw.replace(',', '.').replace(/[^0-9.\-]/g, '')) || 0;
+
+      const bodyData = { ...formData, reservationValue: reservationValueNumeric };
+      const body = editingItem ? { id: editingItem._id, ...bodyData } : bodyData;
 
       const response = await fetch('/api/pre-registration', {
         method,
@@ -155,6 +199,18 @@ export default function PreCadastrosPage() {
         phone: item.phone,
         notes: item.notes || '',
         expirationDays: 30,
+        checkInDate: item.checkInDate ? new Date(item.checkInDate).toISOString().split('T')[0] : '',
+        checkInTime: item.checkInTime || '15:00',
+        checkOutDate: item.checkOutDate ? new Date(item.checkOutDate).toISOString().split('T')[0] : '',
+        checkOutTime: item.checkOutTime || '11:00',
+        adultsCount: item.adultsCount || 1,
+        childrenCount: item.childrenCount || 0,
+        petsCount: item.petsCount || 0,
+        reservationValue: item.reservationValue || 0,
+        reservationValueRaw: item.reservationValue ? String(item.reservationValue).replace('.', ',') : '',
+        hasReviews: item.hasReviews || false,
+        isHost: item.isHost || false,
+        originCountry: item.originCountry || '',
       });
     } else {
       setEditingItem(null);
@@ -164,6 +220,18 @@ export default function PreCadastrosPage() {
         phone: '',
         notes: '',
         expirationDays: 30,
+        checkInDate: '',
+        checkInTime: '15:00',
+        checkOutDate: '',
+        checkOutTime: '11:00',
+        adultsCount: 1,
+        childrenCount: 0,
+        petsCount: 0,
+        reservationValue: 0,
+        reservationValueRaw: '',
+        hasReviews: false,
+        isHost: false,
+        originCountry: '',
       });
     }
     setIsModalOpen(true);
@@ -173,11 +241,23 @@ export default function PreCadastrosPage() {
     setIsModalOpen(false);
     setEditingItem(null);
     setFormData({
-      name: '',
-      email: '',
-      phone: '',
-      notes: '',
-      expirationDays: 30,
+        name: '',
+        email: '',
+        phone: '',
+        notes: '',
+        expirationDays: 30,
+        checkInDate: '',
+        checkInTime: '15:00',
+        checkOutDate: '',
+        checkOutTime: '11:00',
+        adultsCount: 1,
+        childrenCount: 0,
+        petsCount: 0,
+        reservationValue: 0,
+        reservationValueRaw: '',
+        hasReviews: false,
+        isHost: false,
+        originCountry: '',
     });
   };
 
@@ -201,9 +281,11 @@ export default function PreCadastrosPage() {
 
   const filteredItems = preRegistrations.filter(
     (item) =>
-      item.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      // Excluir itens com status 'registered' - eles aparecem na página de hóspedes
+      item.status !== 'registered' &&
+      (item.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
       item.phone.includes(searchTerm) ||
-      (item.email && item.email.toLowerCase().includes(searchTerm.toLowerCase()))
+      (item.email && item.email.toLowerCase().includes(searchTerm.toLowerCase())))
   );
 
   if (status === 'loading' || loading) {
@@ -254,14 +336,13 @@ export default function PreCadastrosPage() {
             >
               <option value="">Todos os status</option>
               <option value="pending">Pendentes</option>
-              <option value="registered">Cadastrados</option>
               <option value="expired">Expirados</option>
             </select>
           </div>
         </div>
 
         {/* Stats */}
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
           <div className="bg-yellow-50 border border-yellow-200 rounded-xl p-4">
             <div className="flex items-center gap-3">
               <ClockIcon className="h-8 w-8 text-yellow-600" />
@@ -269,17 +350,6 @@ export default function PreCadastrosPage() {
                 <p className="text-sm text-yellow-700">Pendentes</p>
                 <p className="text-2xl font-bold text-yellow-800">
                   {preRegistrations.filter((p) => p.status === 'pending').length}
-                </p>
-              </div>
-            </div>
-          </div>
-          <div className="bg-green-50 border border-green-200 rounded-xl p-4">
-            <div className="flex items-center gap-3">
-              <CheckIcon className="h-8 w-8 text-green-600" />
-              <div>
-                <p className="text-sm text-green-700">Cadastrados</p>
-                <p className="text-2xl font-bold text-green-800">
-                  {preRegistrations.filter((p) => p.status === 'registered').length}
                 </p>
               </div>
             </div>
@@ -311,6 +381,9 @@ export default function PreCadastrosPage() {
                     Contato
                   </th>
                   <th className="text-left py-4 px-6 text-sm font-medium text-gray-500">
+                    Check-in / Check-out
+                  </th>
+                  <th className="text-left py-4 px-6 text-sm font-medium text-gray-500">
                     Status
                   </th>
                   <th className="text-left py-4 px-6 text-sm font-medium text-gray-500">
@@ -324,7 +397,7 @@ export default function PreCadastrosPage() {
               <tbody className="divide-y divide-gray-100">
                 {filteredItems.length === 0 ? (
                   <tr>
-                    <td colSpan={5} className="py-12 text-center text-gray-500">
+                    <td colSpan={6} className="py-12 text-center text-gray-500">
                       {searchTerm
                         ? 'Nenhum resultado encontrado'
                         : 'Nenhum pré-cadastro criado ainda'}
@@ -357,11 +430,35 @@ export default function PreCadastrosPage() {
                           )}
                         </div>
                       </td>
+                      <td className="py-4 px-6">
+                        <div className="text-sm text-gray-600 space-y-1">
+                          {item.checkInDate ? (
+                            <>
+                              <div>
+                                <span className="text-xs text-gray-500">In: </span>
+                                {new Date(item.checkInDate).toLocaleDateString('pt-BR')} {item.checkInTime}
+                              </div>
+                              {item.checkOutDate && (
+                                <div>
+                                  <span className="text-xs text-gray-500">Out: </span>
+                                  {new Date(item.checkOutDate).toLocaleDateString('pt-BR')} {item.checkOutTime}
+                                </div>
+                              )}
+                            </>
+                          ) : (
+                            <span className="text-gray-400">-</span>
+                          )}
+                        </div>
+                      </td>
                       <td className="py-4 px-6">{getStatusBadge(item.status)}</td>
                       <td className="py-4 px-6">
-                        <span className="text-sm text-gray-600">
-                          {new Date(item.expiresAt).toLocaleDateString('pt-BR')}
-                        </span>
+                        {item.status === 'pending' ? (
+                          <span className="text-sm text-gray-600">
+                            {new Date(item.expiresAt).toLocaleDateString('pt-BR')}
+                          </span>
+                        ) : (
+                          <span className="text-sm text-gray-400">-</span>
+                        )}
                       </td>
                       <td className="py-4 px-6">
                         <div className="flex items-center justify-end gap-2">
@@ -429,10 +526,21 @@ export default function PreCadastrosPage() {
                             <span className="truncate">{item.email}</span>
                           </div>
                         )}
-                        <div className="flex items-center gap-2 text-gray-500">
-                          <ClockIcon className="h-4 w-4 flex-shrink-0" />
-                          <span>Expira: {new Date(item.expiresAt).toLocaleDateString('pt-BR')}</span>
-                        </div>
+                        {item.checkInDate && (
+                          <div className="flex items-center gap-2 text-gray-600">
+                            <CalendarIcon className="h-4 w-4 flex-shrink-0" />
+                            <span>
+                              {new Date(item.checkInDate).toLocaleDateString('pt-BR')} {item.checkInTime}
+                              {item.checkOutDate && ` → ${new Date(item.checkOutDate).toLocaleDateString('pt-BR')} ${item.checkOutTime}`}
+                            </span>
+                          </div>
+                        )}
+                        {item.status === 'pending' && (
+                          <div className="flex items-center gap-2 text-gray-500">
+                            <ClockIcon className="h-4 w-4 flex-shrink-0" />
+                            <span>Expira: {new Date(item.expiresAt).toLocaleDateString('pt-BR')}</span>
+                          </div>
+                        )}
                         {item.notes && (
                           <p className="text-xs text-gray-500 italic mt-1">
                             {item.notes}
@@ -480,8 +588,8 @@ export default function PreCadastrosPage() {
       {/* Modal */}
       {isModalOpen && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-2xl max-w-lg w-full p-6">
-            <div className="flex justify-between items-center mb-6">
+          <div className="bg-white rounded-2xl max-w-lg w-full max-h-[90vh] flex flex-col overflow-hidden">
+            <div className="flex justify-between items-center p-6 border-b flex-shrink-0">
               <h2 className="text-xl font-bold text-gray-800">
                 {editingItem ? 'Editar Pré-Cadastro' : 'Novo Pré-Cadastro'}
               </h2>
@@ -493,7 +601,7 @@ export default function PreCadastrosPage() {
               </button>
             </div>
 
-            <form onSubmit={handleSubmit} className="space-y-4">
+            <form onSubmit={handleSubmit} className="p-6 space-y-4 overflow-y-auto flex-1">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
                   Nome do Hóspede *
@@ -519,7 +627,7 @@ export default function PreCadastrosPage() {
                   onChange={(e) =>
                     setFormData({ ...formData, phone: formatPhone(e.target.value) })
                   }
-                  placeholder="+55 (27) 98888-8888"
+                  placeholder="+55 (27) 9XXXX-XXXX"
                   className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent"
                   required
                 />
@@ -539,6 +647,198 @@ export default function PreCadastrosPage() {
                 />
               </div>
 
+              {/* Check-in */}
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Data Check-in
+                  </label>
+                  <input
+                    type="date"
+                    value={formData.checkInDate}
+                    onChange={(e) =>
+                      setFormData({ ...formData, checkInDate: e.target.value })
+                    }
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Hora Check-in
+                  </label>
+                  <input
+                    type="time"
+                    value={formData.checkInTime}
+                    onChange={(e) =>
+                      setFormData({ ...formData, checkInTime: e.target.value })
+                    }
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent"
+                  />
+                </div>
+              </div>
+
+              {/* Check-out */}
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Data Check-out
+                  </label>
+                  <input
+                    type="date"
+                    value={formData.checkOutDate}
+                    onChange={(e) =>
+                      setFormData({ ...formData, checkOutDate: e.target.value })
+                    }
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Hora Check-out
+                  </label>
+                  <input
+                    type="time"
+                    value={formData.checkOutTime}
+                    onChange={(e) =>
+                      setFormData({ ...formData, checkOutTime: e.target.value })
+                    }
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent"
+                  />
+                </div>
+              </div>
+
+              {/* Quantidade de hóspedes */}
+              <div className="grid grid-cols-3 gap-3">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Adultos
+                  </label>
+                  <input
+                    type="number"
+                    min={1}
+                    value={formData.adultsCount}
+                    onChange={(e) =>
+                      setFormData({ ...formData, adultsCount: Number(e.target.value) })
+                    }
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Crianças
+                  </label>
+                  <input
+                    type="number"
+                    min={0}
+                    value={formData.childrenCount}
+                    onChange={(e) =>
+                      setFormData({ ...formData, childrenCount: Number(e.target.value) })
+                    }
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Pets
+                  </label>
+                  <input
+                    type="number"
+                    min={0}
+                    value={formData.petsCount}
+                    onChange={(e) =>
+                      setFormData({ ...formData, petsCount: Number(e.target.value) })
+                    }
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent"
+                  />
+                </div>
+              </div>
+
+              {/* Valor e País */}
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Valor da Reserva (R$)
+                  </label>
+                  <input
+                    type="text"
+                    inputMode="decimal"
+                    value={formData.reservationValueRaw}
+                    onChange={(e) => {
+                      const raw = e.target.value;
+                      const numeric = parseFloat(raw.replace(',', '.').replace(/[^0-9.\-]/g, '')) || 0;
+                      setFormData({ ...formData, reservationValueRaw: raw, reservationValue: numeric });
+                    }}
+                    placeholder="0.00"
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    País de Origem
+                  </label>
+                  <select
+                    value={formData.originCountry}
+                    onChange={(e) =>
+                      setFormData({ ...formData, originCountry: e.target.value })
+                    }
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent"
+                  >
+                    <option value="">Selecione...</option>
+                    <option value="Brasil">Brasil</option>
+                    <option value="Argentina">Argentina</option>
+                    <option value="Chile">Chile</option>
+                    <option value="Colombia">Colômbia</option>
+                    <option value="Mexico">México</option>
+                    <option value="Peru">Peru</option>
+                    <option value="Uruguai">Uruguai</option>
+                    <option value="Paraguai">Paraguai</option>
+                    <option value="Estados Unidos">Estados Unidos</option>
+                    <option value="Canadá">Canadá</option>
+                    <option value="Portugal">Portugal</option>
+                    <option value="Espanha">Espanha</option>
+                    <option value="França">França</option>
+                    <option value="Itália">Itália</option>
+                    <option value="Alemanha">Alemanha</option>
+                    <option value="Reino Unido">Reino Unido</option>
+                    <option value="Holanda">Holanda</option>
+                    <option value="Suíça">Suíça</option>
+                    <option value="Japão">Japão</option>
+                    <option value="China">China</option>
+                    <option value="Coreia do Sul">Coreia do Sul</option>
+                    <option value="Austrália">Austrália</option>
+                    <option value="Nova Zelândia">Nova Zelândia</option>
+                    <option value="África do Sul">África do Sul</option>
+                    <option value="Outro">Outro</option>
+                  </select>
+                </div>
+              </div>
+
+              {/* Checkboxes */}
+              <div className="flex flex-wrap gap-4">
+                <label className="flex items-center gap-2 cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={formData.hasReviews}
+                    onChange={(e) =>
+                      setFormData({ ...formData, hasReviews: e.target.checked })
+                    }
+                    className="rounded border-gray-300 text-amber-600 focus:ring-amber-500"
+                  />
+                  <span className="text-sm text-gray-700">Tem avaliações</span>
+                </label>
+                <label className="flex items-center gap-2 cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={formData.isHost}
+                    onChange={(e) =>
+                      setFormData({ ...formData, isHost: e.target.checked })
+                    }
+                    className="rounded border-gray-300 text-amber-600 focus:ring-amber-500"
+                  />
+                  <span className="text-sm text-gray-700">É anfitrião</span>
+                </label>
+              </div>
+
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
                   Observações
@@ -550,7 +850,7 @@ export default function PreCadastrosPage() {
                   }
                   rows={2}
                   className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent"
-                  placeholder="Ex: Reserva de 10-15/Jan, 3 pessoas..."
+                  placeholder="Ex: aniversário, alergia..."
                 />
               </div>
 

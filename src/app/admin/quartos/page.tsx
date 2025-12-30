@@ -8,10 +8,29 @@ import {
   TrashIcon,
   XMarkIcon,
   EyeIcon,
+  Bars3Icon
 } from '@heroicons/react/24/outline';
 import toast from 'react-hot-toast';
 import { CloudinaryUpload } from '@/components/CloudinaryUpload';
 import { CLOUDINARY_FOLDERS } from '@/lib/cloudinary';
+import {
+  DndContext,
+  closestCenter,
+  KeyboardSensor,
+  PointerSensor,
+  useSensor,
+  useSensors,
+  DragEndEvent,
+} from '@dnd-kit/core';
+import {
+  arrayMove,
+  SortableContext,
+  sortableKeyboardCoordinates,
+  useSortable,
+  rectSortingStrategy,
+} from '@dnd-kit/sortable';
+import { CSS } from '@dnd-kit/utilities';
+import { Tooltip } from 'react-tooltip';
 
 interface Bed {
   type: string;
@@ -52,6 +71,115 @@ const emptyRoom: Omit<Room, '_id'> = {
   isActive: true,
 };
 
+// Componente de card sortável
+interface SortableRoomCardProps {
+  room: Room;
+  onView: (room: Room) => void;
+  onEdit: (room: Room) => void;
+  onDelete: (id: string) => void;
+}
+
+function SortableRoomCard({ room, onView, onEdit, onDelete }: SortableRoomCardProps) {
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition,
+    isDragging,
+  } = useSortable({ id: room._id });
+
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+    opacity: isDragging ? 0.5 : 1,
+  };
+
+  return (
+    <div
+      ref={setNodeRef}
+      style={style}
+      className={`bg-white rounded-xl shadow-sm overflow-hidden ${
+        !room.isActive ? 'opacity-60' : ''
+      } ${isDragging ? 'ring-2 ring-amber-500 shadow-lg z-10' : ''}`}
+    >
+      {/* Imagem */}
+      <div className="relative h-48 bg-gray-200">
+        {room.images && room.images.length > 0 ? (
+          <Image
+            src={room.images[0]}
+            alt={room.name}
+            fill
+            className="object-cover"
+          />
+        ) : (
+          <div className="flex items-center justify-center h-full text-gray-400">
+            Sem imagem
+          </div>
+        )}
+        {!room.isActive && (
+          <div className="absolute top-2 left-2 bg-red-500 text-white text-xs px-2 py-1 rounded">
+            Inativo
+          </div>
+        )}
+        {/* Drag Handle */}
+        <button
+          {...attributes}
+          {...listeners}
+          className="absolute top-2 right-2 cursor-grab active:cursor-grabbing text-white bg-black/50 hover:bg-black/70 rounded p-1.5 transition-colors"
+          data-tooltip-id="drag-tooltip"
+          data-tooltip-content="Arraste para reordenar"
+        >
+          <Bars3Icon className="h-5 w-5" />
+        </button>
+      </div>
+
+      {/* Conteúdo */}
+      <div className="p-4">
+        <div className="flex items-start justify-between gap-2">
+          <h3 className="font-semibold text-gray-800">{room.name}</h3>
+          <span className="text-xs text-gray-400 flex-shrink-0">#{room.order}</span>
+        </div>
+        <p className="text-sm text-gray-500 mt-1 line-clamp-2">
+          {room.description}
+        </p>
+        <div className="mt-2 text-sm text-gray-600">
+          <span>Máximo: {room.maxGuests} hóspedes</span>
+          {room.beds && room.beds.length > 0 && (
+            <span className="ml-2">
+              • {room.beds.reduce((acc, b) => acc + b.quantity, 0)} cama(s)
+            </span>
+          )}
+        </div>
+
+        {/* Ações */}
+        <div className="flex gap-2 mt-4">
+          <button
+            onClick={() => onView(room)}
+            className="flex-1 flex items-center justify-center gap-1 px-3 py-1.5 text-sm text-gray-600 border border-gray-300 rounded-lg hover:bg-gray-50"
+          >
+            <EyeIcon className="h-4 w-4" />
+            Ver
+          </button>
+          <button
+            onClick={() => onEdit(room)}
+            className="flex-1 flex items-center justify-center gap-1 px-3 py-1.5 text-sm text-amber-600 border border-amber-600 rounded-lg hover:bg-amber-50"
+          >
+            <PencilIcon className="h-4 w-4" />
+            Editar
+          </button>
+          <button
+            onClick={() => onDelete(room._id)}
+            className="px-3 py-1.5 text-red-600 border border-red-600 rounded-lg hover:bg-red-50"
+          >
+            <TrashIcon className="h-4 w-4" />
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export default function AdminQuartosPage() {
   const [rooms, setRooms] = useState<Room[]>([]);
   const [loading, setLoading] = useState(true);
@@ -62,6 +190,60 @@ export default function AdminQuartosPage() {
   const [saving, setSaving] = useState(false);
   const [newAmenity, setNewAmenity] = useState('');
   const [newBed, setNewBed] = useState<Bed>({ type: 'Cama de Casal', quantity: 1 });
+  const [isSavingOrder, setIsSavingOrder] = useState(false);
+
+  const sensors = useSensors(
+    useSensor(PointerSensor, {
+      activationConstraint: {
+        distance: 8,
+      },
+    }),
+    useSensor(KeyboardSensor, {
+      coordinateGetter: sortableKeyboardCoordinates,
+    })
+  );
+
+  const handleReorder = async (reorderedRooms: Room[]) => {
+    const previousRooms = [...rooms];
+    setRooms(reorderedRooms);
+    setIsSavingOrder(true);
+    
+    try {
+      const response = await fetch('/api/admin/reorder', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          model: 'rooms',
+          items: reorderedRooms.map((room) => ({ _id: room._id, order: room.order })),
+        }),
+      });
+      
+      if (!response.ok) throw new Error('Erro ao salvar ordem');
+      toast.success('Ordem atualizada!');
+    } catch (error) {
+      console.error('Erro ao reordenar:', error);
+      setRooms(previousRooms);
+      toast.error('Erro ao salvar ordem');
+    } finally {
+      setIsSavingOrder(false);
+    }
+  };
+
+  const handleDragEnd = (event: DragEndEvent) => {
+    const { active, over } = event;
+    
+    if (over && active.id !== over.id) {
+      const oldIndex = rooms.findIndex((room) => room._id === active.id);
+      const newIndex = rooms.findIndex((room) => room._id === over.id);
+      
+      const newRooms = arrayMove(rooms, oldIndex, newIndex).map((room, index) => ({
+        ...room,
+        order: index + 1,
+      }));
+      
+      handleReorder(newRooms);
+    }
+  };
 
   useEffect(() => {
     fetchRooms();
@@ -252,77 +434,36 @@ export default function AdminQuartosPage() {
       </div>
 
       {/* Grid de Quartos */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {rooms.map((room) => (
-          <div
-            key={room._id}
-            className={`bg-white rounded-xl shadow-sm overflow-hidden ${
-              !room.isActive ? 'opacity-60' : ''
-            }`}
-          >
-            {/* Imagem */}
-            <div className="relative h-48 bg-gray-200">
-              {room.images && room.images.length > 0 ? (
-                <Image
-                  src={room.images[0]}
-                  alt={room.name}
-                  fill
-                  className="object-cover"
-                />
-              ) : (
-                <div className="flex items-center justify-center h-full text-gray-400">
-                  Sem imagem
-                </div>
-              )}
-              {!room.isActive && (
-                <div className="absolute top-2 left-2 bg-red-500 text-white text-xs px-2 py-1 rounded">
-                  Inativo
-                </div>
-              )}
-            </div>
-
-            {/* Conteúdo */}
-            <div className="p-4">
-              <h3 className="font-semibold text-gray-800">{room.name}</h3>
-              <p className="text-sm text-gray-500 mt-1 line-clamp-2">
-                {room.description}
-              </p>
-              <div className="mt-2 text-sm text-gray-600">
-                <span>Máximo: {room.maxGuests} hóspedes</span>
-                {room.beds && room.beds.length > 0 && (
-                  <span className="ml-2">
-                    • {room.beds.reduce((acc, b) => acc + b.quantity, 0)} cama(s)
-                  </span>
-                )}
-              </div>
-
-              {/* Ações */}
-              <div className="flex gap-2 mt-4">
-                <button
-                  onClick={() => openViewModal(room)}
-                  className="flex-1 flex items-center justify-center gap-1 px-3 py-1.5 text-sm text-gray-600 border border-gray-300 rounded-lg hover:bg-gray-50"
-                >
-                  <EyeIcon className="h-4 w-4" />
-                  Ver
-                </button>
-                <button
-                  onClick={() => openModal(room)}
-                  className="flex-1 flex items-center justify-center gap-1 px-3 py-1.5 text-sm text-amber-600 border border-amber-600 rounded-lg hover:bg-amber-50"
-                >
-                  <PencilIcon className="h-4 w-4" />
-                  Editar
-                </button>
-                <button
-                  onClick={() => handleDelete(room._id)}
-                  className="px-3 py-1.5 text-red-600 border border-red-600 rounded-lg hover:bg-red-50"
-                >
-                  <TrashIcon className="h-4 w-4" />
-                </button>
-              </div>
-            </div>
+      <DndContext
+        sensors={sensors}
+        collisionDetection={closestCenter}
+        onDragEnd={handleDragEnd}
+      >
+        <SortableContext
+          items={rooms.map((room) => room._id)}
+          strategy={rectSortingStrategy}
+        >
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {rooms.map((room) => (
+              <SortableRoomCard
+                key={room._id}
+                room={room}
+                onView={openViewModal}
+                onEdit={openModal}
+                onDelete={handleDelete}
+              />
+            ))}
           </div>
-        ))}
-      </div>
+        </SortableContext>
+      </DndContext>
+      <Tooltip id="drag-tooltip" place="top" />
+      
+      {isSavingOrder && (
+        <div className="fixed bottom-4 right-4 bg-amber-600 text-white px-4 py-2 rounded-lg shadow-lg flex items-center gap-2 z-50">
+          <div className="animate-spin h-4 w-4 border-2 border-white border-t-transparent rounded-full"></div>
+          Salvando ordem...
+        </div>
+      )}
 
       {rooms.length === 0 && (
         <div className="text-center py-12">

@@ -2,7 +2,7 @@
 
 import { useSession } from 'next-auth/react';
 import { useRouter, usePathname } from 'next/navigation';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import {
@@ -19,26 +19,82 @@ import {
   XMarkIcon,
   SparklesIcon,
   HomeModernIcon,
-  UserCircleIcon
+  UserCircleIcon,
+  CalendarDaysIcon,
+  ChevronDownIcon,
+  BuildingOfficeIcon,
+  UserGroupIcon,
+  DocumentCheckIcon,
 } from '@heroicons/react/24/outline';
 import { signOut } from 'next-auth/react';
 
-const sidebarItems = [
-  { name: 'Dashboard', href: '/admin', icon: HomeIcon },
-  { name: 'Propriedade', href: '/admin/propriedade', icon: HomeIcon },
-  { name: 'Galeria', href: '/admin/galeria', icon: PhotoIcon },
-  { name: 'Locais', href: '/admin/locais', icon: MapPinIcon },
-  { name: 'Comodidades', href: '/admin/comodidades', icon: SquaresPlusIcon },
-  { name: 'Quartos', href: '/admin/quartos', icon: HomeModernIcon },
-  { name: 'FAQs', href: '/admin/faqs', icon: QuestionMarkCircleIcon },
-  { name: 'Usuários', href: '/admin/usuarios', icon: UsersIcon },
-  { name: 'Hóspedes', href: '/admin/hospedes', icon: ClipboardDocumentCheckIcon },
-  { name: 'Pré-cadastros', href: '/admin/pre-cadastros', icon: ClipboardDocumentCheckIcon },
-  { name: 'Informações', href: '/admin/guest-info', icon: ClipboardDocumentCheckIcon },
-  { name: 'Área Kids', href: '/admin/kids', icon: SparklesIcon },
-  { name: 'Configurações', href: '/admin/configuracoes', icon: CogIcon },
+interface MenuItem {
+  name: string;
+  href: string;
+  icon: React.ComponentType<{ className?: string }>;
+  countKey?: string; // Chave para buscar contador
+}
+
+interface MenuGroup {
+  name: string;
+  icon: React.ComponentType<{ className?: string }>;
+  items: MenuItem[];
+  countKey?: string; // Chave para contador do grupo
+}
+
+interface AdminStats {
+  users: number;
+  guests: number;
+  preRegistrations: number;
+  places: number;
+  gallery: number;
+  faqs: number;
+  rooms: number;
+  amenities: number;
+  usersGroupTotal: number;
+  activeReservations: number;
+  totalReservations: number;
+}
+
+const menuGroups: MenuGroup[] = [
+  {
+    name: 'Propriedade',
+    icon: BuildingOfficeIcon,
+    items: [
+      { name: 'Propriedade', href: '/admin/propriedade', icon: HomeIcon },
+      { name: 'Galeria', href: '/admin/galeria', icon: PhotoIcon, countKey: 'gallery' },
+      { name: 'Locais', href: '/admin/locais', icon: MapPinIcon, countKey: 'places' },
+      { name: 'Comodidades', href: '/admin/comodidades', icon: SquaresPlusIcon, countKey: 'amenities' },
+      { name: 'Quartos', href: '/admin/quartos', icon: HomeModernIcon, countKey: 'rooms' },
+      { name: 'Área Kids', href: '/admin/kids', icon: SparklesIcon },
+      { name: 'FAQs', href: '/admin/faqs', icon: QuestionMarkCircleIcon, countKey: 'faqs' },
+      { name: 'Informações', href: '/admin/guest-info', icon: ClipboardDocumentCheckIcon },
+    ],
+  },
+  {
+    name: 'Usuários',
+    icon: UserGroupIcon,
+    countKey: 'usersGroupTotal',
+    items: [
+      { name: 'Usuários', href: '/admin/usuarios', icon: UsersIcon, countKey: 'users' },
+      { name: 'Hóspedes', href: '/admin/hospedes', icon: ClipboardDocumentCheckIcon, countKey: 'guests' },
+      { name: 'Pré-cadastros', href: '/admin/pre-cadastros', icon: ClipboardDocumentCheckIcon, countKey: 'preRegistrations' },
+    ],
+  },
+  {
+    name: 'Reservas',
+    icon: DocumentCheckIcon,
+    countKey: 'activeReservations',
+    items: [
+      { name: 'Todas as Reservas', href: '/admin/reservas', icon: CalendarDaysIcon, countKey: 'totalReservations' },
+    ],
+  },
 ];
 
+const standaloneItems: MenuItem[] = [
+  { name: 'Dashboard', href: '/admin', icon: HomeIcon },
+  { name: 'Configurações', href: '/admin/configuracoes', icon: CogIcon },
+];
 export default function AdminLayout({
   children,
 }: {
@@ -48,6 +104,44 @@ export default function AdminLayout({
   const router = useRouter();
   const pathname = usePathname();
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [openGroup, setOpenGroup] = useState<string | null>(null);
+  const [stats, setStats] = useState<AdminStats | null>(null);
+
+  // Buscar estatísticas
+  const fetchStats = useCallback(async () => {
+    try {
+      const response = await fetch('/api/admin/stats');
+      if (response.ok) {
+        const data = await response.json();
+        setStats(data);
+      }
+    } catch (error) {
+      console.error('Erro ao buscar estatísticas:', error);
+    }
+  }, []);
+
+  useEffect(() => {
+    if (status === 'authenticated' && session?.user?.role === 'admin') {
+      fetchStats();
+    }
+  }, [status, session, fetchStats]);
+
+  // Atualizar stats ao mudar de página
+  useEffect(() => {
+    if (status === 'authenticated' && session?.user?.role === 'admin') {
+      fetchStats();
+    }
+  }, [pathname, status, session, fetchStats]);
+
+  // Encontra o grupo que contém o item ativo
+  useEffect(() => {
+    for (const group of menuGroups) {
+      if (group.items.some(item => item.href === pathname)) {
+        setOpenGroup(group.name);
+        break;
+      }
+    }
+  }, [pathname]);
 
   useEffect(() => {
     if (status === 'unauthenticated') {
@@ -62,6 +156,30 @@ export default function AdminLayout({
     setSidebarOpen(false);
   }, [pathname]);
 
+  const toggleGroup = (groupName: string) => {
+    setOpenGroup(prev => prev === groupName ? null : groupName);
+  };
+
+  const getCount = (key?: string): number | undefined => {
+    if (!key || !stats) return undefined;
+    return stats[key as keyof AdminStats] as number | undefined;
+  };
+
+  // Encontrar o item atual para mostrar no header mobile
+  const getCurrentItem = () => {
+    for (const item of standaloneItems) {
+      if (item.href === pathname) return item;
+    }
+    for (const group of menuGroups) {
+      for (const item of group.items) {
+        if (item.href === pathname) return item;
+      }
+    }
+    return standaloneItems[0];
+  };
+
+  const currentItem = getCurrentItem();
+
   if (status === 'loading') {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-100">
@@ -73,9 +191,6 @@ export default function AdminLayout({
   if (status === 'unauthenticated' || session?.user?.role !== 'admin') {
     return null;
   }
-
-  // Encontrar o item atual para mostrar no header mobile
-  const currentItem = sidebarItems.find(item => item.href === pathname) || sidebarItems[0];
 
   return (
     <div className="min-h-screen bg-gray-100">
@@ -108,24 +223,103 @@ export default function AdminLayout({
         </div>
 
         {/* Navigation com scroll */}
-        <nav className="flex-1 p-4 space-y-1 overflow-y-auto">
-          {sidebarItems.map((item) => {
-            const isActive = pathname === item.href;
+        <nav className="flex-1 p-4 space-y-2 overflow-y-auto">
+          {/* Dashboard Link */}
+          <Link
+            href="/admin"
+            className={`flex items-center space-x-3 px-4 py-3 rounded-lg transition-colors ${
+              pathname === '/admin'
+                ? 'bg-amber-600 text-white'
+                : 'text-gray-300 hover:bg-gray-800 hover:text-white'
+            }`}
+          >
+            <HomeIcon className="w-5 h-5 flex-shrink-0" />
+            <span>Dashboard</span>
+          </Link>
+
+          {/* Menu Groups */}
+          {menuGroups.map((group) => {
+            const isOpen = openGroup === group.name;
+            const hasActiveItem = group.items.some(item => item.href === pathname);
+
             return (
-              <Link
-                key={item.name}
-                href={item.href}
-                className={`flex items-center space-x-3 px-4 py-3 rounded-lg transition-colors ${
-                  isActive
-                    ? 'bg-amber-600 text-white'
-                    : 'text-gray-300 hover:bg-gray-800 hover:text-white'
-                }`}
-              >
-                <item.icon className="w-5 h-5 flex-shrink-0" />
-                <span>{item.name}</span>
-              </Link>
+              <div key={group.name} className="space-y-1">
+                <button
+                  onClick={() => toggleGroup(group.name)}
+                  className={`w-full flex items-center justify-between px-4 py-3 rounded-lg transition-colors ${
+                    hasActiveItem
+                      ? 'bg-gray-800 text-amber-400'
+                      : 'text-gray-300 hover:bg-gray-800 hover:text-white'
+                  }`}
+                >
+                  <div className="flex items-center space-x-3">
+                    <group.icon className="w-5 h-5 flex-shrink-0" />
+                    <span>{group.name}</span>
+                    {getCount(group.countKey) !== undefined && (
+                      <span className="ml-1 px-2 py-0.5 text-xs font-medium bg-amber-600 text-white rounded-full">
+                        {getCount(group.countKey)}
+                      </span>
+                    )}
+                  </div>
+                  <ChevronDownIcon
+                    className={`w-4 h-4 transition-transform duration-200 ${isOpen ? 'rotate-180' : ''}`}
+                  />
+                </button>
+
+                {/* Group Items */}
+                <div
+                  className={`overflow-hidden transition-all duration-200 ${
+                    isOpen ? 'max-h-96 opacity-100' : 'max-h-0 opacity-0'
+                  }`}
+                >
+                  <div className="pl-4 space-y-1 pt-1">
+                    {group.items.map((item) => {
+                      const isActive = pathname === item.href;
+                      const itemCount = getCount(item.countKey);
+                      return (
+                        <Link
+                          key={item.href}
+                          href={item.href}
+                          className={`flex items-center justify-between px-4 py-2 rounded-lg transition-colors text-sm ${
+                            isActive
+                              ? 'bg-amber-600 text-white'
+                              : 'text-gray-400 hover:bg-gray-800 hover:text-white'
+                          }`}
+                        >
+                          <div className="flex items-center space-x-3">
+                            <item.icon className="w-4 h-4 flex-shrink-0" />
+                            <span>{item.name}</span>
+                          </div>
+                          {itemCount !== undefined && (
+                            <span className={`px-2 py-0.5 text-xs font-medium rounded-full ${
+                              isActive
+                                ? 'bg-white/20 text-white'
+                                : 'bg-gray-700 text-gray-300'
+                            }`}>
+                              {itemCount}
+                            </span>
+                          )}
+                        </Link>
+                      );
+                    })}
+                  </div>
+                </div>
+              </div>
             );
           })}
+
+          {/* Configurações Link */}
+          <Link
+            href="/admin/configuracoes"
+            className={`flex items-center space-x-3 px-4 py-3 rounded-lg transition-colors ${
+              pathname === '/admin/configuracoes'
+                ? 'bg-amber-600 text-white'
+                : 'text-gray-300 hover:bg-gray-800 hover:text-white'
+            }`}
+          >
+            <CogIcon className="w-5 h-5 flex-shrink-0" />
+            <span>Configurações</span>
+          </Link>
         </nav>
 
         {/* Footer do Sidebar */}
