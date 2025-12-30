@@ -85,8 +85,8 @@ export default function Header() {
     await signOut({ callbackUrl: '/' });
   };
 
-  // Não renderizar o Header nas páginas do admin (admin tem seu próprio layout)
-  if (pathname?.startsWith('/admin')) {
+  // Não renderizar o Header nas páginas do admin e funcionario (têm seus próprios layouts)
+  if (pathname?.startsWith('/admin') || pathname?.startsWith('/funcionario')) {
     return null;
   }
 
@@ -208,6 +208,25 @@ export default function Header() {
                           </Link>
                           <Link
                             href="/admin/perfil"
+                            onClick={() => setIsUserMenuOpen(false)}
+                            className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-amber-50 hover:text-amber-600"
+                          >
+                            <UserIcon className="h-5 w-5 mr-3" />
+                            Meu Perfil
+                          </Link>
+                        </>
+                      ) : session.user.role === 'staff' ? (
+                        <>
+                          <Link
+                            href="/funcionario"
+                            onClick={() => setIsUserMenuOpen(false)}
+                            className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-amber-50 hover:text-amber-600"
+                          >
+                            <Cog6ToothIcon className="h-5 w-5 mr-3" />
+                            Meu Painel
+                          </Link>
+                          <Link
+                            href="/funcionario/perfil"
                             onClick={() => setIsUserMenuOpen(false)}
                             className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-amber-50 hover:text-amber-600"
                           >

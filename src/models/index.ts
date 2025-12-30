@@ -13,3 +13,6 @@ export { GuestRegistration } from './GuestRegistration';
 export { WelcomeGuide } from './WelcomeGuide';
 export { Reservation } from './Reservation';
 export { PreRegistration } from './PreRegistration';
+export { StaffTask } from './StaffTask';
+export { StaffSupply } from './StaffSupply';
+export { StaffMessage } from './StaffMessage';

@@ -61,6 +61,13 @@ export const authOptions: NextAuthOptions = {
           name: user.name,
           role: user.role,
           image: user.avatar || null,
+          phone: user.phone || null,
+          staff: user.staff ? {
+            jobType: user.staff.jobType,
+            jobTitle: user.staff.jobTitle,
+            workDays: user.staff.workDays,
+            checklistTemplate: user.staff.checklistTemplate,
+          } : null,
         };
       }
     })
@@ -71,6 +78,8 @@ export const authOptions: NextAuthOptions = {
         token.id = user.id;
         token.role = user.role;
         token.image = user.image;
+        token.phone = (user as any).phone;
+        token.staff = (user as any).staff;
       }
       // Handle session update (when user updates their profile)
       if (trigger === 'update' && session) {
@@ -84,6 +93,8 @@ export const authOptions: NextAuthOptions = {
         session.user.id = token.id as string;
         session.user.role = token.role as string;
         session.user.image = (token.image as string | null) || undefined;
+        (session.user as any).phone = token.phone || null;
+        (session.user as any).staff = token.staff || null;
       }
       return session;
     }

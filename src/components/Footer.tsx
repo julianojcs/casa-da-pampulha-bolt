@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
+import { usePathname } from 'next/navigation';
 import {
   FaFacebook,
   FaInstagram,
@@ -41,9 +42,15 @@ const ICON_MAP: Record<string, any> = {
 };
 
 export default function Footer() {
+  const pathname = usePathname();
   const currentYear = new Date().getFullYear();
   const [socialLinks, setSocialLinks] = useState<Array<any>>([]);
   const [contactInfo, setContactInfo] = useState<any>(null);
+
+  // Não renderizar o Footer nas páginas do admin e funcionario (têm seus próprios layouts)
+  if (pathname?.startsWith('/admin') || pathname?.startsWith('/funcionario')) {
+    return null;
+  }
 
   useEffect(() => {
     let mounted = true;
