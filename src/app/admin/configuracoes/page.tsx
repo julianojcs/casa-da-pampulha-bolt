@@ -5,9 +5,28 @@ import {
   PlusIcon,
   PencilIcon,
   TrashIcon,
-  XMarkIcon
+  XMarkIcon,
+  Bars3Icon
 } from '@heroicons/react/24/outline';
 import toast from 'react-hot-toast';
+import {
+  DndContext,
+  closestCenter,
+  KeyboardSensor,
+  PointerSensor,
+  TouchSensor,
+  useSensor,
+  useSensors,
+  DragEndEvent,
+} from '@dnd-kit/core';
+import {
+  arrayMove,
+  SortableContext,
+  sortableKeyboardCoordinates,
+  useSortable,
+  verticalListSortingStrategy,
+} from '@dnd-kit/sortable';
+import { CSS } from '@dnd-kit/utilities';
 
 interface SocialLink {
   _id: string;
@@ -51,11 +70,92 @@ const emptySocialLink: Omit<SocialLink, '_id'> = {
   isActive: true,
 };
 
+interface LegalItem {
+  _id?: string;
+  title: string;
+  content: string;
+  order: number;
+}
+
+interface LegalContent {
+  type: 'privacy' | 'terms';
+  items: LegalItem[];
+}
+
+const emptyLegalItem: Omit<LegalItem, '_id'> = {
+  title: '',
+  content: '',
+  order: 0,
+};
+
+// Sortable Legal Item Component
+function SortableLegalItem({
+  item,
+  onEdit,
+  onDelete
+}: {
+  item: LegalItem;
+  onEdit: (item: LegalItem) => void;
+  onDelete: (id: string) => void;
+}) {
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition,
+    isDragging,
+  } = useSortable({ id: item._id || item.order.toString() });
+
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+    opacity: isDragging ? 0.5 : 1,
+  };
+
+  return (
+    <div
+      ref={setNodeRef}
+      style={style}
+      className="bg-white border border-gray-200 rounded-lg p-4 mb-2 hover:shadow-md transition-shadow"
+    >
+      <div className="flex items-start gap-3">
+        <button
+          type="button"
+          className="mt-1 cursor-grab active:cursor-grabbing text-gray-400 hover:text-gray-600 touch-none"
+          {...attributes}
+          {...listeners}
+        >
+          <Bars3Icon className="h-5 w-5" />
+        </button>
+        <div className="flex-1 min-w-0">
+          <h4 className="font-medium text-gray-900">{item.title}</h4>
+          <p className="text-sm text-gray-500 line-clamp-2 mt-1">{item.content}</p>
+        </div>
+        <div className="flex items-center gap-1 flex-shrink-0">
+          <button
+            onClick={() => onEdit(item)}
+            className="p-2 text-amber-600 hover:text-amber-800 hover:bg-amber-50 rounded"
+          >
+            <PencilIcon className="h-5 w-5" />
+          </button>
+          <button
+            onClick={() => item._id && onDelete(item._id)}
+            className="p-2 text-red-600 hover:text-red-800 hover:bg-red-50 rounded"
+          >
+            <TrashIcon className="h-5 w-5" />
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export default function AdminConfiguracoesPage() {
   const [socialLinks, setSocialLinks] = useState<SocialLink[]>([]);
   const [hosts, setHosts] = useState<Host[]>([]);
   const [loading, setLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState<'social' | 'hosts'>('social');
+  const [activeTab, setActiveTab] = useState<'social' | 'hosts' | 'legal'>('social');
 
   // Social Modal
   const [isSocialModalOpen, setIsSocialModalOpen] = useState(false);
@@ -68,10 +168,26 @@ export default function AdminConfiguracoesPage() {
   const [hostFormData, setHostFormData] = useState<Omit<Host, '_id'>>(emptyHost);
   const [languageInput, setLanguageInput] = useState('');
 
+  // Legal Content
+  const [privacyItems, setPrivacyItems] = useState<LegalItem[]>([]);
+  const [termsItems, setTermsItems] = useState<LegalItem[]>([]);
+  const [activeLegalType, setActiveLegalType] = useState<'privacy' | 'terms'>('privacy');
+  const [isLegalModalOpen, setIsLegalModalOpen] = useState(false);
+  const [editingLegal, setEditingLegal] = useState<LegalItem | null>(null);
+  const [legalFormData, setLegalFormData] = useState<Omit<LegalItem, '_id'>>(emptyLegalItem);
+
   const [saving, setSaving] = useState(false);
+
+  // DnD sensors
+  const sensors = useSensors(
+    useSensor(PointerSensor, { activationConstraint: { distance: 8 } }),
+    useSensor(TouchSensor, { activationConstraint: { delay: 200, tolerance: 5 } }),
+    useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates })
+  );
 
   useEffect(() => {
     fetchData();
+    fetchLegalContent();
   }, []);
 
   const fetchData = async () => {
@@ -92,6 +208,25 @@ export default function AdminConfiguracoesPage() {
       console.error('Erro ao carregar configurações:', error);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const fetchLegalContent = async () => {
+    try {
+      const [privacyRes, termsRes] = await Promise.all([
+        fetch('/api/legal?type=privacy'),
+        fetch('/api/legal?type=terms'),
+      ]);
+
+      const [privacyData, termsData] = await Promise.all([
+        privacyRes.json(),
+        termsRes.json(),
+      ]);
+
+      if (privacyData?.items) setPrivacyItems(privacyData.items);
+      if (termsData?.items) setTermsItems(termsData.items);
+    } catch (error) {
+      console.error('Erro ao carregar conteúdo legal:', error);
     }
   };
 
@@ -230,6 +365,110 @@ export default function AdminConfiguracoesPage() {
     });
   };
 
+  // Legal Content handlers
+  const currentLegalItems = activeLegalType === 'privacy' ? privacyItems : termsItems;
+  const setCurrentLegalItems = activeLegalType === 'privacy' ? setPrivacyItems : setTermsItems;
+
+  const openLegalModal = (item?: LegalItem) => {
+    if (item) {
+      setEditingLegal(item);
+      setLegalFormData({
+        title: item.title,
+        content: item.content,
+        order: item.order,
+      });
+    } else {
+      setEditingLegal(null);
+      setLegalFormData({
+        ...emptyLegalItem,
+        order: currentLegalItems.length + 1,
+      });
+    }
+    setIsLegalModalOpen(true);
+  };
+
+  const handleLegalSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setSaving(true);
+
+    try {
+      const newItems = editingLegal
+        ? currentLegalItems.map(item =>
+            item._id === editingLegal._id
+              ? { ...item, ...legalFormData }
+              : item
+          )
+        : [...currentLegalItems, { ...legalFormData, _id: `temp-${Date.now()}` }];
+
+      const response = await fetch(`/api/legal?type=${activeLegalType}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ items: newItems }),
+      });
+
+      if (!response.ok) throw new Error('Erro ao salvar');
+
+      toast.success(editingLegal ? 'Item atualizado!' : 'Item criado!');
+      setIsLegalModalOpen(false);
+      fetchLegalContent();
+    } catch (error) {
+      toast.error('Erro ao salvar item');
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const handleLegalDelete = async (id: string) => {
+    if (!confirm('Tem certeza?')) return;
+
+    try {
+      const newItems = currentLegalItems.filter(item => item._id !== id);
+
+      const response = await fetch(`/api/legal?type=${activeLegalType}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ items: newItems }),
+      });
+
+      if (!response.ok) throw new Error('Erro ao excluir');
+
+      toast.success('Item excluído!');
+      fetchLegalContent();
+    } catch (error) {
+      toast.error('Erro ao excluir item');
+    }
+  };
+
+  const handleLegalDragEnd = async (event: DragEndEvent) => {
+    const { active, over } = event;
+
+    if (over && active.id !== over.id) {
+      const oldIndex = currentLegalItems.findIndex(item => (item._id || item.order.toString()) === active.id);
+      const newIndex = currentLegalItems.findIndex(item => (item._id || item.order.toString()) === over.id);
+
+      const reorderedItems = arrayMove(currentLegalItems, oldIndex, newIndex).map((item, index) => ({
+        ...item,
+        order: index + 1,
+      }));
+
+      setCurrentLegalItems(reorderedItems);
+
+      try {
+        const response = await fetch(`/api/legal?type=${activeLegalType}`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ items: reorderedItems }),
+        });
+
+        if (!response.ok) throw new Error('Erro ao reordenar');
+        toast.success('Ordem atualizada!');
+      } catch (error) {
+        toast.error('Erro ao reordenar itens');
+        fetchLegalContent();
+      }
+    }
+  };
+
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
@@ -255,6 +494,12 @@ export default function AdminConfiguracoesPage() {
           className={`px-4 py-2 -mb-px ${activeTab === 'hosts' ? 'border-b-2 border-amber-600 text-amber-600' : 'text-gray-500'}`}
         >
           Anfitriões
+        </button>
+        <button
+          onClick={() => setActiveTab('legal')}
+          className={`px-4 py-2 -mb-px ${activeTab === 'legal' ? 'border-b-2 border-amber-600 text-amber-600' : 'text-gray-500'}`}
+        >
+          Termos Legais
         </button>
       </div>
 
@@ -415,6 +660,78 @@ export default function AdminConfiguracoesPage() {
                 )}
               </div>
             ))}
+          </div>
+        </div>
+      )}
+
+      {/* Legal Content Tab */}
+      {activeTab === 'legal' && (
+        <div className="space-y-4">
+          {/* Sub-tabs for Privacy/Terms */}
+          <div className="flex gap-2">
+            <button
+              onClick={() => setActiveLegalType('privacy')}
+              className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+                activeLegalType === 'privacy'
+                  ? 'bg-amber-100 text-amber-700'
+                  : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+              }`}
+            >
+              Política de Privacidade
+            </button>
+            <button
+              onClick={() => setActiveLegalType('terms')}
+              className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+                activeLegalType === 'terms'
+                  ? 'bg-amber-100 text-amber-700'
+                  : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+              }`}
+            >
+              Termos de Uso
+            </button>
+          </div>
+
+          <div className="flex justify-between items-center">
+            <p className="text-sm text-gray-500">
+              Arraste os itens para reordenar. As alterações são salvas automaticamente.
+            </p>
+            <button
+              onClick={() => openLegalModal()}
+              className="flex items-center gap-2 px-4 py-2 bg-amber-600 text-white rounded-lg hover:bg-amber-700"
+            >
+              <PlusIcon className="h-5 w-5" />
+              Novo Item
+            </button>
+          </div>
+
+          <div className="bg-gray-50 rounded-xl p-4">
+            {currentLegalItems.length === 0 ? (
+              <div className="text-center py-8 text-gray-500">
+                Nenhum item cadastrado. Execute o seed ou adicione manualmente.
+              </div>
+            ) : (
+              <DndContext
+                sensors={sensors}
+                collisionDetection={closestCenter}
+                onDragEnd={handleLegalDragEnd}
+              >
+                <SortableContext
+                  items={currentLegalItems.map(item => item._id || item.order.toString())}
+                  strategy={verticalListSortingStrategy}
+                >
+                  {currentLegalItems
+                    .sort((a, b) => a.order - b.order)
+                    .map((item) => (
+                      <SortableLegalItem
+                        key={item._id || item.order}
+                        item={item}
+                        onEdit={openLegalModal}
+                        onDelete={handleLegalDelete}
+                      />
+                    ))}
+                </SortableContext>
+              </DndContext>
+            )}
           </div>
         </div>
       )}
@@ -591,6 +908,65 @@ export default function AdminConfiguracoesPage() {
               <div className="flex justify-end gap-2 pt-4">
                 <button type="button" onClick={() => setIsHostModalOpen(false)} className="px-4 py-2 text-gray-600">Cancelar</button>
                 <button type="submit" disabled={saving} className="px-4 py-2 bg-amber-600 text-white rounded-lg disabled:opacity-50">
+                  {saving ? 'Salvando...' : 'Salvar'}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* Legal Modal */}
+      {isLegalModalOpen && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-xl p-6 w-full max-w-lg max-h-[90vh] overflow-y-auto">
+            <div className="flex justify-between items-center mb-4">
+              <h2 className="text-xl font-bold">
+                {editingLegal ? 'Editar Item' : 'Novo Item'} - {activeLegalType === 'privacy' ? 'Política de Privacidade' : 'Termos de Uso'}
+              </h2>
+              <button onClick={() => setIsLegalModalOpen(false)}>
+                <XMarkIcon className="h-6 w-6 text-gray-500" />
+              </button>
+            </div>
+            <form onSubmit={handleLegalSubmit} className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Título</label>
+                <input
+                  type="text"
+                  value={legalFormData.title}
+                  onChange={(e) => setLegalFormData({ ...legalFormData, title: e.target.value })}
+                  placeholder="Ex: 1. Introdução"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg"
+                  required
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Conteúdo</label>
+                <textarea
+                  value={legalFormData.content}
+                  onChange={(e) => setLegalFormData({ ...legalFormData, content: e.target.value })}
+                  rows={8}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg"
+                  placeholder="Use **texto** para negrito e • para listas"
+                  required
+                />
+                <p className="text-xs text-gray-500 mt-1">
+                  Dica: Use **texto** para negrito e \n• para listas com bullets
+                </p>
+              </div>
+              <div className="flex justify-end gap-2 pt-4">
+                <button
+                  type="button"
+                  onClick={() => setIsLegalModalOpen(false)}
+                  className="px-4 py-2 text-gray-600"
+                >
+                  Cancelar
+                </button>
+                <button
+                  type="submit"
+                  disabled={saving}
+                  className="px-4 py-2 bg-amber-600 text-white rounded-lg disabled:opacity-50"
+                >
                   {saving ? 'Salvando...' : 'Salvar'}
                 </button>
               </div>

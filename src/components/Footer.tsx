@@ -10,13 +10,6 @@ import {
 } from 'react-icons/fa';
 import { HomeIcon, EnvelopeIcon, PhoneIcon, MapPinIcon } from '@heroicons/react/24/outline';
 
-const FALLBACK_SOCIALS = [
-  { icon: FaInstagram, href: 'https://instagram.com', label: 'Instagram' },
-  { icon: FaFacebook, href: 'https://facebook.com', label: 'Facebook' },
-  { icon: FaWhatsapp, href: 'https://wa.me/5531999999999', label: 'WhatsApp' },
-  { icon: FaAirbnb, href: 'https://www.airbnb.com.br', label: 'Airbnb' },
-];
-
 const quickLinks = [
   { name: 'Sobre a Casa', href: '/#sobre' },
   { name: 'Quartos', href: '/#quartos' },
@@ -77,7 +70,7 @@ export default function Footer() {
         href: s.url,
         label: s.platform || s.icon || 'social',
       }))
-    : FALLBACK_SOCIALS.map((s) => ({ Icon: s.icon, href: s.href, label: s.label }));
+    : [];
 
   return (
     <footer className="bg-gray-900 text-white">
@@ -137,9 +130,22 @@ export default function Footer() {
                 <li className="flex items-start space-x-3">
                   <MapPinIcon className="h-5 w-5 text-amber-500 mt-0.5" />
                   <span className="text-gray-400 text-sm">
-                    {contactInfo?.address || 'Pampulha, Belo Horizonte'}<br />
-                    {contactInfo?.city || 'Minas Gerais'}, {contactInfo?.country || 'Brasil'}
+                    {contactInfo?.address}<br />
+                    {contactInfo?.city}, {contactInfo?.country}
                   </span>
+                </li>
+              )}
+              {contactInfo?.whatsapp && (
+                <li className="flex items-center space-x-3">
+                  <FaWhatsapp className="h-5 w-5 text-amber-500" />
+                  <a
+                    href={`https://wa.me/${contactInfo.whatsapp.replace(/\D/g, '')}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-gray-400 hover:text-amber-500 text-sm"
+                  >
+                    {contactInfo.whatsapp}
+                  </a>
                 </li>
               )}
               {contactInfo?.phone && (
@@ -149,7 +155,7 @@ export default function Footer() {
                     href={`tel:${contactInfo?.phone}`}
                     className="text-gray-400 hover:text-amber-500 text-sm"
                   >
-                    {contactInfo?.phone || 'Não disponível'}
+                    {contactInfo?.phone}
                   </a>
                 </li>
               )}

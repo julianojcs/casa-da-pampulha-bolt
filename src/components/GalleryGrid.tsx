@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback, useRef } from 'react';
+import { useSearchParams } from 'next/navigation';
 import Image from 'next/image';
 import { XMarkIcon, ChevronLeftIcon, ChevronRightIcon, PlayIcon } from '@heroicons/react/24/outline';
 import { IGalleryItem } from '@/types';
@@ -11,11 +12,25 @@ interface GalleryGridProps {
   categories: string[];
 }
 
+// Room-related categories to show when "quartos" filter is selected
+const ROOM_CATEGORIES = ['Quarto Família', 'Quarto Crianças', 'Suite Master', 'Loft'];
+
 // Número de itens a carregar por vez
 const ITEMS_PER_PAGE = 12;
 
 export default function GalleryGrid({ items, categories }: GalleryGridProps) {
-  const [selectedCategory, setSelectedCategory] = useState('Todos');
+  const searchParams = useSearchParams();
+  const categoryParam = searchParams.get('categoria');
+
+  // Initialize with URL param or default
+  const getInitialCategory = () => {
+    if (categoryParam === 'quartos') {
+      return 'Quartos'; // Special filter for rooms
+    }
+    return 'Todos';
+  };
+
+  const [selectedCategory, setSelectedCategory] = useState(getInitialCategory);
   const [selectedItem, setSelectedItem] = useState<IGalleryItem | null>(null);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [preloadedImages, setPreloadedImages] = useState<Set<string>>(new Set());
@@ -56,8 +71,13 @@ export default function GalleryGrid({ items, categories }: GalleryGridProps) {
     return () => window.removeEventListener('resize', checkFilterScroll);
   }, [checkFilterScroll, categories]);
 
+  // Categories with special "Quartos" option
+  const displayCategories = ['Todos', 'Quartos', ...categories.filter(c => c !== 'Todos')];
+
   const filteredItems = selectedCategory === 'Todos'
     ? items
+    : selectedCategory === 'Quartos'
+    ? items.filter(item => ROOM_CATEGORIES.includes(item.category))
     : items.filter(item => item.category === selectedCategory);
 
   // Items visíveis com lazy loading
@@ -204,7 +224,7 @@ export default function GalleryGrid({ items, categories }: GalleryGridProps) {
           }}
           onScroll={checkFilterScroll}
         >
-          {categories.map((category) => (
+          {displayCategories.map((category) => (
             <button
               key={category}
               onClick={() => setSelectedCategory(category)}

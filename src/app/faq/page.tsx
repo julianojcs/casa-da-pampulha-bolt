@@ -1,5 +1,6 @@
 import dbConnect from '@/lib/mongodb';
 import { FAQ } from '@/models/FAQ';
+import { Property } from '@/models/Property';
 import FAQAccordion from '@/components/FAQAccordion';
 
 export const metadata = {
@@ -13,8 +14,18 @@ async function getFAQs() {
   return JSON.parse(JSON.stringify(faqs));
 }
 
+async function getProperty() {
+  await dbConnect();
+  const property = await Property.findOne({ isActive: true });
+  return property ? JSON.parse(JSON.stringify(property)) : null;
+}
+
 export default async function FAQPage() {
-  const faqs = await getFAQs();
+  const [faqs, property] = await Promise.all([getFAQs(), getProperty()]);
+
+  const whatsappUrl = property?.whatsapp
+    ? `https://wa.me/${property.whatsapp.replace(/\D/g, '')}`
+    : null;
 
   return (
     <div className="pt-20">
@@ -44,14 +55,16 @@ export default async function FAQPage() {
           <p className="text-gray-600 mb-6">
             Entre em contato conosco e teremos prazer em ajudar.
           </p>
-          <a
-            href="https://wa.me/5531999999999"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="btn-primary"
-          >
-            Fale Conosco
-          </a>
+          {whatsappUrl && (
+            <a
+              href={whatsappUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="btn-primary"
+            >
+              Fale Conosco
+            </a>
+          )}
         </div>
       </section>
     </div>

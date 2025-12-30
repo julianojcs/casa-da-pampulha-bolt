@@ -54,7 +54,7 @@ function CadastroContent() {
   }, []);
 
   const getWhatsAppUrl = () => {
-    if (!property?.whatsapp) return 'https://wa.me/5531999999999';
+    if (!property?.whatsapp) return null;
     const digits = property.whatsapp.replace(/\D/g, '');
     return `https://wa.me/${digits}`;
   };
@@ -249,17 +249,21 @@ function CadastroContent() {
               </button>
 
               <div className="text-center text-sm text-gray-500">
-                <p>
-                  Não tem pré-cadastro?{' '}
-                  <a
-                    href={getWhatsAppUrl()}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-amber-600 hover:underline"
-                  >
-                    Entre em contato
-                  </a>
-                </p>
+                {getWhatsAppUrl() ? (
+                  <p>
+                    Não tem pré-cadastro?{' '}
+                    <a
+                      href={getWhatsAppUrl()!}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-amber-600 hover:underline"
+                    >
+                      Entre em contato
+                    </a>
+                  </p>
+                ) : (
+                  <p>Não tem pré-cadastro? Entre em contato com o anfitrião.</p>
+                )}
               </div>
             </div>
           )}

@@ -21,6 +21,7 @@ import {
   closestCenter,
   KeyboardSensor,
   PointerSensor,
+  TouchSensor,
   useSensor,
   useSensors,
   DragEndEvent,
@@ -98,25 +99,25 @@ function SortableGalleryItem({
     transform: CSS.Transform.toString(transform),
     transition,
     opacity: isDragging ? 0.5 : 1,
+    touchAction: disabled ? 'auto' : 'none',
   };
 
   return (
     <div
       ref={setNodeRef}
       style={style}
-      className={`relative group rounded-lg overflow-hidden border border-gray-200 ${isDragging ? 'ring-2 ring-purple-500 shadow-lg z-10' : ''}`}
+      className={`relative group rounded-lg overflow-hidden border border-gray-200 ${isDragging ? 'ring-2 ring-purple-500 shadow-lg z-10' : ''} ${!disabled ? 'cursor-grab active:cursor-grabbing' : ''}`}
+      {...attributes}
+      {...listeners}
     >
-      {/* Drag Handle */}
-      <button
-        {...attributes}
-        {...listeners}
-        className={`absolute top-2 right-2 z-10 cursor-grab active:cursor-grabbing bg-white/90 rounded p-1.5 shadow-sm text-gray-400 hover:text-gray-600 transition-colors ${disabled ? 'opacity-30 cursor-not-allowed' : ''}`}
+      {/* Drag Handle Indicator */}
+      <div
+        className={`absolute top-2 right-2 z-10 bg-white/90 rounded p-1.5 shadow-sm text-gray-400 transition-colors ${disabled ? 'opacity-30' : ''}`}
         data-tooltip-id="drag-tooltip"
         data-tooltip-content="Arraste para reordenar"
-        disabled={disabled}
       >
         <Bars3Icon className="h-4 w-4" />
-      </button>
+      </div>
 
       <div className="aspect-video relative">
         {item.type === 'video' ? (
@@ -315,6 +316,12 @@ export default function AdminGaleriaPage() {
         distance: 8,
       },
     }),
+    useSensor(TouchSensor, {
+      activationConstraint: {
+        delay: 250,
+        tolerance: 5,
+      },
+    }),
     useSensor(KeyboardSensor, {
       coordinateGetter: sortableKeyboardCoordinates,
     })
@@ -411,7 +418,6 @@ export default function AdminGaleriaPage() {
               <SortableContext
                 items={filteredItems.map((item) => item._id)}
                 strategy={rectSortingStrategy}
-                disabled={!!categoryFilter || !!searchTerm}
               >
                 <div className="grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
                   {filteredItems.map((item) => (

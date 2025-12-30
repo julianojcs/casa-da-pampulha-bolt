@@ -239,7 +239,7 @@ export default function AdminDashboard() {
               <CalendarDaysIcon className="h-6 w-6" />
               <h2 className="text-xl font-bold">Próxima Reserva</h2>
               <span className="text-blue-100 text-sm">
-                (em {getDaysRemaining(nextReservation.checkInDate)} dias)
+                ({getDaysRemaining(nextReservation.checkInDate) === 0 ? 'hoje' : getDaysRemaining(nextReservation.checkInDate) === 1 ? 'amanhã' : `em ${getDaysRemaining(nextReservation.checkInDate)} dias`})
               </span>
             </div>
             <a

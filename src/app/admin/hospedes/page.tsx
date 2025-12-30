@@ -36,6 +36,7 @@ interface Guest {
   agreedToRules?: boolean;
   isActive: boolean;
   createdAt: string;
+  reservationStatus?: 'pending' | 'upcoming' | 'current' | 'completed' | 'cancelled' | null;
 }
 
 const emptyGuest: Omit<Guest, '_id' | 'createdAt'> = {

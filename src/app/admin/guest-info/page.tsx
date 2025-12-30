@@ -10,6 +10,7 @@ import {
 import toast from 'react-hot-toast';
 import { ScrollableFilter } from '@/components/ScrollableFilter';
 import { SortableContainer, SortableRow, SortableCard } from '@/components/SortableTable';
+import { IconPicker } from '@/components/IconPicker';
 
 interface GuestInfo {
   _id: string;
@@ -462,18 +463,11 @@ export default function AdminGuestInfoPage() {
 
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Ícone
-                    <span className="text-xs text-gray-500 ml-1">(opcional)</span>
-                  </label>
-                  <input
-                    type="text"
+                  <IconPicker
                     value={formData.icon}
-                    onChange={(e) => setFormData({ ...formData, icon: e.target.value })}
-                    placeholder="clock, key, home, wifi..."
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500"
+                    onChange={(iconName) => setFormData({ ...formData, icon: iconName })}
+                    label="Ícone (opcional)"
                   />
-                  <p className="text-xs text-gray-500 mt-1">Sugestões: clock, key, home, wifi, tv, rules</p>
                 </div>
                 <div className="flex flex-col justify-end gap-2">
                   <label className="flex items-center gap-2">

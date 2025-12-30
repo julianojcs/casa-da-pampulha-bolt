@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import dbConnect from '@/lib/mongodb';
 import { User } from '@/models/User';
+import { Reservation } from '@/models/Reservation';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 
@@ -21,9 +22,27 @@ export async function GET() {
     // Buscar usuários com role='guest'
     const guests = await User.find({ role: 'guest' })
       .select('-password -emailVerificationToken')
-      .sort({ createdAt: -1 });
+      .sort({ createdAt: -1 })
+      .lean();
 
-    return NextResponse.json(guests);
+    // Buscar reservas para cada hóspede (mais recente primeiro)
+    const guestsWithReservations = await Promise.all(
+      guests.map(async (guest) => {
+        const reservation = await Reservation.findOne({ userId: guest._id.toString() })
+          .sort({ checkInDate: -1 })
+          .lean();
+
+        return {
+          ...guest,
+          // Use reservation dates if available, otherwise fall back to user's dates
+          checkInDate: reservation?.checkInDate || guest.checkInDate,
+          checkOutDate: reservation?.checkOutDate || guest.checkOutDate,
+          reservationStatus: reservation?.status || null,
+        };
+      })
+    );
+
+    return NextResponse.json(guestsWithReservations);
   } catch (error) {
     console.error('Error fetching guests:', error);
     return NextResponse.json(

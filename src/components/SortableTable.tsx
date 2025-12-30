@@ -6,6 +6,7 @@ import {
   closestCenter,
   KeyboardSensor,
   PointerSensor,
+  TouchSensor,
   useSensor,
   useSensors,
   DragEndEvent,
@@ -48,18 +49,17 @@ export function SortableRow({ id, children, disabled }: SortableRowProps) {
       ref={setNodeRef}
       style={style}
       className={`hover:bg-gray-50 ${isDragging ? 'bg-amber-50 shadow-lg z-10' : ''}`}
+      {...attributes}
+      {...listeners}
     >
       <td className="px-3 py-4 w-10">
-        <button
-          {...attributes}
-          {...listeners}
+        <div
           className={`cursor-grab active:cursor-grabbing text-gray-400 hover:text-gray-600 transition-colors ${disabled ? 'opacity-30 cursor-not-allowed' : ''}`}
           data-tooltip-id="drag-tooltip"
           data-tooltip-content="Arraste para reordenar"
-          disabled={disabled}
         >
           <Bars3Icon className="h-5 w-5" />
-        </button>
+        </div>
       </td>
       {children}
     </tr>
@@ -86,24 +86,24 @@ export function SortableCard({ id, children, disabled }: SortableCardProps) {
     transform: CSS.Transform.toString(transform),
     transition,
     opacity: isDragging ? 0.5 : 1,
+    touchAction: disabled ? 'auto' : 'none',
   };
 
   return (
     <div
       ref={setNodeRef}
       style={style}
-      className={`relative ${isDragging ? 'bg-amber-50 shadow-lg z-10 rounded-lg' : ''}`}
+      className={`relative p-4 pl-10 ${isDragging ? 'bg-amber-50 shadow-lg z-10 rounded-lg' : ''} ${!disabled ? 'cursor-grab active:cursor-grabbing' : ''}`}
+      {...attributes}
+      {...listeners}
     >
-      <button
-        {...attributes}
-        {...listeners}
-        className={`absolute top-2 left-2 cursor-grab active:cursor-grabbing text-gray-400 hover:text-gray-600 bg-white rounded p-1 shadow-sm transition-colors ${disabled ? 'opacity-30 cursor-not-allowed' : ''}`}
+      <div
+        className={`absolute top-4 left-2 text-gray-400 ${disabled ? 'opacity-30' : ''}`}
         data-tooltip-id="drag-tooltip"
         data-tooltip-content="Arraste para reordenar"
-        disabled={disabled}
       >
         <Bars3Icon className="h-4 w-4" />
-      </button>
+      </div>
       {children}
     </div>
   );
@@ -134,6 +134,12 @@ export function SortableContainer<T extends { _id: string; order?: number }>({
     useSensor(PointerSensor, {
       activationConstraint: {
         distance: 8,
+      },
+    }),
+    useSensor(TouchSensor, {
+      activationConstraint: {
+        delay: 250,
+        tolerance: 5,
       },
     }),
     useSensor(KeyboardSensor, {
@@ -177,7 +183,6 @@ export function SortableContainer<T extends { _id: string; order?: number }>({
         <SortableContext
           items={localItems.map((item) => item._id)}
           strategy={verticalListSortingStrategy}
-          disabled={disabled || isSaving}
         >
           {children(localItems)}
         </SortableContext>

@@ -353,7 +353,7 @@ var kidsAreaData = {
 var socialLinksData = [
     { platform: "Instagram", url: "https://instagram.com/casadapampulha", icon: "instagram", order: 1 },
     { platform: "Facebook", url: "https://facebook.com/casadapampulha", icon: "facebook", order: 2 },
-    { platform: "WhatsApp", url: "https://wa.me/5531999999999", icon: "whatsapp", order: 3 },
+    { platform: "WhatsApp", url: "https://wa.me/5527981330708", icon: "whatsapp", order: 3 },
     { platform: "Airbnb", url: "https://www.airbnb.com.br/rooms/1028115044709052736", icon: "airbnb", order: 4 },
 ];
 function seed() {

@@ -255,7 +255,7 @@ function AmenitiesSection({ amenities }: { amenities: any[] }) {
       </div>
 
       <div className="mt-12 text-center">
-        <Link href="/#quartos" className="btn-primary">
+        <Link href="/galeria?categoria=quartos" className="btn-primary">
           Ver Quartos
         </Link>
       </div>

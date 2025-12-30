@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import * as FaIcons from 'react-icons/fa';
 import {
   FaWifi, FaParking, FaTv, FaSnowflake, FaSwimmingPool, FaHotTub,
   FaUtensils, FaTree, FaChild, FaDumbbell, FaShieldAlt, FaConciergeBell
@@ -15,7 +16,8 @@ interface Amenity {
   order: number;
 }
 
-const iconMap: Record<string, any> = {
+// Map for legacy icon names (lowercase)
+const legacyIconMap: Record<string, any> = {
   wifi: FaWifi,
   car: FaParking,
   parking: FaParking,
@@ -58,7 +60,15 @@ export default function ComodidadesPage() {
     : amenities.filter(a => a.category === selectedCategory);
 
   const getIcon = (iconName: string) => {
-    const IconComponent = iconMap[iconName] || iconMap.default;
+    // Check if it's a FaIcon name (e.g., FaSwimmingPool)
+    if (iconName && iconName.startsWith('Fa')) {
+      const IconComponent = (FaIcons as any)[iconName];
+      if (IconComponent) {
+        return <IconComponent className="w-8 h-8" />;
+      }
+    }
+    // Fallback to legacy icon map
+    const IconComponent = legacyIconMap[iconName] || legacyIconMap.default;
     return <IconComponent className="w-8 h-8" />;
   };
 
