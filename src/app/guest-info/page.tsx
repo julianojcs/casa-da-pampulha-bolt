@@ -3,16 +3,15 @@ import { GuestInfo } from '@/models/GuestInfo';
 import {
   KeyIcon,
   ClockIcon,
-  WifiIcon,
-  BoltIcon,
-  ShieldExclamationIcon,
   HomeModernIcon,
+  CheckCircleIcon,
   NoSymbolIcon,
-  CheckCircleIcon
+  ShieldExclamationIcon
 } from '@heroicons/react/24/outline';
 import Link from 'next/link';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
+import { GuestInfoIcon } from '@/components/GuestInfoIcon';
 
 export const metadata = {
   title: 'Check-in & Check-out | Casa da Pampulha',
@@ -29,16 +28,6 @@ async function getGuestInfo() {
   const items = await GuestInfo.find(query).sort({ order: 1 });
   return JSON.parse(JSON.stringify(items));
 }
-
-const iconMap: Record<string, React.ElementType> = {
-  key: KeyIcon,
-  clock: ClockIcon,
-  wifi: WifiIcon,
-  bolt: BoltIcon,
-  shield: ShieldExclamationIcon,
-  home: HomeModernIcon,
-  no: NoSymbolIcon,
-};
 
 export default async function CheckinPage() {
   const items = await getGuestInfo();
@@ -94,20 +83,17 @@ export default async function CheckinPage() {
 
             <div className="space-y-4">
               {checkinItems.length > 0 ? (
-                checkinItems.map((item: { _id: string; icon: string; title: string; content: string }) => {
-                  const Icon = iconMap[item.icon || 'key'] || KeyIcon;
-                  return (
+                checkinItems.map((item: { _id: string; icon: string; title: string; content: string }) => (
                     <div key={item._id} className="bg-white p-4 rounded-lg shadow-md">
                       <div className="flex items-start space-x-3">
-                        <Icon className="h-6 w-6 min-h-6 min-w-6 flex-shrink-0 text-amber-600 mt-1" />
+                        <GuestInfoIcon iconName={item.icon || 'KeyIcon'} className="h-6 w-6 min-h-6 min-w-6 flex-shrink-0 text-amber-600 mt-1" />
                         <div>
                           <h3 className="font-semibold text-gray-800">{item.title}</h3>
                           <p className="text-gray-600 text-sm whitespace-pre-line">{item.content}</p>
                         </div>
                       </div>
                     </div>
-                  );
-                })
+                  ))
               ) : (
                 <div className="bg-white p-4 rounded-lg shadow-md">
                   <div className="flex items-start space-x-3">
@@ -138,20 +124,17 @@ export default async function CheckinPage() {
 
             <div className="space-y-4">
               {checkoutItems.length > 0 ? (
-                checkoutItems.map((item: { _id: string; icon: string; title: string; content: string }) => {
-                  const Icon = iconMap[item.icon || 'home'] || HomeModernIcon;
-                  return (
+                checkoutItems.map((item: { _id: string; icon: string; title: string; content: string }) => (
                     <div key={item._id} className="bg-white p-4 rounded-lg shadow-md">
                       <div className="flex items-start space-x-3">
-                        <Icon className="h-6 w-6 min-h-6 min-w-6 flex-shrink-0 text-amber-600 mt-1" />
+                        <GuestInfoIcon iconName={item.icon || 'HomeModernIcon'} className="h-6 w-6 min-h-6 min-w-6 flex-shrink-0 text-amber-600 mt-1" />
                         <div>
                           <h3 className="font-semibold text-gray-800">{item.title}</h3>
                           <p className="text-gray-600 text-sm whitespace-pre-line">{item.content}</p>
                         </div>
                       </div>
                     </div>
-                  );
-                })
+                  ))
               ) : (
                 <>
                   <div className="bg-white p-4 rounded-lg shadow-md">
@@ -196,10 +179,10 @@ export default async function CheckinPage() {
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {rules.length > 0 ? (
-            rules.map((rule: { _id: string; title: string; content: string }) => (
+            rules.map((rule: { _id: string; icon: string; title: string; content: string }) => (
               <div key={rule._id} className="bg-white p-6 rounded-lg shadow-md">
                 <div className="flex items-center space-x-3 mb-3">
-                  <NoSymbolIcon className="h-6 w-6 min-h-6 min-w-6 flex-shrink-0 text-red-500" />
+                  <GuestInfoIcon iconName={rule.icon || 'NoSymbolIcon'} className="h-6 w-6 min-h-6 min-w-6 flex-shrink-0 text-red-500" />
                   <h3 className="font-semibold text-gray-800">{rule.title}</h3>
                 </div>
                 <p className="text-gray-600 text-sm">{rule.content}</p>
@@ -274,20 +257,17 @@ export default async function CheckinPage() {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {instructions.map((item: { _id: string; icon: string; title: string; content: string }) => {
-              const Icon = iconMap[item.icon || 'home'] || HomeModernIcon;
-              return (
+            {instructions.map((item: { _id: string; icon: string; title: string; content: string }) => (
                 <div key={item._id} className="bg-white p-6 rounded-lg shadow-md">
                   <div className="flex items-start space-x-3">
-                    <Icon className="h-6 w-6 min-h-6 min-w-6 flex-shrink-0 text-amber-600 mt-1" />
+                    <GuestInfoIcon iconName={item.icon || 'HomeModernIcon'} className="h-6 w-6 min-h-6 min-w-6 flex-shrink-0 text-amber-600 mt-1" />
                     <div>
                       <h3 className="font-semibold text-gray-800 mb-2">{item.title}</h3>
                       <p className="text-gray-600 text-sm whitespace-pre-line">{item.content}</p>
                     </div>
                   </div>
                 </div>
-              );
-            })}
+              ))}
           </div>
         </section>
       )}

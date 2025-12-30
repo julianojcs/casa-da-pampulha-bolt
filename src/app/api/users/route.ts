@@ -76,18 +76,23 @@ export async function POST(request: NextRequest) {
     await dbConnect();
 
     const body = await request.json();
-    const { email, password, name, role, phone, avatar, host } = body;
+    const { email, name, role, phone, avatar, isHost, host, staff } = body;
 
-    // Check if user already exists
-    const existingUser = await User.findOne({ email: email.toLowerCase() });
-    if (existingUser) {
-      return NextResponse.json({ error: 'Email já cadastrado' }, { status: 400 });
+    // For staff, email is optional; for other roles, email is required
+    if (role !== 'staff' && !email) {
+      return NextResponse.json({ error: 'Email é obrigatório' }, { status: 400 });
     }
 
-    // Create user
+    // Check if user already exists (only if email is provided)
+    if (email) {
+      const existingUser = await User.findOne({ email: email.toLowerCase() });
+      if (existingUser) {
+        return NextResponse.json({ error: 'Email já cadastrado' }, { status: 400 });
+      }
+    }
+
+    // Create user - password is not required when admin creates user
     const userData: Record<string, unknown> = {
-      email: email.toLowerCase(),
-      password,
       name,
       role,
       phone,
@@ -96,10 +101,24 @@ export async function POST(request: NextRequest) {
       emailVerified: true, // Admin creating user, no need for verification
     };
 
-    // If role is host, include host data
-    if (role === 'host' && host) {
+    // Only add email if provided
+    if (email) {
+      userData.email = email.toLowerCase();
+    }
+
+    // isHost is a characteristic for guests (indicates they are a host on Airbnb)
+    if (role === 'guest' && isHost !== undefined) {
+      userData.isHost = isHost;
+    }
+
+    // Host data is only for admin users who are property hosts
+    if (role === 'admin' && host) {
       userData.host = host;
-      userData.role = 'admin'; // hosts are also admins
+    }
+
+    // If role is staff, include staff data
+    if (role === 'staff' && staff) {
+      userData.staff = staff;
     }
 
     const user = await User.create(userData);
@@ -131,7 +150,7 @@ export async function PUT(request: NextRequest) {
     await dbConnect();
 
     const body = await request.json();
-    const { _id, email, name, role, phone, avatar, isActive, host } = body;
+    const { _id, email, name, role, phone, avatar, isActive, isHost, host, staff } = body;
 
     if (!_id) {
       return NextResponse.json({ error: 'ID do usuário é obrigatório' }, { status: 400 });
@@ -139,16 +158,41 @@ export async function PUT(request: NextRequest) {
 
     const updateData: Record<string, unknown> = {};
 
-    if (email) updateData.email = email.toLowerCase();
+    // Only update email if provided and not empty
+    if (email) {
+      updateData.email = email.toLowerCase();
+    } else if (email === '' && role === 'staff') {
+      // Allow clearing email for staff
+      updateData.email = null;
+    }
     if (name) updateData.name = name;
     if (role) updateData.role = role;
     if (phone !== undefined) updateData.phone = phone;
     if (avatar !== undefined) updateData.avatar = avatar;
     if (isActive !== undefined) updateData.isActive = isActive;
 
-    // If role is host or updating host data
-    if (host) {
+    // isHost is only for guests (indicates they are a host on Airbnb)
+    if (role === 'guest' && isHost !== undefined) {
+      updateData.isHost = isHost;
+    } else if (role !== 'guest') {
+      // Clear isHost if not a guest
+      updateData.isHost = false;
+    }
+
+    // Host data is only for admin users who are property hosts
+    if (role === 'admin' && host) {
       updateData.host = host;
+    } else if (role !== 'admin') {
+      // Clear host data if not admin
+      updateData.host = null;
+    }
+
+    // If role is staff, include staff data
+    if (role === 'staff' && staff) {
+      updateData.staff = staff;
+    } else if (role !== 'staff') {
+      // Clear staff data if not staff
+      updateData.staff = null;
     }
 
     const user = await User.findByIdAndUpdate(

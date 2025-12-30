@@ -768,12 +768,23 @@ export default function AdminConfiguracoesPage() {
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">Ícone</label>
-                  <input
-                    type="text"
+                  <select
                     value={socialFormData.icon}
                     onChange={(e) => setSocialFormData({ ...socialFormData, icon: e.target.value })}
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg"
-                  />
+                  >
+                    <option value="">Selecione um ícone</option>
+                    <option value="instagram">Instagram</option>
+                    <option value="facebook">Facebook</option>
+                    <option value="whatsapp">WhatsApp</option>
+                    <option value="airbnb">Airbnb</option>
+                    <option value="twitter">Twitter</option>
+                    <option value="x">X (Twitter)</option>
+                    <option value="youtube">YouTube</option>
+                    <option value="tiktok">TikTok</option>
+                    <option value="linkedin">LinkedIn</option>
+                    <option value="pinterest">Pinterest</option>
+                  </select>
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">Ordem</label>

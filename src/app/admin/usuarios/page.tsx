@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { useSearchParams } from 'next/navigation';
 import Image from 'next/image';
 import {
   PlusIcon,
@@ -25,29 +26,95 @@ interface Host {
   joinedDate?: string;
 }
 
+interface PaymentInfo {
+  bankName?: string;
+  bankBranch?: string;
+  accountNumber?: string;
+  accountType?: 'corrente' | 'poupanca';
+  pixKey?: string;
+  pixKeyType?: 'cpf' | 'email' | 'telefone' | 'aleatoria';
+  preferredPaymentMethod?: 'pix' | 'transferencia';
+}
+
+interface ChecklistItem {
+  _id?: string;
+  task: string;
+  completed: boolean;
+  completedAt?: Date;
+  notes?: string;
+}
+
+interface Staff {
+  nickname?: string;
+  jobType?: 'piscineiro' | 'jardineiro' | 'faxineira' | 'manutencao' | 'outro';
+  jobTitle?: string;
+  hireDate?: string;
+  salary?: number;
+  salaryType?: 'diaria' | 'mensal';
+  paymentInfo?: PaymentInfo;
+  checklistTemplate?: ChecklistItem[];
+  currentChecklist?: ChecklistItem[];
+  workDays?: string[];
+  notes?: string;
+}
+
 interface User {
   _id: string;
-  email: string;
+  email?: string;
   name: string;
-  role: 'admin' | 'guest' | 'host';
+  role: 'admin' | 'guest' | 'staff';
   phone?: string;
   avatar?: string;
   isActive: boolean;
   emailVerified?: boolean;
-  host?: Host;
+  isHost?: boolean; // For guests: indicates if they are a host on Airbnb
+  host?: Host; // For admins: property host data
+  staff?: Staff;
   createdAt: string;
 }
 
 const roleLabels: Record<string, string> = {
   admin: 'Administrador',
   guest: 'Hóspede',
-  host: 'Anfitrião',
+  staff: 'Funcionário',
 };
 
 const roleColors: Record<string, string> = {
   admin: 'bg-purple-100 text-purple-800',
   guest: 'bg-blue-100 text-blue-800',
-  host: 'bg-amber-100 text-amber-800',
+  staff: 'bg-green-100 text-green-800',
+};
+
+const jobTypeLabels: Record<string, string> = {
+  piscineiro: 'Piscineiro',
+  jardineiro: 'Jardineiro',
+  faxineira: 'Faxineira',
+  manutencao: 'Manutenção',
+  outro: 'Outro',
+};
+
+const emptyPaymentInfo: PaymentInfo = {
+  bankName: '',
+  bankBranch: '',
+  accountNumber: '',
+  accountType: 'corrente',
+  pixKey: '',
+  pixKeyType: 'cpf',
+  preferredPaymentMethod: 'pix',
+};
+
+const emptyStaff: Staff = {
+  nickname: '',
+  jobType: 'faxineira',
+  jobTitle: '',
+  hireDate: new Date().toISOString().split('T')[0],
+  salary: 0,
+  salaryType: 'diaria',
+  paymentInfo: emptyPaymentInfo,
+  checklistTemplate: [],
+  currentChecklist: [],
+  workDays: [],
+  notes: '',
 };
 
 const emptyUser: Omit<User, '_id' | 'createdAt'> = {
@@ -58,7 +125,9 @@ const emptyUser: Omit<User, '_id' | 'createdAt'> = {
   avatar: '',
   isActive: true,
   emailVerified: false,
+  isHost: false,
   host: undefined,
+  staff: undefined,
 };
 
 const emptyHost: Host = {
@@ -87,10 +156,13 @@ const AVAILABLE_LANGUAGES = [
 ];
 
 export default function AdminUsuariosPage() {
+  const searchParams = useSearchParams();
+  const initialRoleFilter = searchParams.get('role') || 'all';
+
   const [users, setUsers] = useState<User[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
-  const [roleFilter, setRoleFilter] = useState<string>('all');
+  const [roleFilter, setRoleFilter] = useState<string>(initialRoleFilter);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isViewMode, setIsViewMode] = useState(false);
   const [editingUser, setEditingUser] = useState<User | null>(null);
@@ -134,18 +206,20 @@ export default function AdminUsuariosPage() {
     if (user) {
       setEditingUser(user);
       setFormData({
-        email: user.email,
+        email: user.email || '',
         name: user.name,
         role: user.role,
         phone: user.phone || '',
         avatar: user.avatar || '',
         isActive: user.isActive,
         emailVerified: user.emailVerified,
+        isHost: user.isHost || false,
         host: user.host,
+        staff: user.staff,
       });
     } else {
       setEditingUser(null);
-      setFormData({ ...emptyUser, password: '' });
+      setFormData({ ...emptyUser });
     }
     setIsViewMode(false);
     setIsModalOpen(true);
@@ -243,6 +317,7 @@ export default function AdminUsuariosPage() {
       isActive: user.isActive,
       emailVerified: user.emailVerified,
       host: user.host,
+      staff: user.staff,
     });
     setIsViewMode(true);
     setIsModalOpen(true);
@@ -294,6 +369,7 @@ export default function AdminUsuariosPage() {
             <option value="all">Todos os tipos</option>
             <option value="admin">Administradores</option>
             <option value="guest">Hóspedes</option>
+            <option value="staff">Funcionários</option>
           </select>
           <button
             onClick={handleSearch}
@@ -327,7 +403,7 @@ export default function AdminUsuariosPage() {
                       Status
                     </th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Anfitrião
+                      Detalhes
                     </th>
                     <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
                       Ações
@@ -385,6 +461,10 @@ export default function AdminUsuariosPage() {
                         {user.host ? (
                           <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-amber-100 text-amber-800">
                             {user.host.role}
+                          </span>
+                        ) : user.staff ? (
+                          <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                            {jobTypeLabels[user.staff.jobType || 'outro']}
                           </span>
                         ) : (
                           <span className="text-gray-400">-</span>
@@ -459,6 +539,11 @@ export default function AdminUsuariosPage() {
                           {user.host && (
                             <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-amber-100 text-amber-800">
                               {user.host.role}
+                            </span>
+                          )}
+                          {user.staff && (
+                            <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                              {jobTypeLabels[user.staff.jobType || 'outro']}
                             </span>
                           )}
                         </div>
@@ -551,32 +636,18 @@ export default function AdminUsuariosPage() {
 
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Email {!isViewMode && '*'}
+                    Email {!isViewMode && formData.role !== 'staff' && '*'}
                   </label>
                   <input
                     type="email"
-                    required={!isViewMode}
+                    required={!isViewMode && formData.role !== 'staff'}
                     value={formData.email}
                     onChange={(e) => setFormData(prev => ({ ...prev, email: e.target.value }))}
+                    placeholder={formData.role === 'staff' ? 'Opcional para funcionários' : ''}
                     className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-amber-500 disabled:bg-gray-50"
                     disabled={isViewMode}
                   />
                 </div>
-
-                {!editingUser && !isViewMode && (
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Senha *
-                    </label>
-                    <input
-                      type="password"
-                      required={!editingUser}
-                      value={formData.password || ''}
-                      onChange={(e) => setFormData(prev => ({ ...prev, password: e.target.value }))}
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-amber-500"
-                    />
-                  </div>
-                )}
 
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -598,12 +669,20 @@ export default function AdminUsuariosPage() {
                   <select
                     required={!isViewMode}
                     value={formData.role}
-                    onChange={(e) => setFormData(prev => ({ ...prev, role: e.target.value as 'admin' | 'guest' | 'host' }))}
+                    onChange={(e) => {
+                      const newRole = e.target.value as 'admin' | 'guest' | 'staff';
+                      setFormData(prev => ({
+                        ...prev,
+                        role: newRole,
+                        staff: newRole === 'staff' ? (prev.staff || emptyStaff) : undefined,
+                      }));
+                    }}
                     className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-amber-500 disabled:bg-gray-50"
                     disabled={isViewMode}
                   >
                     <option value="guest">Hóspede</option>
                     <option value="admin">Administrador</option>
+                    <option value="staff">Funcionário</option>
                   </select>
                 </div>
 
@@ -661,39 +740,54 @@ export default function AdminUsuariosPage() {
                     />
                     <span className="text-sm font-medium text-gray-700">Email verificado</span>
                   </label>
-                </div>
-              </div>
 
-              {/* Dados de Anfitrião */}
-              <div className="border-t pt-6">
-                <div className="flex items-center justify-between mb-4">
-                  <h3 className="text-lg font-semibold text-gray-700">Dados de Anfitrião</h3>
-                  {!isViewMode && (
+                  {/* isHost: For guests only - indicates if they are a host on Airbnb */}
+                  {formData.role === 'guest' && (
                     <label className="flex items-center space-x-2">
                       <input
                         type="checkbox"
-                        checked={!!formData.host}
-                        onChange={(e) => toggleHostData(e.target.checked)}
+                        checked={formData.isHost || false}
+                        onChange={(e) => setFormData(prev => ({ ...prev, isHost: e.target.checked }))}
                         className="rounded border-gray-300 text-amber-600 focus:ring-amber-500"
+                        disabled={isViewMode}
                       />
-                      <span className="text-sm font-medium text-gray-700">É anfitrião</span>
+                      <span className="text-sm font-medium text-gray-700">É anfitrião no Airbnb</span>
                     </label>
                   )}
-                  {isViewMode && (
-                    <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${formData.host ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'}`}>
-                      {formData.host ? 'Sim' : 'Não'}
-                    </span>
-                  )}
                 </div>
+              </div>
 
-                {formData.host && (
-                  <div className="grid md:grid-cols-2 gap-4 bg-amber-50 p-4 rounded-lg">
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">
-                        Função
+              {/* Dados de Anfitrião da Propriedade - Only for admin role */}
+              {formData.role === 'admin' && (
+                <div className="border-t pt-6">
+                  <div className="flex items-center justify-between mb-4">
+                    <h3 className="text-lg font-semibold text-gray-700">Dados de Anfitrião da Propriedade</h3>
+                    {!isViewMode && (
+                      <label className="flex items-center space-x-2">
+                        <input
+                          type="checkbox"
+                          checked={!!formData.host}
+                          onChange={(e) => toggleHostData(e.target.checked)}
+                          className="rounded border-gray-300 text-amber-600 focus:ring-amber-500"
+                        />
+                        <span className="text-sm font-medium text-gray-700">É anfitrião desta propriedade</span>
                       </label>
-                      <select
-                        value={formData.host.role || 'Coanfitrião'}
+                    )}
+                    {isViewMode && (
+                      <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${formData.host ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'}`}>
+                        {formData.host ? 'Sim' : 'Não'}
+                      </span>
+                    )}
+                  </div>
+
+                  {formData.host && (
+                    <div className="grid md:grid-cols-2 gap-4 bg-amber-50 p-4 rounded-lg">
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                          Função
+                        </label>
+                        <select
+                          value={formData.host.role || 'Coanfitrião'}
                         onChange={(e) => setFormData(prev => ({
                           ...prev,
                           host: { ...prev.host!, role: e.target.value }
@@ -829,6 +923,308 @@ export default function AdminUsuariosPage() {
                   </div>
                 )}
               </div>
+              )}
+
+              {/* Dados de Funcionário */}
+              {formData.role === 'staff' && (
+                <div className="border-t pt-6">
+                  <div className="flex items-center justify-between mb-4">
+                    <h3 className="text-lg font-semibold text-gray-700">Dados do Funcionário</h3>
+                    {isViewMode && formData.staff && (
+                      <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                        {jobTypeLabels[formData.staff.jobType || 'outro']}
+                      </span>
+                    )}
+                  </div>
+
+                  <div className="grid md:grid-cols-2 gap-4 bg-green-50 p-4 rounded-lg">
+                    <div className="md:col-span-2">
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        Apelido
+                      </label>
+                      <input
+                        type="text"
+                        value={formData.staff?.nickname || ''}
+                        onChange={(e) => setFormData(prev => ({
+                          ...prev,
+                          staff: { ...prev.staff!, nickname: e.target.value }
+                        }))}
+                        placeholder="Como o funcionário prefere ser chamado"
+                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-amber-500 disabled:bg-gray-50"
+                        disabled={isViewMode}
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        Tipo de Serviço *
+                      </label>
+                      <select
+                        value={formData.staff?.jobType || 'faxineira'}
+                        onChange={(e) => setFormData(prev => ({
+                          ...prev,
+                          staff: { ...prev.staff!, jobType: e.target.value as Staff['jobType'] }
+                        }))}
+                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-amber-500 disabled:bg-gray-50"
+                        disabled={isViewMode}
+                      >
+                        <option value="piscineiro">Piscineiro</option>
+                        <option value="jardineiro">Jardineiro</option>
+                        <option value="faxineira">Faxineira</option>
+                        <option value="manutencao">Manutenção</option>
+                        <option value="outro">Outro</option>
+                      </select>
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        Cargo/Título
+                      </label>
+                      <input
+                        type="text"
+                        value={formData.staff?.jobTitle || ''}
+                        onChange={(e) => setFormData(prev => ({
+                          ...prev,
+                          staff: { ...prev.staff!, jobTitle: e.target.value }
+                        }))}
+                        placeholder="Ex: Piscineiro Chefe"
+                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-amber-500 disabled:bg-gray-50"
+                        disabled={isViewMode}
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        Data de Contratação
+                      </label>
+                      <input
+                        type="date"
+                        value={formData.staff?.hireDate?.split('T')[0] || ''}
+                        onChange={(e) => setFormData(prev => ({
+                          ...prev,
+                          staff: { ...prev.staff!, hireDate: e.target.value }
+                        }))}
+                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-amber-500 disabled:bg-gray-50"
+                        disabled={isViewMode}
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        Salário (R$)
+                      </label>
+                      <input
+                        type="number"
+                        min="0"
+                        step="0.01"
+                        value={formData.staff?.salary || ''}
+                        onChange={(e) => setFormData(prev => ({
+                          ...prev,
+                          staff: { ...prev.staff!, salary: parseFloat(e.target.value) || 0 }
+                        }))}
+                        placeholder="0,00"
+                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-amber-500 disabled:bg-gray-50"
+                        disabled={isViewMode}
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        Tipo de Pagamento
+                      </label>
+                      <select
+                        value={formData.staff?.salaryType || 'diaria'}
+                        onChange={(e) => setFormData(prev => ({
+                          ...prev,
+                          staff: { ...prev.staff!, salaryType: e.target.value as 'diaria' | 'mensal' }
+                        }))}
+                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-amber-500 disabled:bg-gray-50"
+                        disabled={isViewMode}
+                      >
+                        <option value="diaria">Por Diária</option>
+                        <option value="mensal">Mensal</option>
+                      </select>
+                    </div>
+
+                    <div className="md:col-span-2">
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        Observações
+                      </label>
+                      <textarea
+                        rows={2}
+                        value={formData.staff?.notes || ''}
+                        onChange={(e) => setFormData(prev => ({
+                          ...prev,
+                          staff: { ...prev.staff!, notes: e.target.value }
+                        }))}
+                        placeholder="Observações sobre o funcionário..."
+                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-amber-500"
+                        disabled={isViewMode}
+                      />
+                    </div>
+
+                    {/* Informações de Pagamento */}
+                    <div className="md:col-span-2 border-t pt-4 mt-2">
+                      <h4 className="text-md font-semibold text-gray-700 mb-3">💳 Informações de Pagamento</h4>
+                      <div className="grid md:grid-cols-2 gap-4">
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-1">
+                            Método Preferido
+                          </label>
+                          <select
+                            value={formData.staff?.paymentInfo?.preferredPaymentMethod || 'pix'}
+                            onChange={(e) => setFormData(prev => ({
+                              ...prev,
+                              staff: {
+                                ...prev.staff!,
+                                paymentInfo: {
+                                  ...prev.staff?.paymentInfo,
+                                  preferredPaymentMethod: e.target.value as 'pix' | 'transferencia'
+                                }
+                              }
+                            }))}
+                            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-amber-500 disabled:bg-gray-50"
+                            disabled={isViewMode}
+                          >
+                            <option value="pix">PIX</option>
+                            <option value="transferencia">Transferência Bancária</option>
+                          </select>
+                        </div>
+
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-1">
+                            Tipo de Chave PIX
+                          </label>
+                          <select
+                            value={formData.staff?.paymentInfo?.pixKeyType || 'cpf'}
+                            onChange={(e) => setFormData(prev => ({
+                              ...prev,
+                              staff: {
+                                ...prev.staff!,
+                                paymentInfo: {
+                                  ...prev.staff?.paymentInfo,
+                                  pixKeyType: e.target.value as 'cpf' | 'email' | 'telefone' | 'aleatoria'
+                                }
+                              }
+                            }))}
+                            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-amber-500 disabled:bg-gray-50"
+                            disabled={isViewMode}
+                          >
+                            <option value="cpf">CPF</option>
+                            <option value="email">E-mail</option>
+                            <option value="telefone">Telefone</option>
+                            <option value="aleatoria">Chave Aleatória</option>
+                          </select>
+                        </div>
+
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-1">
+                            Chave PIX
+                          </label>
+                          <input
+                            type="text"
+                            value={formData.staff?.paymentInfo?.pixKey || ''}
+                            onChange={(e) => setFormData(prev => ({
+                              ...prev,
+                              staff: {
+                                ...prev.staff!,
+                                paymentInfo: { ...prev.staff?.paymentInfo, pixKey: e.target.value }
+                              }
+                            }))}
+                            placeholder="Informe a chave PIX"
+                            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-amber-500 disabled:bg-gray-50"
+                            disabled={isViewMode}
+                          />
+                        </div>
+
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-1">
+                            Banco
+                          </label>
+                          <input
+                            type="text"
+                            value={formData.staff?.paymentInfo?.bankName || ''}
+                            onChange={(e) => setFormData(prev => ({
+                              ...prev,
+                              staff: {
+                                ...prev.staff!,
+                                paymentInfo: { ...prev.staff?.paymentInfo, bankName: e.target.value }
+                              }
+                            }))}
+                            placeholder="Nome do banco"
+                            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-amber-500 disabled:bg-gray-50"
+                            disabled={isViewMode}
+                          />
+                        </div>
+
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-1">
+                            Agência
+                          </label>
+                          <input
+                            type="text"
+                            value={formData.staff?.paymentInfo?.bankBranch || ''}
+                            onChange={(e) => setFormData(prev => ({
+                              ...prev,
+                              staff: {
+                                ...prev.staff!,
+                                paymentInfo: { ...prev.staff?.paymentInfo, bankBranch: e.target.value }
+                              }
+                            }))}
+                            placeholder="Número da agência"
+                            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-amber-500 disabled:bg-gray-50"
+                            disabled={isViewMode}
+                          />
+                        </div>
+
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-1">
+                            Conta
+                          </label>
+                          <input
+                            type="text"
+                            value={formData.staff?.paymentInfo?.accountNumber || ''}
+                            onChange={(e) => setFormData(prev => ({
+                              ...prev,
+                              staff: {
+                                ...prev.staff!,
+                                paymentInfo: { ...prev.staff?.paymentInfo, accountNumber: e.target.value }
+                              }
+                            }))}
+                            placeholder="Número da conta"
+                            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-amber-500 disabled:bg-gray-50"
+                            disabled={isViewMode}
+                          />
+                        </div>
+
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-1">
+                            Tipo de Conta
+                          </label>
+                          <select
+                            value={formData.staff?.paymentInfo?.accountType || 'corrente'}
+                            onChange={(e) => setFormData(prev => ({
+                              ...prev,
+                              staff: {
+                                ...prev.staff!,
+                                paymentInfo: {
+                                  ...prev.staff?.paymentInfo,
+                                  accountType: e.target.value as 'corrente' | 'poupanca'
+                                }
+                              }
+                            }))}
+                            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-amber-500 disabled:bg-gray-50"
+                            disabled={isViewMode}
+                          >
+                            <option value="corrente">Conta Corrente</option>
+                            <option value="poupanca">Poupança</option>
+                          </select>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
 
               <div className="flex justify-end space-x-3 pt-4 border-t">
                 <button

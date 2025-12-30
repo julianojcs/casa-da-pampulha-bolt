@@ -1,6 +1,7 @@
 import dbConnect from '@/lib/mongodb';
 import { Property } from '@/models/Property';
 import { LegalContent } from '@/models/LegalContent';
+import { ShieldCheckIcon } from '@heroicons/react/24/outline';
 
 export const metadata = {
   title: 'Política de Privacidade | Casa da Pampulha',
@@ -19,13 +20,6 @@ async function getPrivacyContent() {
   return content ? JSON.parse(JSON.stringify(content)) : null;
 }
 
-// Parse markdown-like content to HTML
-function parseContent(content: string): string {
-  return content
-    .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
-    .replace(/\n/g, '<br />');
-}
-
 export default async function PoliticaPrivacidadePage() {
   const [property, privacyContent] = await Promise.all([
     getProperty(),
@@ -37,86 +31,117 @@ export default async function PoliticaPrivacidadePage() {
   const items = privacyContent?.items?.sort((a: any, b: any) => a.order - b.order) || [];
 
   return (
-    <div className="pt-20">
+    <div className="pt-20 bg-gray-50 min-h-screen">
       {/* Header */}
-      <section className="bg-gradient-to-br from-gray-700 to-gray-800 text-white py-16">
-        <div className="container-section py-0">
-          <h1 className="text-4xl md:text-5xl font-bold mb-4">Política de Privacidade</h1>
-          <p className="text-lg text-gray-300">
-            Última atualização: {new Date().toLocaleDateString('pt-BR')}
+      <section className="bg-gradient-to-br from-slate-800 via-slate-700 to-slate-800 text-white py-20">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex items-center justify-center mb-6">
+            <div className="p-4 bg-white/10 rounded-2xl backdrop-blur-sm">
+              <ShieldCheckIcon className="h-12 w-12 text-amber-400" />
+            </div>
+          </div>
+          <h1 className="text-4xl md:text-5xl font-bold text-center mb-4">
+            Política de Privacidade
+          </h1>
+          <p className="text-lg text-slate-300 text-center max-w-2xl mx-auto">
+            Nosso compromisso com a transparência e proteção dos seus dados pessoais.
           </p>
+          <div className="mt-6 text-center">
+            <span className="inline-flex items-center px-4 py-2 bg-white/10 rounded-full text-sm text-slate-300">
+              Última atualização: {new Date().toLocaleDateString('pt-BR', { day: '2-digit', month: 'long', year: 'numeric' })}
+            </span>
+          </div>
         </div>
       </section>
 
       {/* Content */}
-      <section className="container-section">
-        <div className="max-w-4xl mx-auto prose prose-gray prose-lg">
-          {items.length > 0 ? (
-            items.map((item: any) => (
-              <div key={item._id || item.order}>
-                <h2>{item.title}</h2>
-                <div
-                  dangerouslySetInnerHTML={{
-                    __html: parseContent(item.content.replace(/{propertyName}/g, propertyName))
-                  }}
-                />
+      <section className="py-16">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+            {items.length > 0 ? (
+              <div className="divide-y divide-gray-100">
+                {items.map((item: any, index: number) => (
+                  <article
+                    key={item._id || item.order}
+                    className="p-8 hover:bg-gray-50/50 transition-colors"
+                  >
+                    <h2 className="text-xl font-semibold text-gray-900 mb-4 flex items-center">
+                      <span className="w-8 h-8 bg-amber-100 text-amber-700 rounded-lg flex items-center justify-center text-sm font-bold mr-3 flex-shrink-0">
+                        {index + 1}
+                      </span>
+                      <span>{item.title.replace(/^\d+\.\s*/, '')}</span>
+                    </h2>
+                    <div className="text-gray-600 leading-relaxed space-y-4 pl-11">
+                      {item.content.split('\n\n').map((paragraph: string, pIndex: number) => {
+                        const lines = paragraph.split('\n').filter((l: string) => l.trim());
+                        const hasBullets = lines.some((l: string) => l.trim().startsWith('•'));
+
+                        if (hasBullets) {
+                          return (
+                            <ul key={pIndex} className="space-y-2">
+                              {lines.map((line: string, lIndex: number) => {
+                                const text = line.replace(/^•\s*/, '').trim();
+                                if (!text) return null;
+                                return (
+                                  <li key={lIndex} className="flex items-start">
+                                    <span className="text-amber-500 mr-3 mt-0.5 text-lg">•</span>
+                                    <span
+                                      dangerouslySetInnerHTML={{
+                                        __html: text
+                                          .replace(/\*\*(.*?)\*\*/g, '<strong class="text-gray-800 font-semibold">$1</strong>')
+                                          .replace(/{propertyName}/g, propertyName)
+                                      }}
+                                    />
+                                  </li>
+                                );
+                              })}
+                            </ul>
+                          );
+                        }
+                        return (
+                          <p
+                            key={pIndex}
+                            className="text-gray-600 leading-relaxed"
+                            dangerouslySetInnerHTML={{
+                              __html: paragraph
+                                .replace(/\*\*(.*?)\*\*/g, '<strong class="text-gray-800 font-semibold">$1</strong>')
+                                .replace(/{propertyName}/g, propertyName)
+                            }}
+                          />
+                        );
+                      })}
+                    </div>
+                  </article>
+                ))}
               </div>
-            ))
-          ) : (
-            <>
-              <h2>1. Introdução</h2>
-              <p>
-                A {propertyName} está comprometida em proteger a privacidade de seus hóspedes e visitantes.
-                Esta Política de Privacidade descreve como coletamos, usamos, armazenamos e protegemos
-                suas informações pessoais quando você utiliza nosso site e serviços.
-              </p>
+            ) : (
+              <div className="p-8">
+                <p className="text-gray-500 text-center">
+                  Conteúdo não disponível. Por favor, entre em contato conosco.
+                </p>
+              </div>
+            )}
 
-              <h2>2. Informações que Coletamos</h2>
-              <p>Podemos coletar os seguintes tipos de informações:</p>
-              <ul>
-                <li>
-                  <strong>Informações de identificação pessoal:</strong> Nome completo, endereço de e-mail,
-                  número de telefone, CPF ou documento de identificação, endereço residencial.
-                </li>
-                <li>
-                  <strong>Informações de reserva:</strong> Datas de check-in e check-out, número de hóspedes,
-                  preferências especiais.
-                </li>
-                <li>
-                  <strong>Informações de acesso:</strong> Dados de login, histórico de acesso ao sistema.
-                </li>
-                <li>
-                  <strong>Informações técnicas:</strong> Endereço IP, tipo de navegador, páginas visitadas,
-                  tempo de permanência no site.
-                </li>
-              </ul>
-
-              <h2>3. Como Usamos suas Informações</h2>
-              <p>Utilizamos suas informações para:</p>
-              <ul>
-                <li>Processar e gerenciar suas reservas;</li>
-                <li>Comunicar informações importantes sobre sua estadia;</li>
-                <li>Fornecer acesso às áreas restritas do site;</li>
-                <li>Melhorar nossos serviços e experiência do usuário;</li>
-                <li>Cumprir obrigações legais e regulatórias;</li>
-                <li>Enviar comunicações de marketing (apenas com seu consentimento).</li>
-              </ul>
-
-              <h2>10. Contato</h2>
-              <p>
-                Se você tiver dúvidas sobre esta Política de Privacidade ou sobre como tratamos
-                suas informações pessoais, entre em contato conosco:
-              </p>
-              {propertyEmail && (
-                <p>
-                  <strong>E-mail:</strong>{' '}
-                  <a href={`mailto:${propertyEmail}`} className="text-amber-600 hover:underline">
+            {/* Contact Footer */}
+            {propertyEmail && (
+              <div className="bg-gradient-to-r from-amber-50 to-orange-50 p-8 border-t border-amber-100">
+                <div className="text-center">
+                  <h3 className="text-lg font-semibold text-gray-900 mb-2">
+                    Dúvidas sobre privacidade?
+                  </h3>
+                  <p className="text-gray-600 mb-4">
+                    Entre em contato conosco para esclarecer qualquer questão.
+                  </p>
+                  <a
+                    href={`mailto:${propertyEmail}`}
+                    className="inline-flex items-center px-6 py-3 bg-amber-600 text-white rounded-lg font-medium hover:bg-amber-700 transition-colors"
+                  >
                     {propertyEmail}
                   </a>
-                </p>
-              )}
-            </>
-          )}
+                </div>
+              </div>
+            )}
+          </div>
         </div>
       </section>
     </div>

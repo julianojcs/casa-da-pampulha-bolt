@@ -25,6 +25,7 @@ import {
   BuildingOfficeIcon,
   UserGroupIcon,
   DocumentCheckIcon,
+  WrenchScrewdriverIcon,
 } from '@heroicons/react/24/outline';
 import { signOut } from 'next-auth/react';
 
@@ -77,6 +78,7 @@ const menuGroups: MenuGroup[] = [
     countKey: 'usersGroupTotal',
     items: [
       { name: 'Usuários', href: '/admin/usuarios', icon: UsersIcon, countKey: 'users' },
+      { name: 'Funcionários', href: '/admin/usuarios?role=staff', icon: WrenchScrewdriverIcon },
       { name: 'Hóspedes', href: '/admin/hospedes', icon: ClipboardDocumentCheckIcon, countKey: 'guests' },
       { name: 'Pré-cadastros', href: '/admin/pre-cadastros', icon: ClipboardDocumentCheckIcon, countKey: 'preRegistrations' },
     ],

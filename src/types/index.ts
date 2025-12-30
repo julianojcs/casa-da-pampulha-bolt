@@ -171,12 +171,50 @@ export interface ISocialLink {
   updatedAt?: Date;
 }
 
-export type UserRole = 'admin' | 'guest';
+export type UserRole = 'admin' | 'guest' | 'staff';
+
+export type StaffJobType = 'piscineiro' | 'jardineiro' | 'faxineira' | 'manutencao' | 'outro';
+
+export interface IChecklistItem {
+  _id?: string;
+  task: string;
+  completed: boolean;
+  completedAt?: Date;
+  notes?: string;
+}
+
+export interface IPaymentInfo {
+  bankName?: string;
+  bankBranch?: string;
+  accountNumber?: string;
+  accountType?: 'corrente' | 'poupanca';
+  pixKey?: string;
+  pixKeyType?: 'cpf' | 'email' | 'telefone' | 'aleatoria';
+  preferredPaymentMethod?: 'pix' | 'transferencia';
+}
+
+export interface IStaff {
+  _id?: string;
+  nickname?: string;
+  jobType: StaffJobType;
+  jobTitle?: string;
+  hireDate?: Date;
+  salary?: number;
+  salaryType?: 'diaria' | 'mensal';
+  paymentInfo?: IPaymentInfo;
+  checklistTemplate?: IChecklistItem[];
+  currentChecklist?: IChecklistItem[];
+  lastChecklistReset?: Date;
+  workDays?: string[];
+  notes?: string;
+  createdAt?: Date;
+  updatedAt?: Date;
+}
 
 export interface IUser {
   _id?: string;
-  email: string;
-  password: string;
+  email?: string;
+  password?: string;
   name: string;
   role: UserRole;
   phone?: string;
@@ -188,7 +226,9 @@ export interface IUser {
   emailVerified?: boolean;
   emailVerificationToken?: string;
   emailVerificationExpires?: Date;
-  host?: IHost | null;
+  isHost?: boolean; // For guests: indicates if they are a host on Airbnb
+  host?: IHost | null; // For admins: host profile data (property host)
+  staff?: IStaff | null;
   createdAt?: Date;
   updatedAt?: Date;
 }

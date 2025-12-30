@@ -6,8 +6,14 @@ import {
   FaFacebook,
   FaInstagram,
   FaWhatsapp,
-  FaAirbnb
+  FaAirbnb,
+  FaTwitter,
+  FaYoutube,
+  FaTiktok,
+  FaLinkedin,
+  FaPinterest
 } from 'react-icons/fa';
+import { FaXTwitter } from 'react-icons/fa6';
 import { HomeIcon, EnvelopeIcon, PhoneIcon, MapPinIcon } from '@heroicons/react/24/outline';
 
 const quickLinks = [
@@ -26,6 +32,12 @@ const ICON_MAP: Record<string, any> = {
   facebook: FaFacebook,
   whatsapp: FaWhatsapp,
   airbnb: FaAirbnb,
+  twitter: FaTwitter,
+  x: FaXTwitter,
+  youtube: FaYoutube,
+  tiktok: FaTiktok,
+  linkedin: FaLinkedin,
+  pinterest: FaPinterest,
 };
 
 export default function Footer() {

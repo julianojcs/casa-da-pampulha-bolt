@@ -155,12 +155,26 @@ export default function AdminDashboard() {
   };
 
   const getDaysRemaining = (date: Date | string) => {
+    // Convert to string and extract just the date part (YYYY-MM-DD)
+    const dateStr = typeof date === 'string' ? date : date.toISOString();
+    const datePart = dateStr.split('T')[0]; // Get "YYYY-MM-DD"
+    const [year, month, day] = datePart.split('-').map(Number);
+
+    // Get today's date in local timezone
     const now = new Date();
-    now.setHours(0, 0, 0, 0); // Reset to start of day
-    const target = new Date(date);
-    target.setHours(0, 0, 0, 0); // Reset to start of day
-    const diff = Math.round((target.getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
-    return diff;
+    const todayYear = now.getFullYear();
+    const todayMonth = now.getMonth() + 1; // getMonth() is 0-indexed
+    const todayDay = now.getDate();
+
+    // Create dates at noon to avoid any DST issues
+    const targetDate = new Date(year, month - 1, day, 12, 0, 0, 0);
+    const todayDate = new Date(todayYear, todayMonth - 1, todayDay, 12, 0, 0, 0);
+
+    // Calculate difference in days
+    const diffTime = targetDate.getTime() - todayDate.getTime();
+    const diffDays = Math.round(diffTime / (1000 * 60 * 60 * 24));
+
+    return diffDays;
   };
 
   return (

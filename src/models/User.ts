@@ -1,6 +1,6 @@
 import mongoose, { Schema, Document } from 'mongoose';
 import bcrypt from 'bcryptjs';
-import { IUser, IHost } from '@/types';
+import { IUser, IHost, IStaff, IChecklistItem, IPaymentInfo } from '@/types';
 
 export interface UserDocument extends Omit<IUser, '_id'>, Document {
   comparePassword(candidatePassword: string): Promise<boolean>;
@@ -19,12 +19,57 @@ const HostSchema = new Schema<Omit<IHost, '_id'>>(
   { _id: false }
 );
 
+const ChecklistItemSchema = new Schema<Omit<IChecklistItem, '_id'>>(
+  {
+    task: { type: String, required: true },
+    completed: { type: Boolean, default: false },
+    completedAt: { type: Date },
+    notes: { type: String },
+  },
+  { _id: true }
+);
+
+const PaymentInfoSchema = new Schema<IPaymentInfo>(
+  {
+    bankName: { type: String },
+    bankBranch: { type: String },
+    accountNumber: { type: String },
+    accountType: { type: String, enum: ['corrente', 'poupanca'] },
+    pixKey: { type: String },
+    pixKeyType: { type: String, enum: ['cpf', 'email', 'telefone', 'aleatoria'] },
+    preferredPaymentMethod: { type: String, enum: ['pix', 'transferencia'] },
+  },
+  { _id: false }
+);
+
+const StaffSchema = new Schema<Omit<IStaff, '_id'>>(
+  {
+    nickname: { type: String },
+    jobType: {
+      type: String,
+      enum: ['piscineiro', 'jardineiro', 'faxineira', 'manutencao', 'outro'],
+      required: true
+    },
+    jobTitle: { type: String },
+    hireDate: { type: Date },
+    salary: { type: Number, default: 0 },
+    salaryType: { type: String, enum: ['diaria', 'mensal'], default: 'diaria' },
+    paymentInfo: { type: PaymentInfoSchema, default: null },
+    checklistTemplate: [ChecklistItemSchema],
+    currentChecklist: [ChecklistItemSchema],
+    lastChecklistReset: { type: Date },
+    workDays: [{ type: String }],
+    notes: { type: String },
+  },
+  { _id: false }
+);
+
 const UserSchema = new Schema<UserDocument>(
   {
-    email: { type: String, required: true, unique: true, lowercase: true },
-    password: { type: String, required: true },
+    email: { type: String, unique: true, sparse: true, lowercase: true },
+    password: { type: String },
     name: { type: String, required: true },
-    role: { type: String, enum: ['admin', 'guest'], required: true },
+    role: { type: String, enum: ['admin', 'guest', 'staff'], required: true },
     phone: { type: String },
     avatar: { type: String },
     reservationCode: { type: String },
@@ -34,14 +79,16 @@ const UserSchema = new Schema<UserDocument>(
     emailVerified: { type: Boolean, default: false },
     emailVerificationToken: { type: String },
     emailVerificationExpires: { type: Date },
-    host: { type: HostSchema, default: null },
+    isHost: { type: Boolean, default: false }, // For guests: indicates if they are a host on Airbnb
+    host: { type: HostSchema, default: null }, // For admins: host profile data
+    staff: { type: StaffSchema, default: null },
   },
   { timestamps: true }
 );
 
 // Hash password before saving
 UserSchema.pre('save', async function(next) {
-  if (!this.isModified('password')) return next();
+  if (!this.isModified('password') || !this.password) return next();
 
   try {
     const salt = await bcrypt.genSalt(10);
@@ -54,6 +101,7 @@ UserSchema.pre('save', async function(next) {
 
 // Method to compare passwords
 UserSchema.methods.comparePassword = async function(candidatePassword: string): Promise<boolean> {
+  if (!this.password) return false;
   return bcrypt.compare(candidatePassword, this.password);
 };
 

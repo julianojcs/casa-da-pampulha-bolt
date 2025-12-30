@@ -10,7 +10,7 @@ import {
 import toast from 'react-hot-toast';
 import { ScrollableFilter } from '@/components/ScrollableFilter';
 import { SortableContainer, SortableRow, SortableCard } from '@/components/SortableTable';
-import { IconPicker } from '@/components/IconPicker';
+import { IconPicker, DynamicIcon } from '@/components/IconPicker';
 
 interface GuestInfo {
   _id: string;
@@ -246,6 +246,7 @@ export default function AdminGuestInfoPage() {
                 <thead className="bg-gray-50">
                   <tr>
                     <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase w-10"></th>
+                    <th className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase w-16">Ícone</th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Tipo</th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Título</th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Conteúdo</th>
@@ -257,7 +258,7 @@ export default function AdminGuestInfoPage() {
                 <tbody className="divide-y divide-gray-200">
                   {sortedItems.length === 0 ? (
                     <tr>
-                      <td colSpan={7} className="px-6 py-12 text-center">
+                      <td colSpan={8} className="px-6 py-12 text-center">
                         <div className="flex flex-col items-center justify-center text-gray-500">
                           <PlusIcon className="h-12 w-12 text-gray-400 mb-3" />
                           <p className="text-lg font-medium text-gray-700 mb-1">
@@ -278,6 +279,9 @@ export default function AdminGuestInfoPage() {
                   ) : (
                     sortedItems.map((item) => (
                       <SortableRow key={item._id} id={item._id} disabled={!filterType}>
+                        <td className="px-4 py-4 text-center">
+                          <DynamicIcon name={item.icon} className="h-5 w-5 text-amber-600 mx-auto" />
+                        </td>
                         <td className="px-6 py-4">
                           <span className={`px-2 py-1 text-xs rounded-full ${getTypeBadgeColor(item.type)}`}>
                             {getTypeLabel(item.type)}
