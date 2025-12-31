@@ -5,6 +5,8 @@ export const CLOUDINARY_FOLDERS = {
   HOSTS: 'hosts',
   LOCAL_GUIDE: 'local-guide',
   LOGO: 'logo',
+  ASSETS: 'assets',
+  PRODUCTS: 'products',
 } as const;
 
 export type CloudinaryFolder = typeof CLOUDINARY_FOLDERS[keyof typeof CLOUDINARY_FOLDERS];

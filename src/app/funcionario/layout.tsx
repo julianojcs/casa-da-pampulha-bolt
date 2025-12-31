@@ -16,6 +16,8 @@ import {
   XMarkIcon,
   UserCircleIcon,
   BellIcon,
+  ExclamationTriangleIcon,
+  GlobeAltIcon,
 } from '@heroicons/react/24/outline';
 import { signOut } from 'next-auth/react';
 
@@ -23,14 +25,30 @@ interface MenuItem {
   name: string;
   href: string;
   icon: React.ComponentType<{ className?: string }>;
+  badgeKey?: 'tasks' | 'materials' | 'messages';
+}
+
+interface PropertyInfo {
+  name: string;
+  logo?: string;
+  heroImage?: string;
+}
+
+interface StaffStats {
+  pendingTasks: number;
+  inProgressTasks: number;
+  unreadMessages: number;
+  materialsWithIssues: number;
+  hasUrgentMaterials: boolean;
+  hasUrgentMessages: boolean;
 }
 
 const menuItems: MenuItem[] = [
   { name: 'Dashboard', href: '/funcionario', icon: HomeIcon },
-  { name: 'Minhas Tarefas', href: '/funcionario/tarefas', icon: ClipboardDocumentListIcon },
+  { name: 'Minhas Tarefas', href: '/funcionario/tarefas', icon: ClipboardDocumentListIcon, badgeKey: 'tasks' },
   { name: 'Calendário', href: '/funcionario/calendario', icon: CalendarDaysIcon },
-  { name: 'Materiais', href: '/funcionario/materiais', icon: ShoppingCartIcon },
-  { name: 'Recados', href: '/funcionario/recados', icon: ChatBubbleLeftRightIcon },
+  { name: 'Materiais', href: '/funcionario/materiais', icon: ShoppingCartIcon, badgeKey: 'materials' },
+  { name: 'Recados', href: '/funcionario/recados', icon: ChatBubbleLeftRightIcon, badgeKey: 'messages' },
   { name: 'Perfil', href: '/funcionario/perfil', icon: UserCircleIcon },
 ];
 
@@ -43,8 +61,15 @@ export default function FuncionarioLayout({
   const router = useRouter();
   const pathname = usePathname();
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-  const [unreadMessages, setUnreadMessages] = useState(0);
-  const [pendingTasks, setPendingTasks] = useState(0);
+  const [propertyInfo, setPropertyInfo] = useState<PropertyInfo | null>(null);
+  const [stats, setStats] = useState<StaffStats>({
+    pendingTasks: 0,
+    inProgressTasks: 0,
+    unreadMessages: 0,
+    materialsWithIssues: 0,
+    hasUrgentMaterials: false,
+    hasUrgentMessages: false,
+  });
 
   useEffect(() => {
     if (status === 'unauthenticated') {
@@ -62,32 +87,119 @@ export default function FuncionarioLayout({
   useEffect(() => {
     if (status === 'authenticated' && session?.user?.role === 'staff') {
       fetchNotifications();
+      fetchPropertyInfo();
     }
   }, [status, session]);
 
+  const fetchPropertyInfo = async () => {
+    try {
+      const res = await fetch('/api/property');
+      if (res.ok) {
+        const data = await res.json();
+        setPropertyInfo({
+          name: data.name || 'Casa',
+          logo: data.logo,
+          heroImage: data.heroImage,
+        });
+      }
+    } catch (error) {
+      console.error('Erro ao buscar propriedade:', error);
+    }
+  };
+
   const fetchNotifications = async () => {
     try {
-      const [tasksRes, messagesRes] = await Promise.all([
-        fetch('/api/staff/tasks?status=pending'),
+      const [tasksRes, messagesRes, suppliesRes] = await Promise.all([
+        fetch('/api/staff/tasks'),
         fetch('/api/staff/messages'),
+        fetch('/api/staff/supplies'),
       ]);
 
+      let pendingTasks = 0;
+      let inProgressTasks = 0;
       if (tasksRes.ok) {
         const tasks = await tasksRes.json();
-        setPendingTasks(Array.isArray(tasks) ? tasks.length : 0);
+        if (Array.isArray(tasks)) {
+          pendingTasks = tasks.filter((t: any) => t.status === 'pending').length;
+          inProgressTasks = tasks.filter((t: any) => t.status === 'in_progress').length;
+        }
       }
 
+      let unreadMessages = 0;
+      let hasUrgentMessages = false;
       if (messagesRes.ok) {
         const messages = await messagesRes.json();
-        const unread = messages.filter(
+        const unreadMsgs = messages.filter(
           (m: any) => !m.readBy?.includes(session?.user?.id)
-        ).length;
-        setUnreadMessages(unread);
+        );
+        unreadMessages = unreadMsgs.length;
+        hasUrgentMessages = unreadMsgs.some((m: any) => m.priority === 'urgent');
       }
+
+      let materialsWithIssues = 0;
+      let hasUrgentMaterials = false;
+      if (suppliesRes.ok) {
+        const supplies = await suppliesRes.json();
+        // Count only out_of_stock (Esgotado) materials for the badge
+        const outOfStockSupplies = supplies.filter(
+          (s: any) => s.status === 'out_of_stock'
+        );
+        materialsWithIssues = outOfStockSupplies.length;
+        // Show urgency for critical or out_of_stock
+        hasUrgentMaterials = supplies.some((s: any) => s.status === 'critical' || s.status === 'out_of_stock');
+      }
+
+      setStats({
+        pendingTasks,
+        inProgressTasks,
+        unreadMessages,
+        materialsWithIssues,
+        hasUrgentMaterials,
+        hasUrgentMessages,
+      });
     } catch (error) {
       console.error('Erro ao buscar notificações:', error);
     }
   };
+
+  const getBadgeCount = (key: 'tasks' | 'materials' | 'messages') => {
+    switch (key) {
+      case 'tasks':
+        return stats.pendingTasks + stats.inProgressTasks;
+      case 'materials':
+        return stats.materialsWithIssues;
+      case 'messages':
+        return stats.unreadMessages;
+      default:
+        return 0;
+    }
+  };
+
+  const hasUrgency = (key: 'tasks' | 'materials' | 'messages') => {
+    switch (key) {
+      case 'materials':
+        return stats.hasUrgentMaterials;
+      case 'messages':
+        return stats.hasUrgentMessages;
+      default:
+        return false;
+    }
+  };
+
+  const getPropertyInitials = () => {
+    if (!propertyInfo?.name) return 'CP';
+    // Palavras a ignorar: artigos, preposições e pronomes em português
+    const ignoreWords = ['a', 'o', 'as', 'os', 'um', 'uma', 'uns', 'umas', 'de', 'da', 'do', 'das', 'dos', 'em', 'na', 'no', 'nas', 'nos', 'para', 'por', 'com', 'sem', 'e', 'ou'];
+    return propertyInfo.name
+      .split(' ')
+      .filter(word => !ignoreWords.includes(word.toLowerCase()))
+      .map(word => word[0])
+      .join('')
+      .substring(0, 2)
+      .toUpperCase() || 'CP';
+  };
+
+  const totalNotifications = stats.pendingTasks + stats.inProgressTasks + stats.unreadMessages + stats.materialsWithIssues;
 
   if (status === 'loading') {
     return (
@@ -117,18 +229,28 @@ export default function FuncionarioLayout({
         </button>
 
         <div className="flex items-center gap-2">
-          <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-emerald-500 to-teal-600 flex items-center justify-center">
-            <span className="text-white font-bold text-sm">CP</span>
-          </div>
-          <span className="font-semibold text-slate-800">Staff Portal</span>
+          {propertyInfo?.logo ? (
+            <Image
+              src={propertyInfo.logo}
+              alt={propertyInfo.name}
+              width={32}
+              height={32}
+              className="w-8 h-8 rounded-lg object-cover"
+            />
+          ) : (
+            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-emerald-500 to-teal-600 flex items-center justify-center">
+              <span className="text-white font-bold text-sm">{getPropertyInitials()}</span>
+            </div>
+          )}
+          <span className="font-semibold text-slate-800">{propertyInfo?.name || 'Staff Portal'}</span>
         </div>
 
         <div className="flex items-center gap-2">
-          {(pendingTasks > 0 || unreadMessages > 0) && (
+          {totalNotifications > 0 && (
             <div className="relative">
               <BellIcon className="h-6 w-6 text-slate-600" />
-              <span className="absolute -top-1 -right-1 w-4 h-4 bg-red-500 text-white text-xs rounded-full flex items-center justify-center">
-                {pendingTasks + unreadMessages}
+              <span className="absolute -top-1 -right-1 w-5 h-5 bg-red-500 text-white text-xs rounded-full flex items-center justify-center">
+                {totalNotifications > 99 ? '99+' : totalNotifications}
               </span>
             </div>
           )}
@@ -153,11 +275,21 @@ export default function FuncionarioLayout({
           {/* Logo */}
           <div className="h-16 flex items-center justify-between px-4 border-b border-slate-200">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-emerald-500 to-teal-600 flex items-center justify-center shadow-lg">
-                <span className="text-white font-bold">CP</span>
-              </div>
+              {propertyInfo?.logo ? (
+                <Image
+                  src={propertyInfo.logo}
+                  alt={propertyInfo.name}
+                  width={40}
+                  height={40}
+                  className="w-10 h-10 rounded-xl object-cover shadow-lg"
+                />
+              ) : (
+                <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-emerald-500 to-teal-600 flex items-center justify-center shadow-lg">
+                  <span className="text-white font-bold">{getPropertyInitials()}</span>
+                </div>
+              )}
               <div>
-                <h1 className="font-bold text-slate-800">Casa da Pampulha</h1>
+                <h1 className="font-bold text-slate-800">{propertyInfo?.name || 'Casa'}</h1>
                 <p className="text-xs text-slate-500">Portal do Funcionário</p>
               </div>
             </div>
@@ -175,7 +307,7 @@ export default function FuncionarioLayout({
               {session.user.image ? (
                 <Image
                   src={session.user.image}
-                  alt={session.user.name || ''}
+                  alt={(session.user as any).staff?.nickname || session.user.name || ''}
                   width={40}
                   height={40}
                   className="w-10 h-10 rounded-full object-cover"
@@ -183,13 +315,13 @@ export default function FuncionarioLayout({
               ) : (
                 <div className="w-10 h-10 rounded-full bg-gradient-to-br from-emerald-400 to-teal-500 flex items-center justify-center">
                   <span className="text-white font-semibold">
-                    {session.user.name?.charAt(0).toUpperCase()}
+                    {((session.user as any).staff?.nickname || session.user.name)?.charAt(0).toUpperCase()}
                   </span>
                 </div>
               )}
               <div className="flex-1 min-w-0">
                 <p className="font-medium text-slate-800 truncate">
-                  {session.user.name}
+                  {(session.user as any).staff?.nickname || session.user.name}
                 </p>
                 <p className="text-xs text-slate-500 capitalize">
                   {(session.user as any).staff?.jobType?.replace('_', ' ') || 'Funcionário'}
@@ -204,15 +336,9 @@ export default function FuncionarioLayout({
               {menuItems.map((item) => {
                 const isActive = pathname === item.href;
                 const Icon = item.icon;
-                const showBadge =
-                  (item.href === '/funcionario/tarefas' && pendingTasks > 0) ||
-                  (item.href === '/funcionario/recados' && unreadMessages > 0);
-                const badgeCount =
-                  item.href === '/funcionario/tarefas'
-                    ? pendingTasks
-                    : item.href === '/funcionario/recados'
-                    ? unreadMessages
-                    : 0;
+                const badgeCount = item.badgeKey ? getBadgeCount(item.badgeKey) : 0;
+                const showBadge = badgeCount > 0;
+                const isUrgent = item.badgeKey ? hasUrgency(item.badgeKey) : false;
 
                 return (
                   <Link
@@ -228,15 +354,28 @@ export default function FuncionarioLayout({
                     <Icon className="h-5 w-5" />
                     <span className="font-medium flex-1">{item.name}</span>
                     {showBadge && (
-                      <span
-                        className={`px-2 py-0.5 text-xs font-semibold rounded-full ${
-                          isActive
-                            ? 'bg-white/20 text-white'
-                            : 'bg-red-100 text-red-600'
-                        }`}
-                      >
-                        {badgeCount}
-                      </span>
+                      <div className="flex items-center gap-1.5">
+                        <span
+                          className={`px-2 py-0.5 text-xs font-semibold rounded-full ${
+                            isActive
+                              ? 'bg-white/20 text-white'
+                              : item.badgeKey === 'materials'
+                              ? 'bg-amber-100 text-amber-600'
+                              : 'bg-red-100 text-red-600'
+                          }`}
+                        >
+                          {badgeCount}
+                        </span>
+                        {isUrgent && (
+                          <div className="relative flex items-center justify-center w-5 h-5">
+                            {/* Animated danger indicator */}
+                            <span className="absolute inset-0 animate-ping rounded-full bg-red-400 opacity-75"></span>
+                            <ExclamationTriangleIcon
+                              className={`relative h-5 w-5 ${isActive ? 'text-yellow-300' : 'text-red-500'} animate-bounce`}
+                            />
+                          </div>
+                        )}
+                      </div>
                     )}
                   </Link>
                 );
@@ -244,8 +383,15 @@ export default function FuncionarioLayout({
             </div>
           </nav>
 
-          {/* Logout */}
-          <div className="p-4 border-t border-slate-200">
+          {/* Footer Actions */}
+          <div className="p-4 border-t border-slate-200 space-y-2">
+            <Link
+              href="/"
+              className="flex items-center gap-3 w-full px-3 py-2.5 text-slate-600 hover:text-emerald-600 hover:bg-emerald-50 rounded-xl transition-colors"
+            >
+              <GlobeAltIcon className="h-5 w-5" />
+              <span className="font-medium">Acessar Site</span>
+            </Link>
             <button
               onClick={handleLogout}
               className="flex items-center gap-3 w-full px-3 py-2.5 text-slate-600 hover:text-red-600 hover:bg-red-50 rounded-xl transition-colors"

@@ -69,21 +69,25 @@ export async function PUT(request: NextRequest) {
 
     await connectDB();
 
+    const body = await request.json();
+
+    // Support both query param and body for ID
     const { searchParams } = new URL(request.url);
-    const id = searchParams.get('id');
+    const id = searchParams.get('id') || body._id || body.id;
     if (!id) {
       return NextResponse.json({ error: 'ID é obrigatório' }, { status: 400 });
     }
 
-    const body = await request.json();
+    // Remove _id and id from body to avoid issues
+    const { _id, id: bodyId, ...updateData } = body;
 
     // Se for aprovação, adicionar dados do aprovador
-    if (body.approvedBy === undefined && session.user.role === 'admin' && body.status === 'ok') {
-      body.approvedBy = session.user.id;
-      body.approvedAt = new Date();
+    if (updateData.approvedBy === undefined && session.user.role === 'admin' && updateData.status === 'ok') {
+      updateData.approvedBy = session.user.id;
+      updateData.approvedAt = new Date();
     }
 
-    const supply = await StaffSupply.findByIdAndUpdate(id, body, { new: true });
+    const supply = await StaffSupply.findByIdAndUpdate(id, updateData, { new: true });
     if (!supply) {
       return NextResponse.json({ error: 'Material não encontrado' }, { status: 404 });
     }

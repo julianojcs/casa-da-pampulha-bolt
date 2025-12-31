@@ -32,6 +32,15 @@ interface Supply {
   createdAt: string;
 }
 
+interface Product {
+  _id: string;
+  name: string;
+  description?: string;
+  category: string;
+  measurementUnit?: string;
+  brand?: string;
+}
+
 const categories = [
   { value: '', label: 'Todas categorias' },
   { value: 'limpeza', label: '🧹 Limpeza' },
@@ -53,12 +62,15 @@ const statusOptions = [
 export default function MateriaisPage() {
   const { data: session } = useSession();
   const [supplies, setSupplies] = useState<Supply[]>([]);
+  const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
   const [filterCategory, setFilterCategory] = useState('');
   const [filterStatus, setFilterStatus] = useState('');
   const [showFilters, setShowFilters] = useState(false);
   const [showNewModal, setShowNewModal] = useState(false);
+  const [selectedProductId, setSelectedProductId] = useState<string>('');
+  const [isCustomProduct, setIsCustomProduct] = useState(false);
   const [newSupply, setNewSupply] = useState({
     name: '',
     description: '',
@@ -71,6 +83,7 @@ export default function MateriaisPage() {
 
   useEffect(() => {
     fetchSupplies();
+    fetchProducts();
   }, []);
 
   const fetchSupplies = async () => {
@@ -86,6 +99,61 @@ export default function MateriaisPage() {
     } finally {
       setLoading(false);
     }
+  };
+
+  const fetchProducts = async () => {
+    try {
+      const res = await fetch('/api/products?active=true');
+      if (res.ok) {
+        const data = await res.json();
+        setProducts(Array.isArray(data) ? data : []);
+      }
+    } catch (error) {
+      console.error('Erro ao buscar produtos:', error);
+    }
+  };
+
+  const handleProductSelect = (productId: string) => {
+    if (productId === 'custom') {
+      setIsCustomProduct(true);
+      setSelectedProductId('');
+      setNewSupply({
+        name: '',
+        description: '',
+        category: 'geral',
+        status: 'low',
+        urgency: 'normal',
+        quantity: '',
+        notes: '',
+      });
+    } else {
+      setIsCustomProduct(false);
+      setSelectedProductId(productId);
+      const product = products.find(p => p._id === productId);
+      if (product) {
+        setNewSupply({
+          ...newSupply,
+          name: product.name,
+          description: product.description || '',
+          category: product.category,
+        });
+      }
+    }
+  };
+
+  const resetModal = () => {
+    setSelectedProductId('');
+    setIsCustomProduct(false);
+    setNewSupply({
+      name: '',
+      description: '',
+      category: 'geral',
+      status: 'low',
+      urgency: 'normal',
+      quantity: '',
+      notes: '',
+    });
+    setShowNewModal(false);
   };
 
   const filteredSupplies = useMemo(() => {
@@ -124,16 +192,7 @@ export default function MateriaisPage() {
       if (res.ok) {
         const created = await res.json();
         setSupplies((prev) => [created, ...prev]);
-        setShowNewModal(false);
-        setNewSupply({
-          name: '',
-          description: '',
-          category: 'geral',
-          status: 'low',
-          urgency: 'normal',
-          quantity: '',
-          notes: '',
-        });
+        resetModal();
       }
     } catch (error) {
       console.error('Erro ao criar material:', error);
@@ -401,7 +460,7 @@ export default function MateriaisPage() {
         <>
           <div
             className="fixed inset-0 bg-black/50 z-50"
-            onClick={() => setShowNewModal(false)}
+            onClick={resetModal}
           />
           <div className="fixed inset-x-4 bottom-4 top-auto md:inset-auto md:left-1/2 md:top-1/2 md:-translate-x-1/2 md:-translate-y-1/2 md:w-full md:max-w-lg bg-white rounded-2xl shadow-xl z-50 max-h-[80vh] overflow-y-auto">
             <div className="sticky top-0 bg-white px-6 py-4 border-b border-slate-100 flex items-center justify-between">
@@ -409,7 +468,7 @@ export default function MateriaisPage() {
                 Solicitar Material
               </h2>
               <button
-                onClick={() => setShowNewModal(false)}
+                onClick={resetModal}
                 className="p-2 hover:bg-slate-100 rounded-lg transition-colors"
               >
                 <XMarkIcon className="h-5 w-5 text-slate-500" />
@@ -417,24 +476,57 @@ export default function MateriaisPage() {
             </div>
 
             <div className="p-6 space-y-4">
+              {/* Product Selection */}
               <div>
                 <label className="text-sm font-medium text-slate-600 mb-1 block">
-                  Nome do Material *
+                  Selecione o Produto *
                 </label>
-                <input
-                  type="text"
-                  value={newSupply.name}
-                  onChange={(e) =>
-                    setNewSupply((prev) => ({ ...prev, name: e.target.value }))
-                  }
-                  placeholder="Ex: Cloro para piscina"
-                  className="w-full px-4 py-2.5 border border-slate-200 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none"
-                />
+                <select
+                  value={isCustomProduct ? 'custom' : selectedProductId}
+                  onChange={(e) => handleProductSelect(e.target.value)}
+                  className="w-full px-3 py-2.5 border border-slate-200 rounded-xl bg-white focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none"
+                >
+                  <option value="">Selecione um produto...</option>
+                  {products.map((product) => (
+                    <option key={product._id} value={product._id}>
+                      {product.name} {product.brand ? `(${product.brand})` : ''}
+                    </option>
+                  ))}
+                  <option value="custom">➕ Adicionar produto personalizado</option>
+                </select>
               </div>
+
+              {/* Custom Product Name - only show if custom selected */}
+              {isCustomProduct && (
+                <div>
+                  <label className="text-sm font-medium text-slate-600 mb-1 block">
+                    Nome do Material *
+                  </label>
+                  <input
+                    type="text"
+                    value={newSupply.name}
+                    onChange={(e) =>
+                      setNewSupply((prev) => ({ ...prev, name: e.target.value }))
+                    }
+                    placeholder="Ex: Cloro para piscina"
+                    className="w-full px-4 py-2.5 border border-slate-200 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none"
+                  />
+                </div>
+              )}
+
+              {/* Show selected product info */}
+              {selectedProductId && !isCustomProduct && (
+                <div className="bg-emerald-50 rounded-xl p-3 border border-emerald-100">
+                  <p className="font-medium text-emerald-800">{newSupply.name}</p>
+                  {newSupply.description && (
+                    <p className="text-sm text-emerald-600 mt-1">{newSupply.description}</p>
+                  )}
+                </div>
+              )}
 
               <div>
                 <label className="text-sm font-medium text-slate-600 mb-1 block">
-                  Descrição
+                  Descrição / Observações
                 </label>
                 <textarea
                   value={newSupply.description}

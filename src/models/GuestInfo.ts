@@ -15,6 +15,7 @@ const GuestInfoSchema = new Schema<GuestInfoDocument>(
     icon: { type: String },
     order: { type: Number, default: 0 },
     isRestricted: { type: Boolean, default: false },
+    showOnGuestDashboard: { type: Boolean, default: false },
     isActive: { type: Boolean, default: true },
   },
   { timestamps: true }

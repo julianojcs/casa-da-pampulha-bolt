@@ -1,8 +1,8 @@
 'use client';
 
 import { useSession } from 'next-auth/react';
-import { useRouter, usePathname } from 'next/navigation';
-import { useEffect, useState, useCallback } from 'react';
+import { useRouter, usePathname, useSearchParams } from 'next/navigation';
+import { useEffect, useState, useCallback, Suspense } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import {
@@ -26,6 +26,10 @@ import {
   UserGroupIcon,
   DocumentCheckIcon,
   WrenchScrewdriverIcon,
+  ClipboardDocumentListIcon,
+  ShoppingCartIcon,
+  ChatBubbleLeftRightIcon,
+  CubeIcon,
 } from '@heroicons/react/24/outline';
 import { signOut } from 'next-auth/react';
 
@@ -46,6 +50,7 @@ interface MenuGroup {
 interface AdminStats {
   users: number;
   guests: number;
+  staff: number;
   preRegistrations: number;
   places: number;
   gallery: number;
@@ -55,6 +60,12 @@ interface AdminStats {
   usersGroupTotal: number;
   activeReservations: number;
   totalReservations: number;
+  pendingTasks: number;
+  inProgressTasks: number;
+  totalActiveTasks: number;
+  pendingSupplies: number;
+  activeMessages: number;
+  products: number;
 }
 
 const menuGroups: MenuGroup[] = [
@@ -78,26 +89,31 @@ const menuGroups: MenuGroup[] = [
     countKey: 'usersGroupTotal',
     items: [
       { name: 'Usuários', href: '/admin/usuarios', icon: UsersIcon, countKey: 'users' },
-      { name: 'Funcionários', href: '/admin/usuarios?role=staff', icon: WrenchScrewdriverIcon },
       { name: 'Hóspedes', href: '/admin/hospedes', icon: ClipboardDocumentCheckIcon, countKey: 'guests' },
       { name: 'Pré-cadastros', href: '/admin/pre-cadastros', icon: ClipboardDocumentCheckIcon, countKey: 'preRegistrations' },
     ],
   },
   {
-    name: 'Reservas',
-    icon: DocumentCheckIcon,
-    countKey: 'activeReservations',
+    name: 'Funcionários',
+    icon: WrenchScrewdriverIcon,
+    countKey: 'staff',
     items: [
-      { name: 'Todas as Reservas', href: '/admin/reservas', icon: CalendarDaysIcon, countKey: 'totalReservations' },
+      { name: 'Staff', href: '/admin/usuarios?role=staff', icon: UsersIcon, countKey: 'staff' },
+      { name: 'Tarefas', href: '/admin/funcionarios/tarefas', icon: ClipboardDocumentListIcon, countKey: 'totalActiveTasks' },
+      { name: 'Materiais', href: '/admin/funcionarios/materiais', icon: ShoppingCartIcon, countKey: 'pendingSupplies' },
+      { name: 'Recados', href: '/admin/funcionarios/recados', icon: ChatBubbleLeftRightIcon, countKey: 'activeMessages' },
     ],
   },
 ];
 
 const standaloneItems: MenuItem[] = [
   { name: 'Dashboard', href: '/admin', icon: HomeIcon },
+  { name: 'Produtos', href: '/admin/produtos', icon: CubeIcon, countKey: 'products' },
+  { name: 'Reservas', href: '/admin/reservas', icon: CalendarDaysIcon, countKey: 'totalReservations' },
   { name: 'Configurações', href: '/admin/configuracoes', icon: CogIcon },
 ];
-export default function AdminLayout({
+
+function AdminLayoutContent({
   children,
 }: {
   children: React.ReactNode;
@@ -105,9 +121,23 @@ export default function AdminLayout({
   const { data: session, status } = useSession();
   const router = useRouter();
   const pathname = usePathname();
+  const searchParams = useSearchParams();
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [openGroup, setOpenGroup] = useState<string | null>(null);
   const [stats, setStats] = useState<AdminStats | null>(null);
+
+  // Create full path with query params for comparison
+  const fullPath = searchParams.toString()
+    ? `${pathname}?${searchParams.toString()}`
+    : pathname;
+
+  // Check if a menu item is active (handles query params)
+  const isItemActive = (itemHref: string) => {
+    if (itemHref.includes('?')) {
+      return fullPath === itemHref;
+    }
+    return pathname === itemHref && !searchParams.toString();
+  };
 
   // Buscar estatísticas
   const fetchStats = useCallback(async () => {
@@ -138,12 +168,12 @@ export default function AdminLayout({
   // Encontra o grupo que contém o item ativo
   useEffect(() => {
     for (const group of menuGroups) {
-      if (group.items.some(item => item.href === pathname)) {
+      if (group.items.some(item => isItemActive(item.href))) {
         setOpenGroup(group.name);
         break;
       }
     }
-  }, [pathname]);
+  }, [pathname, searchParams]);
 
   useEffect(() => {
     if (status === 'unauthenticated') {
@@ -170,11 +200,11 @@ export default function AdminLayout({
   // Encontrar o item atual para mostrar no header mobile
   const getCurrentItem = () => {
     for (const item of standaloneItems) {
-      if (item.href === pathname) return item;
+      if (isItemActive(item.href)) return item;
     }
     for (const group of menuGroups) {
       for (const item of group.items) {
-        if (item.href === pathname) return item;
+        if (isItemActive(item.href)) return item;
       }
     }
     return standaloneItems[0];
@@ -230,7 +260,7 @@ export default function AdminLayout({
           <Link
             href="/admin"
             className={`flex items-center space-x-3 px-4 py-3 rounded-lg transition-colors ${
-              pathname === '/admin'
+              isItemActive('/admin')
                 ? 'bg-amber-600 text-white'
                 : 'text-gray-300 hover:bg-gray-800 hover:text-white'
             }`}
@@ -242,7 +272,7 @@ export default function AdminLayout({
           {/* Menu Groups */}
           {menuGroups.map((group) => {
             const isOpen = openGroup === group.name;
-            const hasActiveItem = group.items.some(item => item.href === pathname);
+            const hasActiveItem = group.items.some(item => isItemActive(item.href));
 
             return (
               <div key={group.name} className="space-y-1">
@@ -276,7 +306,7 @@ export default function AdminLayout({
                 >
                   <div className="pl-4 space-y-1 pt-1">
                     {group.items.map((item) => {
-                      const isActive = pathname === item.href;
+                      const isActive = isItemActive(item.href);
                       const itemCount = getCount(item.countKey);
                       return (
                         <Link
@@ -309,12 +339,58 @@ export default function AdminLayout({
               </div>
             );
           })}
+          {/* Produtos Link */}
+          <Link
+            href="/admin/produtos"
+            className={`flex items-center justify-between px-4 py-3 rounded-lg transition-colors ${
+              isItemActive('/admin/produtos')
+                ? 'bg-amber-600 text-white'
+                : 'text-gray-300 hover:bg-gray-800 hover:text-white'
+            }`}
+          >
+            <div className="flex items-center space-x-3">
+              <CubeIcon className="w-5 h-5 flex-shrink-0" />
+              <span>Produtos</span>
+            </div>
+            {stats?.products !== undefined && (
+              <span className={`px-2 py-0.5 text-xs font-medium rounded-full ${
+                isItemActive('/admin/produtos')
+                  ? 'bg-white/20 text-white'
+                  : 'bg-gray-700 text-gray-300'
+              }`}>
+                {stats.products}
+              </span>
+            )}
+          </Link>
 
+          {/* Reservas Link */}
+          <Link
+            href="/admin/reservas"
+            className={`flex items-center justify-between px-4 py-3 rounded-lg transition-colors ${
+              isItemActive('/admin/reservas')
+                ? 'bg-amber-600 text-white'
+                : 'text-gray-300 hover:bg-gray-800 hover:text-white'
+            }`}
+          >
+            <div className="flex items-center space-x-3">
+              <CalendarDaysIcon className="w-5 h-5 flex-shrink-0" />
+              <span>Reservas</span>
+            </div>
+            {stats?.totalReservations !== undefined && (
+              <span className={`px-2 py-0.5 text-xs font-medium rounded-full ${
+                isItemActive('/admin/reservas')
+                  ? 'bg-white/20 text-white'
+                  : 'bg-gray-700 text-gray-300'
+              }`}>
+                {stats.totalReservations}
+              </span>
+            )}
+          </Link>
           {/* Configurações Link */}
           <Link
             href="/admin/configuracoes"
             className={`flex items-center space-x-3 px-4 py-3 rounded-lg transition-colors ${
-              pathname === '/admin/configuracoes'
+              isItemActive('/admin/configuracoes')
                 ? 'bg-amber-600 text-white'
                 : 'text-gray-300 hover:bg-gray-800 hover:text-white'
             }`}
@@ -395,5 +471,21 @@ export default function AdminLayout({
         </main>
       </div>
     </div>
+  );
+}
+
+export default function AdminLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen flex items-center justify-center bg-gray-100">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-amber-600"></div>
+      </div>
+    }>
+      <AdminLayoutContent>{children}</AdminLayoutContent>
+    </Suspense>
   );
 }

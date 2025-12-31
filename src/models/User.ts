@@ -15,6 +15,7 @@ const HostSchema = new Schema<Omit<IHost, '_id'>>(
     responseRate: { type: String, required: true },
     isSuperhost: { type: Boolean, default: false },
     joinedDate: { type: Date, required: true },
+    phoneVisibility: { type: String, enum: ['public', 'restricted', 'private'], default: 'restricted' },
   },
   { _id: false }
 );
@@ -71,6 +72,7 @@ const UserSchema = new Schema<UserDocument>(
     name: { type: String, required: true },
     role: { type: String, enum: ['admin', 'guest', 'staff'], required: true },
     phone: { type: String },
+    hasWhatsapp: { type: Boolean, default: false },
     avatar: { type: String },
     reservationCode: { type: String },
     checkInDate: { type: Date },

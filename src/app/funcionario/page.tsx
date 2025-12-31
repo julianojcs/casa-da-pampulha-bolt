@@ -56,10 +56,13 @@ interface Message {
 interface Reservation {
   _id: string;
   guestName: string;
-  checkIn: string;
-  checkOut: string;
-  guestCount: number;
+  checkInDate: string;
+  checkInTime?: string;
+  checkOutDate: string;
+  checkOutTime?: string;
+  numberOfGuests?: number;
   status: string;
+  guestPhone?: string;
 }
 
 export default function FuncionarioDashboard() {
@@ -88,7 +91,7 @@ export default function FuncionarioDashboard() {
           fetch('/api/staff/tasks'),
           fetch('/api/staff/supplies'),
           fetch('/api/staff/messages'),
-          fetch('/api/reservas?status=confirmada,checkin'),
+          fetch('/api/reservations?status=upcoming'),
         ]);
 
       if (tasksRes.ok) setTasks(await tasksRes.json());
@@ -96,7 +99,7 @@ export default function FuncionarioDashboard() {
       if (messagesRes.ok) setMessages(await messagesRes.json());
       if (reservationsRes.ok) {
         const data = await reservationsRes.json();
-        setReservations(data.reservas || []);
+        setReservations(Array.isArray(data) ? data : []);
       }
     } catch (error) {
       console.error('Erro ao carregar dados:', error);
@@ -138,11 +141,11 @@ export default function FuncionarioDashboard() {
 
     return reservations
       .filter((r) => {
-        const checkIn = new Date(r.checkIn);
+        const checkIn = new Date(r.checkInDate);
         return checkIn >= today && checkIn <= in3Days;
       })
       .sort(
-        (a, b) => new Date(a.checkIn).getTime() - new Date(b.checkIn).getTime()
+        (a, b) => new Date(a.checkInDate).getTime() - new Date(b.checkInDate).getTime()
       )
       .slice(0, 5);
   }, [reservations]);
@@ -155,12 +158,12 @@ export default function FuncionarioDashboard() {
 
     return reservations
       .filter((r) => {
-        const checkOut = new Date(r.checkOut);
+        const checkOut = new Date(r.checkOutDate);
         return checkOut >= today && checkOut <= in3Days;
       })
       .sort(
         (a, b) =>
-          new Date(a.checkOut).getTime() - new Date(b.checkOut).getTime()
+          new Date(a.checkOutDate).getTime() - new Date(b.checkOutDate).getTime()
       )
       .slice(0, 5);
   }, [reservations]);
@@ -177,6 +180,21 @@ export default function FuncionarioDashboard() {
       })
       .slice(0, 6);
   }, [tasks]);
+
+  // Próxima reserva para o hero
+  const nextReservation = useMemo(() => {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    const upcoming = reservations
+      .filter((r) => {
+        const checkIn = new Date(r.checkInDate);
+        return checkIn >= today;
+      })
+      .sort((a, b) => new Date(a.checkInDate).getTime() - new Date(b.checkInDate).getTime());
+
+    return upcoming[0] || null;
+  }, [reservations]);
 
   const pinnedMessages = useMemo(() => {
     return messages
@@ -313,9 +331,61 @@ export default function FuncionarioDashboard() {
         </button>
       </div>
 
+      {/* Hero - Próxima Reserva */}
+      {nextReservation && (
+        <div className="bg-gradient-to-r from-emerald-600 to-teal-600 rounded-2xl p-6 lg:p-8 text-white shadow-lg">
+          <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+            <div className="flex-1">
+              <div className="flex items-center gap-2 mb-2">
+                <CalendarDaysIcon className="h-5 w-5 text-emerald-200" />
+                <span className="text-sm font-medium text-emerald-100">Próxima Reserva</span>
+              </div>
+              <h2 className="text-2xl lg:text-3xl font-bold mb-1">
+                {nextReservation.guestName}
+              </h2>
+              <p className="text-emerald-100">
+                {nextReservation.numberOfGuests || 1} hóspede{(nextReservation.numberOfGuests || 1) > 1 ? 's' : ''}
+              </p>
+            </div>
+
+            <div className="flex flex-col sm:flex-row gap-4 lg:gap-6">
+              {/* Check-in */}
+              <div className="bg-white/10 backdrop-blur-sm rounded-xl p-4 min-w-[140px]">
+                <div className="flex items-center gap-2 mb-2">
+                  <ArrowTrendingUpIcon className="h-4 w-4 text-emerald-200" />
+                  <span className="text-xs font-medium text-emerald-200 uppercase tracking-wide">Check-in</span>
+                </div>
+                <p className="text-lg font-bold">
+                  {new Date(nextReservation.checkInDate).toLocaleDateString('pt-BR', {
+                    day: '2-digit',
+                    month: 'short',
+                  })}
+                </p>
+                <p className="text-sm text-emerald-100">{nextReservation.checkInTime || '15:00'}</p>
+              </div>
+
+              {/* Check-out */}
+              <div className="bg-white/10 backdrop-blur-sm rounded-xl p-4 min-w-[140px]">
+                <div className="flex items-center gap-2 mb-2">
+                  <ArrowRightIcon className="h-4 w-4 text-emerald-200 rotate-45" />
+                  <span className="text-xs font-medium text-emerald-200 uppercase tracking-wide">Check-out</span>
+                </div>
+                <p className="text-lg font-bold">
+                  {new Date(nextReservation.checkOutDate).toLocaleDateString('pt-BR', {
+                    day: '2-digit',
+                    month: 'short',
+                  })}
+                </p>
+                <p className="text-sm text-emerald-100">{nextReservation.checkOutTime || '11:00'}</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Stats Cards */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-        <div className="bg-white rounded-2xl p-4 lg:p-5 border border-slate-100 shadow-sm hover:shadow-md transition-shadow">
+        <Link href="/funcionario/tarefas" className="bg-white rounded-2xl p-4 lg:p-5 border border-slate-100 shadow-sm hover:shadow-md transition-shadow cursor-pointer">
           <div className="flex items-center justify-between mb-3">
             <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center">
               <ClipboardDocumentListIcon className="h-5 w-5 text-white" />
@@ -325,9 +395,9 @@ export default function FuncionarioDashboard() {
             </span>
           </div>
           <p className="text-sm text-slate-500">Tarefas pendentes</p>
-        </div>
+        </Link>
 
-        <div className="bg-white rounded-2xl p-4 lg:p-5 border border-slate-100 shadow-sm hover:shadow-md transition-shadow">
+        <Link href="/funcionario/tarefas" className="bg-white rounded-2xl p-4 lg:p-5 border border-slate-100 shadow-sm hover:shadow-md transition-shadow cursor-pointer">
           <div className="flex items-center justify-between mb-3">
             <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-emerald-500 to-emerald-600 flex items-center justify-center">
               <CheckCircleIcon className="h-5 w-5 text-white" />
@@ -337,9 +407,9 @@ export default function FuncionarioDashboard() {
             </span>
           </div>
           <p className="text-sm text-slate-500">Concluídas</p>
-        </div>
+        </Link>
 
-        <div className="bg-white rounded-2xl p-4 lg:p-5 border border-slate-100 shadow-sm hover:shadow-md transition-shadow">
+        <Link href="/funcionario/materiais" className="bg-white rounded-2xl p-4 lg:p-5 border border-slate-100 shadow-sm hover:shadow-md transition-shadow cursor-pointer">
           <div className="flex items-center justify-between mb-3">
             <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-amber-500 to-orange-600 flex items-center justify-center">
               <ShoppingCartIcon className="h-5 w-5 text-white" />
@@ -349,9 +419,9 @@ export default function FuncionarioDashboard() {
             </span>
           </div>
           <p className="text-sm text-slate-500">Materiais em falta</p>
-        </div>
+        </Link>
 
-        <div className="bg-white rounded-2xl p-4 lg:p-5 border border-slate-100 shadow-sm hover:shadow-md transition-shadow">
+        <Link href="/funcionario/recados" className="bg-white rounded-2xl p-4 lg:p-5 border border-slate-100 shadow-sm hover:shadow-md transition-shadow cursor-pointer">
           <div className="flex items-center justify-between mb-3">
             <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-purple-500 to-purple-600 flex items-center justify-center">
               <ChatBubbleLeftRightIcon className="h-5 w-5 text-white" />
@@ -361,7 +431,7 @@ export default function FuncionarioDashboard() {
             </span>
           </div>
           <p className="text-sm text-slate-500">Recados não lidos</p>
-        </div>
+        </Link>
       </div>
 
       {/* Main Grid */}
@@ -403,13 +473,13 @@ export default function FuncionarioDashboard() {
                             {res.guestName}
                           </p>
                           <p className="text-xs text-slate-400">
-                            {res.guestCount} hóspede{res.guestCount > 1 ? 's' : ''}
+                            {res.numberOfGuests || 1} hóspede{(res.numberOfGuests || 1) > 1 ? 's' : ''}
                           </p>
                         </div>
                       </div>
                       <div className="text-right">
                         <p className="text-sm font-medium text-emerald-600">
-                          {formatDate(res.checkIn)}
+                          {formatDate(res.checkInDate)}
                         </p>
                       </div>
                     </div>
@@ -461,13 +531,13 @@ export default function FuncionarioDashboard() {
                             {res.guestName}
                           </p>
                           <p className="text-xs text-slate-400">
-                            {res.guestCount} hóspede{res.guestCount > 1 ? 's' : ''}
+                            {res.numberOfGuests || 1} hóspede{(res.numberOfGuests || 1) > 1 ? 's' : ''}
                           </p>
                         </div>
                       </div>
                       <div className="text-right">
                         <p className="text-sm font-medium text-rose-600">
-                          {formatDate(res.checkOut)}
+                          {formatDate(res.checkOutDate)}
                         </p>
                       </div>
                     </div>

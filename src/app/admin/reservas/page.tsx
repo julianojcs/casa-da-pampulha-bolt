@@ -313,7 +313,12 @@ export default function ReservasPage() {
   };
 
   const formatDate = (date: Date | string) => {
-    return new Date(date).toLocaleDateString('pt-BR', {
+    // Extract just the date part (YYYY-MM-DD) to avoid timezone issues
+    const dateStr = typeof date === 'string' ? date : date.toISOString();
+    const datePart = dateStr.split('T')[0];
+    const [year, month, day] = datePart.split('-').map(Number);
+    const localDate = new Date(year, month - 1, day);
+    return localDate.toLocaleDateString('pt-BR', {
       day: '2-digit',
       month: '2-digit',
       year: 'numeric',

@@ -9,6 +9,7 @@ const PropertySchema = new Schema<any>(
     name: { type: String, required: true },
     tagline: { type: String, required: true },
     description: { type: String, required: true },
+    logo: { type: String }, // Logo da propriedade (Cloudinary)
     address: { type: String, required: true },
     city: { type: String, required: true },
     state: { type: String, required: true },
@@ -32,9 +33,23 @@ const PropertySchema = new Schema<any>(
     heroImages: [{ type: String }],
     welcomeMessage: { type: String, required: true },
     phone: { type: String },
+    phoneVisibility: { type: String, enum: ['public', 'restricted', 'private'], default: 'restricted' },
     whatsapp: { type: String },
     email: { type: String },
     isActive: { type: Boolean, default: true },
+
+    // Door passwords
+    doorPasswords: [{
+      location: { type: String, required: true },
+      password: { type: String, required: true },
+      notes: { type: String },
+    }],
+
+    // WiFi passwords
+    wifiPasswords: [{
+      network: { type: String, required: true },
+      password: { type: String, required: true },
+    }],
 
     // Hero Section - textos dinâmicos
     heroTagline: { type: String }, // Ex: "Sua casa de férias perfeita em Belo Horizonte"

@@ -73,6 +73,7 @@ export interface IHost {
   responseRate: string;
   isSuperhost: boolean;
   joinedDate: Date;
+  phoneVisibility?: 'public' | 'restricted' | 'private';
   createdAt?: Date;
   updatedAt?: Date;
 }
@@ -82,6 +83,7 @@ export interface IProperty {
   name: string;
   tagline: string;
   description: string;
+  logo?: string;
   address: string;
   city: string;
   state: string;
@@ -105,9 +107,23 @@ export interface IProperty {
   heroImages: string[];
   welcomeMessage: string;
   phone?: string;
+  phoneVisibility?: 'public' | 'restricted' | 'private';
   whatsapp?: string;
   email?: string;
   isActive: boolean;
+
+  // Door passwords
+  doorPasswords?: {
+    location: string;
+    password: string;
+    notes?: string;
+  }[];
+
+  // WiFi passwords
+  wifiPasswords?: {
+    network: string;
+    password: string;
+  }[];
 
   // Hero Section - textos dinâmicos
   heroTagline?: string;
@@ -130,6 +146,7 @@ export interface ICheckinInfo {
   icon?: string;
   order: number;
   isRestricted: boolean;
+  showOnGuestDashboard: boolean;
   isActive: boolean;
   createdAt?: Date;
   updatedAt?: Date;
@@ -218,6 +235,7 @@ export interface IUser {
   name: string;
   role: UserRole;
   phone?: string;
+  hasWhatsapp?: boolean;
   avatar?: string;
   reservationCode?: string;
   checkInDate?: Date;

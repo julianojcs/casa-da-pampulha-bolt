@@ -1,7 +1,7 @@
 "use client";
 
 import Link from 'next/link';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, Suspense } from 'react';
 import { usePathname } from 'next/navigation';
 import {
   FaFacebook,
@@ -41,7 +41,7 @@ const ICON_MAP: Record<string, any> = {
   pinterest: FaPinterest,
 };
 
-export default function Footer() {
+function FooterContent() {
   const pathname = usePathname();
   const currentYear = new Date().getFullYear();
   const [socialLinks, setSocialLinks] = useState<Array<any>>([]);
@@ -232,5 +232,13 @@ export default function Footer() {
         </div>
       </div>
     </footer>
+  );
+}
+
+export default function Footer() {
+  return (
+    <Suspense fallback={null}>
+      <FooterContent />
+    </Suspense>
   );
 }

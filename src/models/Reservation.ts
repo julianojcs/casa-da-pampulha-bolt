@@ -2,6 +2,22 @@ import mongoose, { Schema, Document } from 'mongoose';
 
 export type ReservationStatus = 'pending' | 'upcoming' | 'current' | 'completed' | 'cancelled';
 
+export interface IReservationGuest {
+  name: string;
+  gender?: 'male' | 'female' | 'other';
+  age?: number;
+  documentType?: 'cpf' | 'rg' | 'passport' | 'other';
+  documentNumber?: string;
+  isMainGuest?: boolean;
+}
+
+export interface IReservationVehicle {
+  brand: string;
+  model: string;
+  color: string;
+  licensePlate: string;
+}
+
 export interface IReservation {
   _id?: string;
   userId: string;
@@ -20,13 +36,37 @@ export interface IReservation {
   confirmationCode?: string;
   totalAmount?: number;
   isPaid?: boolean;
-  preRegistrationId?: string; // ID do pré-cadastro associado
+  preRegistrationId?: string;
+  guests?: IReservationGuest[];
+  vehicles?: IReservationVehicle[];
   createdBy: string;
   createdAt?: Date;
   updatedAt?: Date;
 }
 
 export interface ReservationDocument extends Omit<IReservation, '_id'>, Document {}
+
+const ReservationGuestSchema = new Schema(
+  {
+    name: { type: String, required: true },
+    gender: { type: String, enum: ['male', 'female', 'other'] },
+    age: { type: Number },
+    documentType: { type: String, enum: ['cpf', 'rg', 'passport', 'other'] },
+    documentNumber: { type: String },
+    isMainGuest: { type: Boolean, default: false },
+  },
+  { _id: true }
+);
+
+const ReservationVehicleSchema = new Schema(
+  {
+    brand: { type: String, required: true },
+    model: { type: String, required: true },
+    color: { type: String, required: true },
+    licensePlate: { type: String, required: true },
+  },
+  { _id: true }
+);
 
 const ReservationSchema = new Schema<ReservationDocument>(
   {
@@ -54,7 +94,9 @@ const ReservationSchema = new Schema<ReservationDocument>(
     confirmationCode: { type: String },
     totalAmount: { type: Number },
     isPaid: { type: Boolean, default: false },
-    preRegistrationId: { type: String, index: true }, // Referência ao pré-cadastro
+    preRegistrationId: { type: String, index: true },
+    guests: [ReservationGuestSchema],
+    vehicles: [ReservationVehicleSchema],
     createdBy: { type: String, required: true },
   },
   { timestamps: true }

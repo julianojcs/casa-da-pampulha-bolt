@@ -19,19 +19,23 @@ interface Reservation {
   _id: string;
   checkInDate: string;
   checkOutDate: string;
-  guests: {
+  guests?: {
     name: string;
-    age: number;
-    document?: string;
+    age?: number;
+    documentNumber?: string;
+    isMainGuest?: boolean;
   }[];
-  vehiclePlates: {
-    brand?: string;
-    model?: string;
-    color?: string;
-    plate?: string;
+  vehicles?: {
+    brand: string;
+    model: string;
+    color: string;
+    licensePlate: string;
   }[];
-  status?: 'confirmed' | 'pending' | 'cancelled';
+  status?: 'confirmed' | 'pending' | 'cancelled' | 'current' | 'upcoming' | 'completed';
   specialRequests?: string;
+  notes?: string;
+  guestName?: string;
+  numberOfGuests?: number;
   createdAt: string;
 }
 
@@ -269,12 +273,12 @@ export default function ReservasPage() {
                       <div>
                         <div className="flex items-center gap-2 text-sm text-gray-500 mb-2">
                           <TruckIcon className="h-4 w-4" />
-                          Veículos ({reservation.vehiclePlates?.length || 0})
+                          Veículos ({reservation.vehicles?.length || 0})
                         </div>
-                        {reservation.vehiclePlates &&
-                        reservation.vehiclePlates.length > 0 ? (
+                        {reservation.vehicles &&
+                        reservation.vehicles.length > 0 ? (
                           <ul className="space-y-1">
-                            {reservation.vehiclePlates.map((vehicle, index) => (
+                            {reservation.vehicles.map((vehicle, index) => (
                               <li
                                 key={index}
                                 className="text-sm text-gray-700 flex items-center gap-2"
@@ -282,7 +286,7 @@ export default function ReservasPage() {
                                 <span className="w-2 h-2 bg-green-400 rounded-full" />
                                 {vehicle.brand} {vehicle.model}{' '}
                                 <span className="text-gray-500">
-                                  ({vehicle.plate})
+                                  ({vehicle.licensePlate})
                                 </span>
                               </li>
                             ))}
@@ -375,10 +379,13 @@ export default function ReservasPage() {
                           >
                             <p className="font-medium text-gray-800">
                               {guest.name}
+                              {guest.isMainGuest && (
+                                <span className="ml-2 px-2 py-0.5 bg-amber-100 text-amber-700 rounded text-xs">Principal</span>
+                              )}
                             </p>
                             <p className="text-sm text-gray-500">
-                              {guest.age} anos
-                              {guest.document && ` • Doc: ${guest.document}`}
+                              {guest.age && `${guest.age} anos`}
+                              {guest.documentNumber && ` • Doc: ${guest.documentNumber}`}
                             </p>
                           </li>
                         ))}
@@ -386,15 +393,15 @@ export default function ReservasPage() {
                     </div>
                   )}
 
-                {selectedReservation.vehiclePlates &&
-                  selectedReservation.vehiclePlates.length > 0 && (
+                {selectedReservation.vehicles &&
+                  selectedReservation.vehicles.length > 0 && (
                     <div>
                       <h3 className="font-medium text-gray-800 mb-2 flex items-center gap-2">
                         <TruckIcon className="h-5 w-5" />
                         Veículos
                       </h3>
                       <ul className="space-y-2">
-                        {selectedReservation.vehiclePlates.map(
+                        {selectedReservation.vehicles.map(
                           (vehicle, index) => (
                             <li
                               key={index}
@@ -404,7 +411,7 @@ export default function ReservasPage() {
                                 {vehicle.brand} {vehicle.model}
                               </p>
                               <p className="text-sm text-gray-500">
-                                {vehicle.color} • Placa: {vehicle.plate}
+                                {vehicle.color} • Placa: {vehicle.licensePlate}
                               </p>
                             </li>
                           )
@@ -413,13 +420,13 @@ export default function ReservasPage() {
                     </div>
                   )}
 
-                {selectedReservation.specialRequests && (
+                {(selectedReservation.specialRequests || selectedReservation.notes) && (
                   <div>
                     <h3 className="font-medium text-gray-800 mb-2">
                       Observações
                     </h3>
                     <p className="text-gray-600 bg-gray-50 rounded-lg p-3">
-                      {selectedReservation.specialRequests}
+                      {selectedReservation.specialRequests || selectedReservation.notes}
                     </p>
                   </div>
                 )}

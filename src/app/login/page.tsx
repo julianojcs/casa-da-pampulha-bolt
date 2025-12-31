@@ -62,7 +62,20 @@ function LoginForm() {
         }
       } else {
         toast.success('Login realizado com sucesso!');
-        router.push(callbackUrl);
+
+        // Fetch session to check user role for proper redirect
+        const sessionRes = await fetch('/api/auth/session');
+        const session = await sessionRes.json();
+
+        if (session?.user?.role === 'staff') {
+          router.push('/funcionario');
+        } else if (session?.user?.role === 'admin') {
+          router.push(callbackUrl === '/' ? '/admin' : callbackUrl);
+        } else if (session?.user?.role === 'guest') {
+          router.push('/hospede');
+        } else {
+          router.push(callbackUrl);
+        }
         router.refresh();
       }
     } catch (error) {

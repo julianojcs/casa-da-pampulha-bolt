@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 import dbConnect from '@/lib/mongodb';
-import { GuestRegistration } from '@/models/GuestRegistration';
+import { Reservation } from '@/models/Reservation';
 
 export const dynamic = 'force-dynamic';
 
@@ -17,9 +17,12 @@ export async function GET() {
 
     await dbConnect();
 
-    // Buscar todos os registros de hóspede pelo email do usuário
-    const reservations = await GuestRegistration.find({
-      email: session.user.email,
+    // Buscar reservas pelo userId OU pelo email do usuário
+    const reservations = await Reservation.find({
+      $or: [
+        { userId: session.user.id },
+        { guestEmail: session.user.email }
+      ]
     })
       .sort({ checkInDate: -1 })
       .lean();

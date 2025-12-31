@@ -10,6 +10,10 @@ import { FAQ } from '@/models/FAQ';
 import { Room } from '@/models/Room';
 import { Amenity } from '@/models/Amenity';
 import { Reservation } from '@/models/Reservation';
+import { StaffTask } from '@/models/StaffTask';
+import { StaffSupply } from '@/models/StaffSupply';
+import { StaffMessage } from '@/models/StaffMessage';
+import { Product } from '@/models/Product';
 
 export const dynamic = 'force-dynamic';
 
@@ -27,6 +31,7 @@ export async function GET() {
     const [
       totalUsers,
       totalGuests,
+      totalStaff,
       pendingPreRegistrations,
       totalPlaces,
       totalGalleryItems,
@@ -35,9 +40,15 @@ export async function GET() {
       totalAmenities,
       activeReservations,
       totalReservations,
+      pendingTasks,
+      inProgressTasks,
+      pendingSupplies,
+      activeMessages,
+      totalProducts,
     ] = await Promise.all([
       User.countDocuments({ isActive: true }),
       User.countDocuments({ role: 'guest', isActive: true }),
+      User.countDocuments({ role: 'staff', isActive: true }),
       PreRegistration.countDocuments({ status: 'pending' }),
       Place.countDocuments({ isActive: true }),
       GalleryItem.countDocuments({ isActive: true }),
@@ -46,11 +57,17 @@ export async function GET() {
       Amenity.countDocuments({ isActive: true }),
       Reservation.countDocuments({ status: { $in: ['upcoming', 'current'] } }),
       Reservation.countDocuments({ status: { $ne: 'cancelled' } }),
+      StaffTask.countDocuments({ status: 'pending' }),
+      StaffTask.countDocuments({ status: 'in-progress' }),
+      StaffSupply.countDocuments({ status: { $in: ['low', 'critical', 'out-of-stock'] } }),
+      StaffMessage.countDocuments({ isActive: true }),
+      Product.countDocuments({ isActive: true }),
     ]);
 
     return NextResponse.json({
       users: totalUsers,
       guests: totalGuests,
+      staff: totalStaff,
       preRegistrations: pendingPreRegistrations,
       places: totalPlaces,
       gallery: totalGalleryItems,
@@ -58,10 +75,18 @@ export async function GET() {
       rooms: totalRooms,
       amenities: totalAmenities,
       // Total para o grupo Usuários
-      usersGroupTotal: totalGuests + pendingPreRegistrations,
+      usersGroupTotal: totalGuests + pendingPreRegistrations + totalStaff,
       // Contadores de reservas
       activeReservations: activeReservations,
       totalReservations: totalReservations,
+      // Staff management stats
+      pendingTasks: pendingTasks,
+      inProgressTasks: inProgressTasks,
+      totalActiveTasks: pendingTasks + inProgressTasks,
+      pendingSupplies: pendingSupplies,
+      activeMessages: activeMessages,
+      // Products
+      products: totalProducts,
     });
   } catch (error) {
     console.error('Erro ao buscar estatísticas:', error);

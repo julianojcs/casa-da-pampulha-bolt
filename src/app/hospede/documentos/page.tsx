@@ -15,6 +15,8 @@ import {
 import toast from 'react-hot-toast';
 import { CloudinaryUpload } from '@/components/CloudinaryUpload';
 import { CLOUDINARY_FOLDERS } from '@/lib/cloudinary';
+import { CPFInput } from '@/components/CPFInput';
+import { validateCPF, cleanCPF } from '@/lib/cpf';
 
 interface Documents {
   documentType: string;
@@ -69,12 +71,28 @@ export default function DocumentosPage() {
       return;
     }
 
+    // Validação de CPF
+    if (documents.documentType === 'CPF') {
+      if (!validateCPF(documents.document)) {
+        toast.error('CPF inválido');
+        return;
+      }
+    }
+
     setSaving(true);
     try {
+      // Limpar o CPF antes de enviar (remover máscara)
+      const dataToSend = {
+        ...documents,
+        document: documents.documentType === 'CPF'
+          ? cleanCPF(documents.document)
+          : documents.document,
+      };
+
       const response = await fetch('/api/user/documents', {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(documents),
+        body: JSON.stringify(dataToSend),
       });
 
       if (response.ok) {
@@ -222,21 +240,27 @@ export default function DocumentosPage() {
               <label className="block text-sm font-medium text-gray-700 mb-1">
                 Número do Documento
               </label>
-              <input
-                type="text"
-                value={documents.document}
-                onChange={(e) =>
-                  setDocuments({ ...documents, document: e.target.value })
-                }
-                placeholder={
-                  documents.documentType === 'CPF'
-                    ? '000.000.000-00'
-                    : documents.documentType === 'RG'
-                    ? '00.000.000-0'
-                    : 'Número do passaporte'
-                }
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent"
-              />
+              {documents.documentType === 'CPF' ? (
+                <CPFInput
+                  value={documents.document}
+                  onChange={(value) => setDocuments({ ...documents, document: value })}
+                  required
+                />
+              ) : (
+                <input
+                  type="text"
+                  value={documents.document}
+                  onChange={(e) =>
+                    setDocuments({ ...documents, document: e.target.value })
+                  }
+                  placeholder={
+                    documents.documentType === 'RG'
+                      ? '00.000.000-0'
+                      : 'Número do passaporte'
+                  }
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent"
+                />
+              )}
             </div>
 
             {/* Document Image */}

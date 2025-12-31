@@ -10,6 +10,7 @@ interface Property {
   name: string;
   tagline: string;
   description: string;
+  logo: string;
   address: string;
   city: string;
   state: string;
@@ -30,6 +31,14 @@ interface Property {
   heroImages: string[];
   welcomeMessage: string;
   isActive: boolean;
+  // Contatos
+  phone: string;
+  phoneVisibility: 'public' | 'restricted' | 'private';
+  whatsapp: string;
+  email: string;
+  // Senhas
+  doorPasswords: { location: string; password: string; notes?: string }[];
+  wifiPasswords: { network: string; password: string }[];
   // Hero Section - textos dinâmicos
   heroTagline: string;
   heroSubtitle: string;
@@ -43,6 +52,7 @@ const emptyProperty: Omit<Property, '_id'> = {
   name: '',
   tagline: '',
   description: '',
+  logo: '',
   address: '',
   city: '',
   state: '',
@@ -63,6 +73,14 @@ const emptyProperty: Omit<Property, '_id'> = {
   heroImages: [],
   welcomeMessage: '',
   isActive: true,
+  // Contatos
+  phone: '',
+  phoneVisibility: 'restricted',
+  whatsapp: '',
+  email: '',
+  // Senhas
+  doorPasswords: [],
+  wifiPasswords: [],
   // Hero Section - textos dinâmicos
   heroTagline: '',
   heroSubtitle: '',
@@ -93,6 +111,7 @@ export default function AdminPropriedadePage() {
           name: data.name || '',
           tagline: data.tagline || '',
           description: data.description || '',
+          logo: data.logo || '',
           address: data.address || '',
           city: data.city || '',
           state: data.state || '',
@@ -113,6 +132,14 @@ export default function AdminPropriedadePage() {
           heroImages: data.heroImages || [],
           welcomeMessage: data.welcomeMessage || '',
           isActive: data.isActive ?? true,
+          // Contatos
+          phone: data.phone || '',
+          phoneVisibility: data.phoneVisibility || 'restricted',
+          whatsapp: data.whatsapp || '',
+          email: data.email || '',
+          // Senhas
+          doorPasswords: data.doorPasswords || [],
+          wifiPasswords: data.wifiPasswords || [],
           // Hero Section - textos dinâmicos
           heroTagline: data.heroTagline || '',
           heroSubtitle: data.heroSubtitle || '',
@@ -213,6 +240,21 @@ export default function AdminPropriedadePage() {
               rows={4}
               className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent"
             />
+          </div>
+
+          {/* Logo da Propriedade */}
+          <div className="mt-4">
+            <label className="block text-sm font-medium text-gray-700 mb-1">Logo da Propriedade</label>
+            <div className="flex items-start gap-4">
+              <CloudinaryUpload
+                folder="assets"
+                value={formData.logo}
+                onChange={(url: string) => setFormData({ ...formData, logo: url })}
+                label={formData.logo ? 'Trocar Logo' : 'Upload da Logo'}
+                previewClassName="h-24 w-24"
+              />
+            </div>
+            <p className="text-xs text-gray-500 mt-1">A logo será exibida no cabeçalho e em outros locais do site</p>
           </div>
         </div>
 
@@ -484,6 +526,184 @@ export default function AdminPropriedadePage() {
                 ))}
               </div>
             )}
+          </div>
+        </div>
+
+        {/* Contatos */}
+        <div className="border-b pb-6">
+          <h2 className="text-lg font-semibold text-gray-700 mb-4">Contatos do Anfitrião</h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Telefone</label>
+              <input
+                type="text"
+                value={formData.phone}
+                onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                placeholder="(31) 99999-9999"
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Visibilidade do Telefone</label>
+              <select
+                value={formData.phoneVisibility}
+                onChange={(e) => setFormData({ ...formData, phoneVisibility: e.target.value as 'public' | 'restricted' | 'private' })}
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent"
+              >
+                <option value="public">Público (visível para todos)</option>
+                <option value="restricted">Restrito (apenas hóspedes com reserva ativa)</option>
+                <option value="private">Privado (não exibir)</option>
+              </select>
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">WhatsApp</label>
+              <input
+                type="text"
+                value={formData.whatsapp}
+                onChange={(e) => setFormData({ ...formData, whatsapp: e.target.value })}
+                placeholder="(31) 99999-9999"
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Email</label>
+              <input
+                type="email"
+                value={formData.email}
+                onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                placeholder="contato@exemplo.com"
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent"
+              />
+            </div>
+          </div>
+        </div>
+
+        {/* Senhas WiFi */}
+        <div className="border-b pb-6">
+          <h2 className="text-lg font-semibold text-gray-700 mb-4">Senhas de WiFi</h2>
+          <div className="space-y-3">
+            {formData.wifiPasswords.map((wifi, index) => (
+              <div key={index} className="flex gap-3 items-center bg-gray-50 p-3 rounded-lg">
+                <input
+                  type="text"
+                  value={wifi.network}
+                  onChange={(e) => {
+                    const updated = [...formData.wifiPasswords];
+                    updated[index] = { ...updated[index], network: e.target.value };
+                    setFormData({ ...formData, wifiPasswords: updated });
+                  }}
+                  placeholder="Nome da rede"
+                  className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent"
+                />
+                <input
+                  type="text"
+                  value={wifi.password}
+                  onChange={(e) => {
+                    const updated = [...formData.wifiPasswords];
+                    updated[index] = { ...updated[index], password: e.target.value };
+                    setFormData({ ...formData, wifiPasswords: updated });
+                  }}
+                  placeholder="Senha"
+                  className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent"
+                />
+                <button
+                  type="button"
+                  onClick={() => {
+                    setFormData({
+                      ...formData,
+                      wifiPasswords: formData.wifiPasswords.filter((_, i) => i !== index)
+                    });
+                  }}
+                  className="p-2 text-red-500 hover:text-red-700"
+                >
+                  <XMarkIcon className="h-5 w-5" />
+                </button>
+              </div>
+            ))}
+            <button
+              type="button"
+              onClick={() => {
+                setFormData({
+                  ...formData,
+                  wifiPasswords: [...formData.wifiPasswords, { network: '', password: '' }]
+                });
+              }}
+              className="text-amber-600 hover:text-amber-700 text-sm font-medium"
+            >
+              + Adicionar rede WiFi
+            </button>
+          </div>
+        </div>
+
+        {/* Senhas das Portas */}
+        <div className="border-b pb-6">
+          <h2 className="text-lg font-semibold text-gray-700 mb-4">Senhas das Portas</h2>
+          <div className="space-y-3">
+            {formData.doorPasswords.map((door, index) => (
+              <div key={index} className="flex gap-3 items-start bg-gray-50 p-3 rounded-lg">
+                <div className="flex-1 space-y-2">
+                  <input
+                    type="text"
+                    value={door.location}
+                    onChange={(e) => {
+                      const updated = [...formData.doorPasswords];
+                      updated[index] = { ...updated[index], location: e.target.value };
+                      setFormData({ ...formData, doorPasswords: updated });
+                    }}
+                    placeholder="Local (ex: Portão Principal, Área de Lazer)"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent"
+                  />
+                  <div className="flex gap-3">
+                    <input
+                      type="text"
+                      value={door.password}
+                      onChange={(e) => {
+                        const updated = [...formData.doorPasswords];
+                        updated[index] = { ...updated[index], password: e.target.value };
+                        setFormData({ ...formData, doorPasswords: updated });
+                      }}
+                      placeholder="Senha"
+                      className="w-1/3 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent"
+                    />
+                    <input
+                      type="text"
+                      value={door.notes || ''}
+                      onChange={(e) => {
+                        const updated = [...formData.doorPasswords];
+                        updated[index] = { ...updated[index], notes: e.target.value };
+                        setFormData({ ...formData, doorPasswords: updated });
+                      }}
+                      placeholder="Observações (opcional)"
+                      className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent"
+                    />
+                  </div>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setFormData({
+                      ...formData,
+                      doorPasswords: formData.doorPasswords.filter((_, i) => i !== index)
+                    });
+                  }}
+                  className="p-2 text-red-500 hover:text-red-700"
+                >
+                  <XMarkIcon className="h-5 w-5" />
+                </button>
+              </div>
+            ))}
+            <button
+              type="button"
+              onClick={() => {
+                setFormData({
+                  ...formData,
+                  doorPasswords: [...formData.doorPasswords, { location: '', password: '', notes: '' }]
+                });
+              }}
+              className="text-amber-600 hover:text-amber-700 text-sm font-medium"
+            >
+              + Adicionar senha de porta
+            </button>
           </div>
         </div>
 

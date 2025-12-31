@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import Image from 'next/image';
+import Link from 'next/link';
 import {
   PhotoIcon,
   MapPinIcon,
@@ -13,6 +14,8 @@ import {
   UserIcon,
   PhoneIcon,
   ClockIcon,
+  ExclamationTriangleIcon,
+  ShoppingCartIcon,
 } from '@heroicons/react/24/outline';
 import { formatPhone } from '@/lib/helpers';
 
@@ -21,6 +24,13 @@ interface Stats {
   gallery: number;
   faqs: number;
   guests: number;
+}
+
+interface MaterialAlert {
+  _id: string;
+  name: string;
+  status: 'critical' | 'out_of_stock';
+  category: string;
 }
 
 interface ReservationData {
@@ -52,6 +62,7 @@ export default function AdminDashboard() {
   const [loading, setLoading] = useState(true);
   const [currentReservation, setCurrentReservation] = useState<ReservationData | null>(null);
   const [nextReservation, setNextReservation] = useState<ReservationData | null>(null);
+  const [materialAlerts, setMaterialAlerts] = useState<MaterialAlert[]>([]);
 
   const [property, setProperty] = useState<any>(null);
   const [airbnbUrl, setAirbnbUrl] = useState<string>('https://www.airbnb.com.br');
@@ -60,7 +71,28 @@ export default function AdminDashboard() {
     fetchStats();
     fetchProperty();
     fetchCurrentReservation();
+    fetchMaterialAlerts();
   }, []);
+
+  const fetchMaterialAlerts = async () => {
+    try {
+      const res = await fetch('/api/staff/supplies');
+      if (res.ok) {
+        const supplies = await res.json();
+        const alerts = supplies.filter(
+          (s: any) => s.status === 'critical' || s.status === 'out_of_stock'
+        ).map((s: any) => ({
+          _id: s._id,
+          name: s.name,
+          status: s.status,
+          category: s.category,
+        }));
+        setMaterialAlerts(alerts);
+      }
+    } catch (error) {
+      console.error('Erro ao buscar alertas de materiais:', error);
+    }
+  };
 
   const fetchStats = async () => {
     try {
@@ -147,7 +179,12 @@ export default function AdminDashboard() {
   ];
 
   const formatDate = (date: Date | string) => {
-    return new Date(date).toLocaleDateString('pt-BR', {
+    // Extract just the date part (YYYY-MM-DD) to avoid timezone issues
+    const dateStr = typeof date === 'string' ? date : date.toISOString();
+    const datePart = dateStr.split('T')[0];
+    const [year, month, day] = datePart.split('-').map(Number);
+    const localDate = new Date(year, month - 1, day);
+    return localDate.toLocaleDateString('pt-BR', {
       day: '2-digit',
       month: '2-digit',
       year: 'numeric',
@@ -235,6 +272,14 @@ export default function AdminDashboard() {
                   Check-out: {formatDate(currentReservation.checkOutDate)} às {currentReservation.checkOutTime}
                 </span>
               </div>
+              {currentReservation.numberOfGuests && currentReservation.numberOfGuests > 0 && (
+                <div className="flex items-center gap-2">
+                  <UsersIcon className="h-5 w-5" />
+                  <span>
+                    {currentReservation.numberOfGuests} hóspede{currentReservation.numberOfGuests > 1 ? 's' : ''}
+                  </span>
+                </div>
+              )}
             </div>
           </div>
           {getDaysRemaining(currentReservation.checkOutDate) <= 1 && (
@@ -283,6 +328,52 @@ export default function AdminDashboard() {
                 {formatDate(nextReservation.checkInDate)} - {formatDate(nextReservation.checkOutDate)}
               </p>
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* Material Alerts */}
+      {materialAlerts.length > 0 && (
+        <div className="bg-gradient-to-r from-rose-100 to-orange-100 border border-rose-200 rounded-2xl p-6 shadow-sm mb-8">
+          <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center gap-2">
+              <ExclamationTriangleIcon className="h-6 w-6 text-rose-600" />
+              <h2 className="text-xl font-bold text-rose-800">Alertas de Materiais</h2>
+              <span className="ml-2 px-2 py-0.5 bg-rose-200 text-rose-700 rounded-full text-sm font-medium">
+                {materialAlerts.length}
+              </span>
+            </div>
+            <Link
+              href="/admin/funcionarios/materiais"
+              className="text-sm bg-rose-200 hover:bg-rose-300 text-rose-700 px-3 py-1 rounded-lg transition-colors"
+            >
+              Ver todos
+            </Link>
+          </div>
+          <div className="grid gap-2">
+            {materialAlerts.slice(0, 5).map((alert) => (
+              <div
+                key={alert._id}
+                className="flex items-center justify-between p-3 bg-white/60 rounded-xl border border-rose-100"
+              >
+                <div className="flex items-center gap-3">
+                  <ShoppingCartIcon className="h-5 w-5 text-rose-500" />
+                  <span className="font-medium text-slate-700">{alert.name}</span>
+                </div>
+                <span className={`px-2 py-0.5 rounded-full text-xs font-semibold ${
+                  alert.status === 'out_of_stock'
+                    ? 'bg-red-100 text-red-700'
+                    : 'bg-orange-100 text-orange-700'
+                }`}>
+                  {alert.status === 'out_of_stock' ? 'Esgotado' : 'Crítico'}
+                </span>
+              </div>
+            ))}
+            {materialAlerts.length > 5 && (
+              <p className="text-rose-600 text-sm text-center mt-2">
+                + {materialAlerts.length - 5} outros materiais
+              </p>
+            )}
           </div>
         </div>
       )}

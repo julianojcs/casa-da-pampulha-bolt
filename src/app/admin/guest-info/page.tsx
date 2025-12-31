@@ -20,6 +20,7 @@ interface GuestInfo {
   icon: string;
   order: number;
   isRestricted: boolean;
+  showOnGuestDashboard: boolean;
   isActive: boolean;
 }
 
@@ -37,6 +38,7 @@ const emptyItem: Omit<GuestInfo, '_id'> = {
   icon: 'clock',
   order: 0,
   isRestricted: false,
+  showOnGuestDashboard: false,
   isActive: true,
 };
 
@@ -57,7 +59,9 @@ export default function AdminGuestInfoPage() {
     try {
       const response = await fetch('/api/guest-info?includeRestricted=true');
       const data = await response.json();
-      setItems(Array.isArray(data) ? data : []);
+      // Handle both old format (array) and new format ({items: [...]})
+      const itemsArray = Array.isArray(data) ? data : (data.items || []);
+      setItems(itemsArray);
     } catch (error) {
       console.error('Erro ao carregar informações:', error);
       toast.error('Erro ao carregar informações');
@@ -76,6 +80,7 @@ export default function AdminGuestInfoPage() {
         icon: item.icon,
         order: item.order,
         isRestricted: item.isRestricted,
+        showOnGuestDashboard: item.showOnGuestDashboard,
         isActive: item.isActive,
       });
     } else {
@@ -484,6 +489,18 @@ export default function AdminGuestInfoPage() {
                     <span className="text-sm text-gray-700">
                       Restrito
                       <span className="text-xs text-gray-500 ml-1">(visível apenas para hóspedes logados)</span>
+                    </span>
+                  </label>
+                  <label className="flex items-center gap-2">
+                    <input
+                      type="checkbox"
+                      checked={formData.showOnGuestDashboard}
+                      onChange={(e) => setFormData({ ...formData, showOnGuestDashboard: e.target.checked })}
+                      className="rounded border-gray-300 text-amber-600 focus:ring-amber-500"
+                    />
+                    <span className="text-sm text-gray-700">
+                      Dashboard do hóspede
+                      <span className="text-xs text-gray-500 ml-1">(destacar no painel do hóspede)</span>
                     </span>
                   </label>
                   <label className="flex items-center gap-2">

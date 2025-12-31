@@ -24,6 +24,7 @@ interface Host {
   responseRate?: string;
   isSuperhost?: boolean;
   joinedDate?: string;
+  phoneVisibility?: 'public' | 'restricted' | 'private';
 }
 
 interface PaymentInfo {
@@ -64,6 +65,7 @@ interface User {
   name: string;
   role: 'admin' | 'guest' | 'staff';
   phone?: string;
+  hasWhatsapp?: boolean;
   avatar?: string;
   isActive: boolean;
   emailVerified?: boolean;
@@ -122,6 +124,7 @@ const emptyUser: Omit<User, '_id' | 'createdAt'> = {
   name: '',
   role: 'guest',
   phone: '',
+  hasWhatsapp: false,
   avatar: '',
   isActive: true,
   emailVerified: false,
@@ -138,6 +141,7 @@ const emptyHost: Host = {
   responseRate: '100%',
   isSuperhost: false,
   joinedDate: new Date().toISOString().split('T')[0],
+  phoneVisibility: 'restricted',
 };
 
 // Lista de idiomas disponíveis
@@ -653,13 +657,25 @@ export default function AdminUsuariosPage() {
                   <label className="block text-sm font-medium text-gray-700 mb-1">
                     Telefone
                   </label>
-                  <input
-                    type="tel"
-                    value={formData.phone}
-                    onChange={(e) => setFormData(prev => ({ ...prev, phone: e.target.value }))}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-amber-500 disabled:bg-gray-50"
-                    disabled={isViewMode}
-                  />
+                  <div className="flex gap-3">
+                    <input
+                      type="tel"
+                      value={formData.phone}
+                      onChange={(e) => setFormData(prev => ({ ...prev, phone: e.target.value }))}
+                      className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-amber-500 disabled:bg-gray-50"
+                      disabled={isViewMode}
+                    />
+                    <label className="flex items-center gap-2 px-3 py-2 border border-gray-300 rounded-lg bg-white cursor-pointer hover:bg-gray-50">
+                      <input
+                        type="checkbox"
+                        checked={formData.hasWhatsapp || false}
+                        onChange={(e) => setFormData(prev => ({ ...prev, hasWhatsapp: e.target.checked }))}
+                        className="rounded border-gray-300 text-green-600 focus:ring-green-500"
+                        disabled={isViewMode}
+                      />
+                      <span className="text-sm text-gray-700 whitespace-nowrap">WhatsApp</span>
+                    </label>
+                  </div>
                 </div>
 
                 <div>
@@ -920,6 +936,37 @@ export default function AdminUsuariosPage() {
                         <span className="text-sm font-medium text-gray-700">Superhost</span>
                       </label>
                     </div>
+
+                    {/* Phone Visibility - references the phone field above */}
+                    {formData.phone && (
+                      <div className="md:col-span-2 border-t pt-4 mt-2">
+                        <div className="flex flex-col sm:flex-row sm:items-center gap-4">
+                          <div className="flex items-center gap-2 text-sm text-gray-600">
+                            <span>Telefone:</span>
+                            <span className="font-medium text-gray-800">{formData.phone}</span>
+                            {formData.hasWhatsapp && (
+                              <span className="px-2 py-0.5 bg-green-100 text-green-700 rounded text-xs">WhatsApp</span>
+                            )}
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <label className="text-sm font-medium text-gray-700">Visibilidade:</label>
+                            <select
+                              value={formData.host.phoneVisibility || 'restricted'}
+                              onChange={(e) => setFormData(prev => ({
+                                ...prev,
+                                host: { ...prev.host!, phoneVisibility: e.target.value as 'public' | 'restricted' | 'private' }
+                              }))}
+                              className="px-3 py-1.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-amber-500 disabled:bg-gray-50 text-sm"
+                              disabled={isViewMode}
+                            >
+                              <option value="public">Público</option>
+                              <option value="restricted">Restrito (hóspedes com reserva)</option>
+                              <option value="private">Privado</option>
+                            </select>
+                          </div>
+                        </div>
+                      </div>
+                    )}
                   </div>
                 )}
               </div>

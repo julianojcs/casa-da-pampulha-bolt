@@ -11,12 +11,22 @@ export async function GET(request: NextRequest) {
     const { searchParams } = new URL(request.url);
     const type = searchParams.get('type');
     const includeRestricted = searchParams.get('includeRestricted') === 'true';
+    const dashboardOnly = searchParams.get('dashboard') === 'true';
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const query: any = { isActive: true };
 
     if (type) {
       query.type = type;
+    }
+
+    // Filter for dashboard items only
+    if (dashboardOnly) {
+      // Include rules (always show on dashboard) or items marked for dashboard
+      query.$or = [
+        { type: 'rule' },
+        { showOnGuestDashboard: true }
+      ];
     }
 
     // Only include restricted items if user is authenticated
@@ -29,7 +39,7 @@ export async function GET(request: NextRequest) {
 
     const items = await GuestInfo.find(query).sort({ order: 1 });
 
-    return NextResponse.json(items);
+    return NextResponse.json({ items });
   } catch (error) {
     console.error('Error fetching guest info:', error);
     return NextResponse.json(
