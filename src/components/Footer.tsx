@@ -47,11 +47,6 @@ export default function Footer() {
   const [socialLinks, setSocialLinks] = useState<Array<any>>([]);
   const [contactInfo, setContactInfo] = useState<any>(null);
 
-  // Não renderizar o Footer nas páginas do admin e funcionario (têm seus próprios layouts)
-  if (pathname?.startsWith('/admin') || pathname?.startsWith('/funcionario')) {
-    return null;
-  }
-
   useEffect(() => {
     let mounted = true;
 
@@ -90,6 +85,11 @@ export default function Footer() {
         label: s.platform || s.icon || 'social',
       }))
     : [];
+
+  // Não renderizar o Footer nas páginas do admin e funcionario (têm seus próprios layouts)
+  if (pathname?.startsWith('/admin') || pathname?.startsWith('/funcionario')) {
+    return null;
+  }
 
   return (
     <footer className="bg-gray-900 text-white">
