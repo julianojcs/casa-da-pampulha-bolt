@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useSession } from 'next-auth/react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import {
   PlusIcon,
   PencilIcon,
@@ -17,14 +17,25 @@ import {
   CalendarIcon,
   UserPlusIcon,
   XMarkIcon,
+  CalendarDaysIcon,
 } from '@heroicons/react/24/outline';
 import toast from 'react-hot-toast';
 import { formatPhone } from '@/lib/helpers';
 import { IPreRegistration } from '@/models/PreRegistration';
 
+interface CalendarEvent {
+  uid: string;
+  summary: string;
+  start: string;
+  end: string;
+  status: string;
+  reservationCode?: string;
+}
+
 export default function PreCadastrosPage() {
   const { data: session, status } = useSession();
   const router = useRouter();
+  const searchParams = useSearchParams();
 
   const [preRegistrations, setPreRegistrations] = useState<IPreRegistration[]>([]);
   const [loading, setLoading] = useState(true);
@@ -33,6 +44,10 @@ export default function PreCadastrosPage() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingItem, setEditingItem] = useState<IPreRegistration | null>(null);
   const [copiedId, setCopiedId] = useState<string | null>(null);
+  const [calendarEvents, setCalendarEvents] = useState<CalendarEvent[]>([]);
+  const [loadingCalendar, setLoadingCalendar] = useState(false);
+  const [selectedReservation, setSelectedReservation] = useState<string>('');
+  const [initializedFromParams, setInitializedFromParams] = useState(false);
 
   const [formData, setFormData] = useState({
     name: '',
@@ -46,12 +61,14 @@ export default function PreCadastrosPage() {
     checkOutTime: '11:00',
     adultsCount: 1,
     childrenCount: 0,
+    babiesCount: 0,
     petsCount: 0,
     reservationValue: 0,
     reservationValueRaw: '',
     hasReviews: false,
     isHost: false,
     originCountry: '',
+    reservationCode: '',
   });
 
   useEffect(() => {
@@ -65,6 +82,91 @@ export default function PreCadastrosPage() {
   useEffect(() => {
     fetchPreRegistrations();
   }, [statusFilter]);
+
+  // Handle URL params for creating from calendar
+  useEffect(() => {
+    if (initializedFromParams) return;
+
+    const create = searchParams.get('create');
+    const checkInDate = searchParams.get('checkInDate');
+    const checkOutDate = searchParams.get('checkOutDate');
+    const reservationCode = searchParams.get('reservationCode');
+
+    if (create === 'true' && checkInDate && checkOutDate) {
+      setInitializedFromParams(true);
+      // Pre-fill form data
+      setFormData((prev) => ({
+        ...prev,
+        checkInDate,
+        checkOutDate,
+        notes: reservationCode ? `Código da reserva: ${reservationCode}` : '',
+      }));
+      // Fetch calendar events and open modal
+      fetchCalendarEvents();
+      setIsModalOpen(true);
+      // Clear URL params
+      router.replace('/admin/pre-cadastros', { scroll: false });
+    }
+  }, [searchParams, initializedFromParams, router]);
+
+  const fetchCalendarEvents = async () => {
+    setLoadingCalendar(true);
+    try {
+      const response = await fetch('/api/calendar');
+      const data = await response.json();
+      if (response.ok && data.events) {
+        // Filter only future events that have a reservationCode
+        const today = new Date().toISOString().split('T')[0];
+        const futureEvents = data.events.filter(
+          (e: CalendarEvent) => e.start >= today && e.reservationCode
+        );
+
+        // Also fetch pre-registrations to filter out already registered events
+        const preRegResponse = await fetch('/api/pre-registration');
+        const preRegData = await preRegResponse.json();
+
+        // Filter out events that already have a pre-registration with matching dates
+        const unregisteredEvents = futureEvents.filter((event: CalendarEvent) => {
+          const eventStart = new Date(event.start).toISOString().split('T')[0];
+          const eventEnd = new Date(event.end).toISOString().split('T')[0];
+
+          // Check if any pre-registration matches these dates
+          const hasPreReg = preRegData.some((pr: any) => {
+            const prStart = new Date(pr.checkInDate).toISOString().split('T')[0];
+            const prEnd = new Date(pr.checkOutDate).toISOString().split('T')[0];
+            return prStart === eventStart && prEnd === eventEnd;
+          });
+
+          return !hasPreReg;
+        });
+
+        setCalendarEvents(unregisteredEvents);
+      }
+    } catch (error) {
+      console.error('Erro ao carregar calendário:', error);
+    } finally {
+      setLoadingCalendar(false);
+    }
+  };
+
+  const handleReservationSelect = (uid: string) => {
+    setSelectedReservation(uid);
+    if (!uid) return;
+
+    const event = calendarEvents.find((e) => e.uid === uid);
+    if (event) {
+      // Auto-fill form with calendar event data
+      const guestName = event.summary.replace(/^Reserved$|^Reservado$/i, '').trim() || '';
+
+      setFormData((prev) => ({
+        ...prev,
+        name: guestName || prev.name,
+        checkInDate: event.start,
+        checkOutDate: event.end,
+        reservationCode: event.reservationCode || '',
+      }));
+    }
+  };
 
   const fetchPreRegistrations = async () => {
     try {
@@ -193,6 +295,7 @@ export default function PreCadastrosPage() {
   const openModal = (item?: IPreRegistration) => {
     if (item) {
       setEditingItem(item);
+      setSelectedReservation('');
       setFormData({
         name: item.name,
         email: item.email || '',
@@ -205,15 +308,20 @@ export default function PreCadastrosPage() {
         checkOutTime: item.checkOutTime || '11:00',
         adultsCount: item.adultsCount || 1,
         childrenCount: item.childrenCount || 0,
+        babiesCount: item.babiesCount || 0,
         petsCount: item.petsCount || 0,
         reservationValue: item.reservationValue || 0,
         reservationValueRaw: item.reservationValue ? String(item.reservationValue).replace('.', ',') : '',
         hasReviews: item.hasReviews || false,
         isHost: item.isHost || false,
         originCountry: item.originCountry || '',
+        reservationCode: item.reservationCode || '',
       });
     } else {
       setEditingItem(null);
+      setSelectedReservation('');
+      // Fetch calendar events for new pre-registrations
+      fetchCalendarEvents();
       setFormData({
         name: '',
         email: '',
@@ -226,12 +334,14 @@ export default function PreCadastrosPage() {
         checkOutTime: '11:00',
         adultsCount: 1,
         childrenCount: 0,
+        babiesCount: 0,
         petsCount: 0,
         reservationValue: 0,
         reservationValueRaw: '',
         hasReviews: false,
         isHost: false,
         originCountry: '',
+        reservationCode: '',
       });
     }
     setIsModalOpen(true);
@@ -252,13 +362,16 @@ export default function PreCadastrosPage() {
         checkOutTime: '11:00',
         adultsCount: 1,
         childrenCount: 0,
+        babiesCount: 0,
         petsCount: 0,
         reservationValue: 0,
         reservationValueRaw: '',
         hasReviews: false,
         isHost: false,
         originCountry: '',
+        reservationCode: '',
     });
+    setSelectedReservation('');
   };
 
   const getStatusBadge = (status: string) => {
@@ -602,6 +715,43 @@ export default function PreCadastrosPage() {
             </div>
 
             <form onSubmit={handleSubmit} className="p-6 space-y-4 overflow-y-auto flex-1">
+              {/* Airbnb Calendar Selector - Only show for new pre-registrations */}
+              {!editingItem && (
+                <div className="bg-amber-50 border border-amber-200 rounded-xl p-4 mb-4">
+                  <div className="flex items-center gap-2 mb-2">
+                    <CalendarDaysIcon className="h-5 w-5 text-amber-600" />
+                    <label className="block text-sm font-medium text-amber-800">
+                      Importar do Calendário
+                    </label>
+                  </div>
+                  {loadingCalendar ? (
+                    <div className="flex items-center gap-2 text-amber-600 text-sm">
+                      <div className="w-4 h-4 border-2 border-amber-500 border-t-transparent rounded-full animate-spin" />
+                      Carregando reservas...
+                    </div>
+                  ) : calendarEvents.length > 0 ? (
+                    <select
+                      value={selectedReservation}
+                      onChange={(e) => handleReservationSelect(e.target.value)}
+                      className="w-full px-4 py-2 border border-amber-300 rounded-lg bg-white focus:ring-2 focus:ring-amber-500 focus:border-transparent text-sm"
+                    >
+                      <option value="">Selecione uma reserva para preencher automaticamente...</option>
+                      {calendarEvents.map((event) => (
+                        <option key={event.uid} value={event.uid}>
+                          {new Date(event.start).toLocaleDateString('pt-BR')} - {new Date(event.end).toLocaleDateString('pt-BR')}
+                          {event.summary !== 'Reserved' && event.summary !== 'Reservado' ? ` • ${event.summary}` : ''}
+                          {event.reservationCode ? ` (${event.reservationCode})` : ''}
+                        </option>
+                      ))}
+                    </select>
+                  ) : (
+                    <p className="text-amber-600 text-sm">
+                      Nenhuma reserva futura encontrada no calendário ou calendário não configurado.
+                    </p>
+                  )}
+                </div>
+              )}
+
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
                   Nome do Hóspede *
@@ -647,6 +797,23 @@ export default function PreCadastrosPage() {
                 />
               </div>
 
+              {/* Código de Reserva */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Código de Reserva
+                </label>
+                <input
+                  type="text"
+                  value={formData.reservationCode}
+                  onChange={(e) =>
+                    setFormData({ ...formData, reservationCode: e.target.value })
+                  }
+                  disabled={!!selectedReservation}
+                  placeholder="Ex: HM2AJENN4J"
+                  className={`w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent ${selectedReservation ? 'bg-gray-100 cursor-not-allowed' : ''}`}
+                />
+              </div>
+
               {/* Check-in */}
               <div className="grid grid-cols-2 gap-3">
                 <div>
@@ -659,7 +826,8 @@ export default function PreCadastrosPage() {
                     onChange={(e) =>
                       setFormData({ ...formData, checkInDate: e.target.value })
                     }
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent"
+                    disabled={!!selectedReservation}
+                    className={`w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent ${selectedReservation ? 'bg-gray-100 cursor-not-allowed' : ''}`}
                   />
                 </div>
                 <div>
@@ -689,7 +857,8 @@ export default function PreCadastrosPage() {
                     onChange={(e) =>
                       setFormData({ ...formData, checkOutDate: e.target.value })
                     }
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent"
+                    disabled={!!selectedReservation}
+                    className={`w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent ${selectedReservation ? 'bg-gray-100 cursor-not-allowed' : ''}`}
                   />
                 </div>
                 <div>
@@ -708,7 +877,8 @@ export default function PreCadastrosPage() {
               </div>
 
               {/* Quantidade de hóspedes */}
-              <div className="grid grid-cols-3 gap-3">
+              {/* Quantidade de hóspedes */}
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
                     Adultos
@@ -733,6 +903,20 @@ export default function PreCadastrosPage() {
                     value={formData.childrenCount}
                     onChange={(e) =>
                       setFormData({ ...formData, childrenCount: Number(e.target.value) })
+                    }
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Bebês
+                  </label>
+                  <input
+                    type="number"
+                    min={0}
+                    value={formData.babiesCount}
+                    onChange={(e) =>
+                      setFormData({ ...formData, babiesCount: Number(e.target.value) })
                     }
                     className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent"
                   />

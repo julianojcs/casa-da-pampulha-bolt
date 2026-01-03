@@ -17,6 +17,7 @@ interface StaffSupply {
   _id: string;
   name: string;
   description?: string;
+  image?: string;
   category: string;
   status: string;
   urgency: string;
@@ -68,6 +69,7 @@ export default function AdminMateriaisPage() {
   const [editingSupply, setEditingSupply] = useState<StaffSupply | null>(null);
   const [filter, setFilter] = useState({ status: '', category: '' });
   const [search, setSearch] = useState('');
+  const [showPurchased, setShowPurchased] = useState(false);
 
   const [formData, setFormData] = useState({
     name: '',
@@ -187,18 +189,21 @@ export default function AdminMateriaisPage() {
     setEditingSupply(null);
   };
 
-  const filteredSupplies = supplies.filter((supply) =>
-    supply.name.toLowerCase().includes(search.toLowerCase()) ||
-    supply.description?.toLowerCase().includes(search.toLowerCase())
-  );
+  const filteredSupplies = supplies.filter((supply) => {
+    const matchesSearch = supply.name.toLowerCase().includes(search.toLowerCase()) ||
+      supply.description?.toLowerCase().includes(search.toLowerCase());
+    const matchesPurchased = showPurchased ? true : !supply.purchasedAt;
+    return matchesSearch && matchesPurchased;
+  });
 
   // Stats
   const stats = {
     total: supplies.length,
-    ok: supplies.filter(s => s.status === 'ok').length,
-    low: supplies.filter(s => s.status === 'low').length,
-    critical: supplies.filter(s => s.status === 'critical').length,
-    outOfStock: supplies.filter(s => s.status === 'out-of-stock').length,
+    pending: supplies.filter(s => !s.purchasedAt).length,
+    purchased: supplies.filter(s => s.purchasedAt).length,
+    low: supplies.filter(s => s.status === 'low' && !s.purchasedAt).length,
+    critical: supplies.filter(s => s.status === 'critical' && !s.purchasedAt).length,
+    outOfStock: supplies.filter(s => s.status === 'out-of-stock' && !s.purchasedAt).length,
   };
 
   if (loading) {
@@ -229,12 +234,12 @@ export default function AdminMateriaisPage() {
       {/* Stats */}
       <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
         <div className="bg-white rounded-xl border border-gray-200 p-4">
-          <p className="text-sm text-gray-500">Total</p>
-          <p className="text-2xl font-bold text-gray-900">{stats.total}</p>
+          <p className="text-sm text-gray-500">Pendentes</p>
+          <p className="text-2xl font-bold text-gray-900">{stats.pending}</p>
         </div>
         <div className="bg-green-50 rounded-xl border border-green-200 p-4">
-          <p className="text-sm text-green-600">OK</p>
-          <p className="text-2xl font-bold text-green-700">{stats.ok}</p>
+          <p className="text-sm text-green-600">Comprados</p>
+          <p className="text-2xl font-bold text-green-700">{stats.purchased}</p>
         </div>
         <div className="bg-yellow-50 rounded-xl border border-yellow-200 p-4">
           <p className="text-sm text-yellow-600">Baixo</p>
@@ -265,18 +270,6 @@ export default function AdminMateriaisPage() {
             />
           </div>
 
-          {/* Status Filter */}
-          <select
-            value={filter.status}
-            onChange={(e) => setFilter({ ...filter, status: e.target.value })}
-            className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500"
-          >
-            <option value="">Todos os Status</option>
-            {Object.entries(statusLabels).map(([value, label]) => (
-              <option key={value} value={value}>{label}</option>
-            ))}
-          </select>
-
           {/* Category Filter */}
           <select
             value={filter.category}
@@ -288,6 +281,20 @@ export default function AdminMateriaisPage() {
               <option key={value} value={value}>{label}</option>
             ))}
           </select>
+
+          {/* Show Purchased Toggle */}
+          <div className="flex items-center gap-3">
+            <label className="relative inline-flex items-center cursor-pointer">
+              <input
+                type="checkbox"
+                checked={showPurchased}
+                onChange={(e) => setShowPurchased(e.target.checked)}
+                className="sr-only peer"
+              />
+              <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-amber-300 rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-amber-500"></div>
+            </label>
+            <span className="text-sm text-gray-600">Mostrar comprados</span>
+          </div>
         </div>
       </div>
 
@@ -303,6 +310,7 @@ export default function AdminMateriaisPage() {
             <table className="w-full">
               <thead className="bg-gray-50 border-b border-gray-200">
                 <tr>
+                  <th className="text-left px-4 py-3 text-sm font-medium text-gray-600 w-16">Imagem</th>
                   <th className="text-left px-4 py-3 text-sm font-medium text-gray-600">Material</th>
                   <th className="text-left px-4 py-3 text-sm font-medium text-gray-600">Categoria</th>
                   <th className="text-left px-4 py-3 text-sm font-medium text-gray-600">Status</th>
@@ -315,6 +323,15 @@ export default function AdminMateriaisPage() {
               <tbody className="divide-y divide-gray-100">
                 {filteredSupplies.map((supply) => (
                   <tr key={supply._id} className="hover:bg-gray-50">
+                    <td className="px-4 py-3">
+                      <div className="w-12 h-12 rounded-lg bg-gray-100 flex items-center justify-center overflow-hidden">
+                        {supply.image ? (
+                          <img src={supply.image} alt={supply.name} className="w-full h-full object-cover" />
+                        ) : (
+                          <ShoppingCartIcon className="h-6 w-6 text-gray-400" />
+                        )}
+                      </div>
+                    </td>
                     <td className="px-4 py-3">
                       <div>
                         <p className="font-medium text-gray-900">{supply.name}</p>
@@ -351,7 +368,7 @@ export default function AdminMateriaisPage() {
                     </td>
                     <td className="px-4 py-3">
                       <div className="flex items-center justify-end gap-2">
-                        {supply.status !== 'ok' && (
+                        {!supply.purchasedAt && (
                           <button
                             onClick={() => handleMarkAsPurchased(supply._id)}
                             className="p-1.5 text-gray-500 hover:text-green-600 hover:bg-green-50 rounded-lg transition-colors"
@@ -360,6 +377,11 @@ export default function AdminMateriaisPage() {
                           >
                             <CheckCircleIcon className="h-5 w-5" />
                           </button>
+                        )}
+                        {supply.purchasedAt && (
+                          <span className="text-xs text-green-600 font-medium bg-green-50 px-2 py-1 rounded-lg">
+                            ✓ Comprado
+                          </span>
                         )}
                         <button
                           onClick={() => openModal(supply)}

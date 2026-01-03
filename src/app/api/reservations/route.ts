@@ -73,7 +73,9 @@ export async function GET(request: NextRequest) {
     const reservations = await queryBuilder.lean();
 
     // Fetch guest data for each reservation from User model
-    const userIds = Array.from(new Set(reservations.map((r: any) => r.userId)));
+    // Filter to valid ObjectId strings only (24 hex chars)
+    const userIds = Array.from(new Set(reservations.map((r: any) => r.userId)))
+      .filter((id): id is string => typeof id === 'string' && /^[a-fA-F0-9]{24}$/.test(id));
     const guests = await User.find({ _id: { $in: userIds } }).select('_id name email phone avatar').lean();
     const guestMap = new Map(guests.map((g: any) => [g._id.toString(), g]));
 
@@ -124,9 +126,10 @@ export async function POST(request: NextRequest) {
       numberOfGuests,
       notes,
       source,
-      confirmationCode,
+      reservationCode,
       totalAmount,
       isPaid,
+      temporaryMainDoorPassword,
     } = body;
 
     // Validações
@@ -189,9 +192,10 @@ export async function POST(request: NextRequest) {
       notes,
       status,
       source: source || 'direct',
-      confirmationCode,
+      reservationCode,
       totalAmount,
       isPaid: isPaid ?? false,
+      temporaryMainDoorPassword: temporaryMainDoorPassword?.password ? temporaryMainDoorPassword : undefined,
       createdBy: session.user?.email || 'admin',
     });
 
@@ -235,9 +239,10 @@ export async function PUT(request: NextRequest) {
       notes,
       status,
       source,
-      confirmationCode,
+      reservationCode,
       totalAmount,
       isPaid,
+      temporaryMainDoorPassword,
     } = body;
 
     const updateData: Partial<IReservation> = {};
@@ -253,9 +258,15 @@ export async function PUT(request: NextRequest) {
     if (notes !== undefined) updateData.notes = notes;
     if (status) updateData.status = status;
     if (source) updateData.source = source;
-    if (confirmationCode !== undefined) updateData.confirmationCode = confirmationCode;
+    if (reservationCode !== undefined) updateData.reservationCode = reservationCode;
     if (totalAmount !== undefined) updateData.totalAmount = totalAmount;
     if (isPaid !== undefined) updateData.isPaid = isPaid;
+    if (temporaryMainDoorPassword !== undefined) {
+      // Only save if password is provided, otherwise clear the field
+      updateData.temporaryMainDoorPassword = temporaryMainDoorPassword?.password
+        ? temporaryMainDoorPassword
+        : undefined;
+    }
 
     // Validar datas se fornecidas
     if (updateData.checkInDate && updateData.checkOutDate) {

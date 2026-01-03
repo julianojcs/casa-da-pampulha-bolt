@@ -41,7 +41,7 @@ export default function RecadosPage() {
   const [messages, setMessages] = useState<Message[]>([]);
   const [loading, setLoading] = useState(true);
   const [filterType, setFilterType] = useState('');
-  const [filterRead, setFilterRead] = useState('');
+  const [filterRead, setFilterRead] = useState('unread'); // Default to unread
   const [showFilters, setShowFilters] = useState(false);
   const [selectedMessage, setSelectedMessage] = useState<Message | null>(null);
 
@@ -81,6 +81,12 @@ export default function RecadosPage() {
               : m
           )
         );
+        // If viewing this message, update selectedMessage too
+        if (selectedMessage?._id === messageId) {
+          setSelectedMessage((prev) =>
+            prev ? { ...prev, readBy: [...(prev.readBy || []), userId] } : null
+          );
+        }
       }
     } catch (error) {
       console.error('Erro ao marcar como lido:', error);

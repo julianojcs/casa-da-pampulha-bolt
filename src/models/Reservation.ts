@@ -32,8 +32,13 @@ export interface IReservation {
   numberOfGuests?: number;
   notes?: string;
   status: ReservationStatus;
-  source?: 'airbnb' | 'direct' | 'other';
-  confirmationCode?: string;
+  source?: 'airbnb' | 'booking' | 'vrbo' | 'direct' | 'other';
+  reservationCode?: string;
+  temporaryMainDoorPassword: {
+    location: { type: String, required: true },
+    password: { type: String, required: true },
+    notes: { type: String },
+  },
   totalAmount?: number;
   isPaid?: boolean;
   preRegistrationId?: string;
@@ -88,10 +93,15 @@ const ReservationSchema = new Schema<ReservationDocument>(
     },
     source: {
       type: String,
-      enum: ['airbnb', 'direct', 'other'],
-      default: 'direct',
+      enum: ['airbnb', 'booking', 'vrbo', 'direct', 'other'],
+      default: 'airbnb',
     },
-    confirmationCode: { type: String },
+    reservationCode: { type: String },
+    temporaryMainDoorPassword: {
+      location: { type: String, required: true },
+      password: { type: String, required: true },
+      notes: { type: String },
+    },
     totalAmount: { type: Number },
     isPaid: { type: Boolean, default: false },
     preRegistrationId: { type: String, index: true },

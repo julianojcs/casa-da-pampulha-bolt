@@ -8,6 +8,7 @@ export interface IStaffSupply {
   _id?: string;
   name: string;
   description?: string;
+  image?: string;
   category: SupplyCategory;
   status: SupplyStatus;
   urgency: SupplyUrgency;
@@ -31,6 +32,7 @@ const StaffSupplySchema = new Schema<StaffSupplyDocument>(
   {
     name: { type: String, required: true },
     description: { type: String },
+    image: { type: String },
     category: {
       type: String,
       enum: ['limpeza', 'piscina', 'jardim', 'cozinha', 'banheiro', 'geral'],

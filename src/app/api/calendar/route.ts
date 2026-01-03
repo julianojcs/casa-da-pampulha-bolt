@@ -8,6 +8,7 @@ interface CalendarEvent {
   start: string;
   end: string;
   status: 'blocked' | 'available';
+  reservationCode?: string;
 }
 
 function parseICalDate(dateStr: string): string {
@@ -33,6 +34,7 @@ function parseICalEvents(icalData: string): CalendarEvent[] {
   let currentEvent: Partial<CalendarEvent> | null = null;
 
   for (const line of lines) {
+    // console.log('ICal Line:', line);
     if (line === 'BEGIN:VEVENT') {
       currentEvent = {};
     } else if (line === 'END:VEVENT' && currentEvent) {
@@ -43,12 +45,27 @@ function parseICalEvents(icalData: string): CalendarEvent[] {
           start: currentEvent.start,
           end: currentEvent.end,
           status: 'blocked',
+          reservationCode: currentEvent.reservationCode,
         });
       }
       currentEvent = null;
-    } else if (currentEvent) {
+      } else if (currentEvent) {
       if (line.startsWith('UID:')) {
-        currentEvent.uid = line.slice(4);
+        const uid = line.slice(4);
+        currentEvent.uid = uid;
+        // Extract reservation code from UID (e.g., "HM1234567890@airbnb.com" -> "HM1234567890")
+        const codeMatch = uid.match(/^(HM[A-Z0-9]+)@/i);
+        if (codeMatch) {
+          currentEvent.reservationCode = codeMatch[1].toUpperCase();
+        }
+      } else if (line.startsWith('DESCRIPTION:') || line.includes('reservations/details/')) {
+        // Some Airbnb iCal feeds include the reservation HM code in the DESCRIPTION
+        const desc = line.replace(/^DESCRIPTION:/, '');
+        const codeMatchDesc = desc.match(/reservations\/details\/(HM[ A-Z0-9-]+)/i);
+        if (codeMatchDesc) {
+          // sanitize and uppercase
+          currentEvent.reservationCode = codeMatchDesc[1].replace(/[^A-Z0-9]/gi, '').toUpperCase();
+        }
       } else if (line.startsWith('SUMMARY:')) {
         currentEvent.summary = line.slice(8);
       } else if (line.startsWith('DTSTART')) {

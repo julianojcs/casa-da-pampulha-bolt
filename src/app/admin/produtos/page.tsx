@@ -15,6 +15,7 @@ import {
   TableCellsIcon,
   ArrowTopRightOnSquareIcon,
 } from '@heroicons/react/24/outline';
+import toast from 'react-hot-toast';
 
 interface Product {
   _id: string;
@@ -170,11 +171,15 @@ export default function AdminProdutosPage() {
       });
 
       if (res.ok) {
+        toast.success(editingProduct ? 'Produto atualizado!' : 'Produto criado!');
         fetchProducts();
         closeModal();
+      } else {
+        toast.error('Erro ao salvar produto');
       }
     } catch (error) {
       console.error('Erro ao salvar produto:', error);
+      toast.error('Erro ao salvar produto');
     } finally {
       setUploading(false);
     }
@@ -370,6 +375,9 @@ export default function AdminProdutosPage() {
               <thead className="bg-gray-50">
                 <tr>
                   <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Imagem
+                  </th>
+                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                     Produto
                   </th>
                   <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
@@ -393,37 +401,37 @@ export default function AdminProdutosPage() {
                 {displayedProducts.map((product) => (
                   <tr key={product._id} className={!product.isActive ? 'opacity-50' : ''}>
                     <td className="px-4 py-3 whitespace-nowrap">
-                      <div className="flex items-center gap-3">
-                        <div className="w-8 h-8 rounded-lg bg-gray-100 overflow-hidden flex-shrink-0 relative">
-                          {product.image ? (
-                            <Image
-                              src={product.image}
-                              alt={product.name}
-                              fill
-                              className="object-cover"
-                            />
-                          ) : (
-                            <div className="absolute inset-0 flex items-center justify-center">
-                              <CubeIcon className="h-4 w-4 text-gray-300" />
-                            </div>
-                          )}
-                        </div>
-                        <div className="flex items-center gap-2">
-                          <div>
-                            <div className="font-medium text-gray-900 text-sm">{product.name}</div>
+                      <div className="w-16 h-16 rounded-lg bg-gray-100 overflow-hidden flex-shrink-0 relative">
+                        {product.image ? (
+                          <Image
+                            src={product.image}
+                            alt={product.name}
+                            fill
+                            className="object-cover"
+                          />
+                        ) : (
+                          <div className="absolute inset-0 flex items-center justify-center">
+                            <CubeIcon className="h-6 w-6 text-gray-300" />
                           </div>
-                          {product.purchaseUrl && (
-                            <Link
-                              href={product.purchaseUrl}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="text-emerald-600 hover:text-emerald-700"
-                              title="Link de compra"
-                            >
-                              <ArrowTopRightOnSquareIcon className="h-4 w-4" />
-                            </Link>
-                          )}
+                        )}
+                      </div>
+                    </td>
+                    <td className="px-4 py-3 whitespace-nowrap">
+                      <div className="flex items-center gap-2">
+                        <div>
+                          <div className="font-medium text-gray-900 text-sm">{product.name}</div>
                         </div>
+                        {product.purchaseUrl && (
+                          <Link
+                            href={product.purchaseUrl}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-emerald-600 hover:text-emerald-700"
+                            title="Link de compra"
+                          >
+                            <ArrowTopRightOnSquareIcon className="h-4 w-4" />
+                          </Link>
+                        )}
                       </div>
                     </td>
                     <td className="px-4 py-3 whitespace-nowrap">

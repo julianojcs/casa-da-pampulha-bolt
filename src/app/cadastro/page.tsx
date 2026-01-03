@@ -43,6 +43,8 @@ function CadastroContent() {
     email: '',
     password: '',
     confirmPassword: '',
+    birthDate: '',
+    nationality: 'Brasileiro(a)',
   });
 
   // Buscar dados da propriedade para WhatsApp
@@ -143,6 +145,16 @@ function CadastroContent() {
       return;
     }
 
+    if (!formData.birthDate) {
+      toast.error('Data de nascimento é obrigatória');
+      return;
+    }
+
+    if (!formData.nationality) {
+      toast.error('Nacionalidade é obrigatória');
+      return;
+    }
+
     setLoading(true);
     try {
       const response = await fetch('/api/auth/register', {
@@ -153,6 +165,8 @@ function CadastroContent() {
           email: formData.email,
           phone: formData.phone,
           password: formData.password,
+          birthDate: formData.birthDate,
+          nationality: formData.nationality,
           preRegistrationId: preRegistration ? (preRegistration as any)._id : undefined,
         }),
       });
@@ -342,6 +356,35 @@ function CadastroContent() {
                     className="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-lg bg-gray-50 text-gray-500"
                   />
                 </div>
+              </div>
+
+              {/* Data de Nascimento */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Data de Nascimento <span className="text-red-500">*</span>
+                </label>
+                <input
+                  type="date"
+                  value={formData.birthDate}
+                  onChange={(e) => setFormData({ ...formData, birthDate: e.target.value })}
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent"
+                  required
+                />
+              </div>
+
+              {/* Nacionalidade */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Nacionalidade <span className="text-red-500">*</span>
+                </label>
+                <input
+                  type="text"
+                  value={formData.nationality}
+                  onChange={(e) => setFormData({ ...formData, nationality: e.target.value })}
+                  placeholder="Ex: Brasileiro(a)"
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent"
+                  required
+                />
               </div>
 
               {/* Senha */}

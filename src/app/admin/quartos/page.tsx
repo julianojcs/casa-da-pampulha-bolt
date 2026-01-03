@@ -207,7 +207,7 @@ export default function AdminQuartosPage() {
     const previousRooms = [...rooms];
     setRooms(reorderedRooms);
     setIsSavingOrder(true);
-    
+
     try {
       const response = await fetch('/api/admin/reorder', {
         method: 'PUT',
@@ -217,7 +217,7 @@ export default function AdminQuartosPage() {
           items: reorderedRooms.map((room) => ({ _id: room._id, order: room.order })),
         }),
       });
-      
+
       if (!response.ok) throw new Error('Erro ao salvar ordem');
       toast.success('Ordem atualizada!');
     } catch (error) {
@@ -231,16 +231,16 @@ export default function AdminQuartosPage() {
 
   const handleDragEnd = (event: DragEndEvent) => {
     const { active, over } = event;
-    
+
     if (over && active.id !== over.id) {
       const oldIndex = rooms.findIndex((room) => room._id === active.id);
       const newIndex = rooms.findIndex((room) => room._id === over.id);
-      
+
       const newRooms = arrayMove(rooms, oldIndex, newIndex).map((room, index) => ({
         ...room,
         order: index + 1,
       }));
-      
+
       handleReorder(newRooms);
     }
   };
@@ -278,7 +278,14 @@ export default function AdminQuartosPage() {
       });
     } else {
       setEditingRoom(null);
-      setFormData(emptyRoom);
+      // Calculate next order number (max order + 1)
+      const maxOrder = rooms.length > 0
+        ? Math.max(...rooms.map((r) => r.order || 0))
+        : 0;
+      setFormData({
+        ...emptyRoom,
+        order: maxOrder + 1,
+      });
     }
     setIsModalOpen(true);
   };
@@ -457,7 +464,7 @@ export default function AdminQuartosPage() {
         </SortableContext>
       </DndContext>
       <Tooltip id="drag-tooltip" place="top" />
-      
+
       {isSavingOrder && (
         <div className="fixed bottom-4 right-4 bg-amber-600 text-white px-4 py-2 rounded-lg shadow-lg flex items-center gap-2 z-50">
           <div className="animate-spin h-4 w-4 border-2 border-white border-t-transparent rounded-full"></div>

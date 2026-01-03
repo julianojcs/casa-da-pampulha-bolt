@@ -16,9 +16,12 @@ export interface IPreRegistration {
   checkInTime?: string;
   checkOutDate?: Date;
   checkOutTime?: string;
+  source?: 'airbnb' | 'booking' | 'vrbo' | 'direct' | 'other';
+  reservationCode?: string;
   // Campos de hóspedes
   adultsCount?: number;
   childrenCount?: number;
+  babiesCount?: number;
   petsCount?: number;
   // Campos financeiros
   reservationValue?: number;
@@ -52,9 +55,16 @@ const PreRegistrationSchema = new Schema<PreRegistrationDocument>(
     checkInTime: { type: String },
     checkOutDate: { type: Date },
     checkOutTime: { type: String },
+    source: {
+      type: String,
+      enum: ['airbnb', 'booking', 'vrbo', 'direct', 'other'],
+      default: 'airbnb',
+    },
+    reservationCode: { type: String },
     // Campos de hóspedes
     adultsCount: { type: Number, default: 1 },
     childrenCount: { type: Number, default: 0 },
+    babiesCount: { type: Number, default: 0 },
     petsCount: { type: Number, default: 0 },
     // Campos financeiros
     reservationValue: { type: Number },

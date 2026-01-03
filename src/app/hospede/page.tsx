@@ -34,6 +34,11 @@ interface PropertyInfo {
   email?: string;
   airbnbUrl?: string;
   doorPasswords?: { location: string; password: string; notes?: string }[];
+  doorPasswordConfig?: {
+    showToGuests: boolean;
+    addHashSuffix: boolean;
+    hashSuffixNote: string;
+  };
   wifiPasswords?: { network: string; password: string }[];
 }
 
@@ -58,6 +63,11 @@ interface Reservation {
   status: 'pending' | 'upcoming' | 'current' | 'completed' | 'cancelled';
   guestName?: string;
   numberOfGuests?: number;
+  temporaryMainDoorPassword?: {
+    location: string;
+    password: string;
+    notes?: string;
+  };
 }
 
 export default function HospedeDashboardPage() {
@@ -471,6 +481,36 @@ export default function HospedeDashboardPage() {
                         )}
                       </div>
                     ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Temporary Door Password from Reservation */}
+              {currentReservation?.temporaryMainDoorPassword?.password &&
+               property?.doorPasswordConfig?.showToGuests !== false && (
+                <div className="bg-rose-50 rounded-lg p-4">
+                  <div className="flex items-center gap-2 text-rose-700 mb-3">
+                    <KeyIcon className="h-5 w-5" />
+                    <span className="font-medium">Senha Temporária da Porta</span>
+                  </div>
+                  <div className="bg-white rounded-lg p-3">
+                    <p className="text-sm text-gray-500">
+                      {currentReservation.temporaryMainDoorPassword.location}
+                    </p>
+                    <p className="font-mono font-bold text-rose-600 text-lg">
+                      {currentReservation.temporaryMainDoorPassword.password}
+                      {property?.doorPasswordConfig?.addHashSuffix && (
+                        <span className="text-fuchsia-700">#</span>
+                      )}
+                    </p>
+                    {property?.doorPasswordConfig?.addHashSuffix && property?.doorPasswordConfig?.hashSuffixNote && (
+                      <p className="text-xs text-rose-500 mt-1 font-medium">⚠️ {property.doorPasswordConfig.hashSuffixNote}</p>
+                    )}
+                    {currentReservation.temporaryMainDoorPassword.notes && (
+                      <p className="text-xs text-gray-500 mt-1">
+                        💡 {currentReservation.temporaryMainDoorPassword.notes}
+                      </p>
+                    )}
                   </div>
                 </div>
               )}

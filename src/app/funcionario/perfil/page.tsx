@@ -1,8 +1,9 @@
 'use client';
 
 import { useSession } from 'next-auth/react';
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import Image from 'next/image';
+import toast from 'react-hot-toast';
 import {
   UserCircleIcon,
   EnvelopeIcon,
@@ -10,11 +11,29 @@ import {
   BriefcaseIcon,
   CalendarDaysIcon,
   CheckBadgeIcon,
+  CameraIcon,
+  KeyIcon,
+  EyeIcon,
+  EyeSlashIcon,
 } from '@heroicons/react/24/outline';
 
 export default function PerfilPage() {
-  const { data: session } = useSession();
+  const { data: session, update: updateSession } = useSession();
   const [imageError, setImageError] = useState(false);
+  const [uploading, setUploading] = useState(false);
+  const [showPasswordModal, setShowPasswordModal] = useState(false);
+  const [passwordForm, setPasswordForm] = useState({
+    currentPassword: '',
+    newPassword: '',
+    confirmPassword: '',
+  });
+  const [showPasswords, setShowPasswords] = useState({
+    current: false,
+    new: false,
+    confirm: false,
+  });
+  const [changingPassword, setChangingPassword] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   if (!session) {
     return null;
@@ -41,6 +60,112 @@ export default function PerfilPage() {
     sab: 'Sábado',
   };
 
+  const handleAvatarClick = () => {
+    fileInputRef.current?.click();
+  };
+
+  const handleAvatarChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    // Validate file size (max 5MB)
+    if (file.size > 5 * 1024 * 1024) {
+      toast.error('Imagem muito grande. Máximo: 5MB');
+      return;
+    }
+
+    // Validate file type
+    if (!file.type.startsWith('image/')) {
+      toast.error('Por favor, selecione uma imagem');
+      return;
+    }
+
+    setUploading(true);
+    try {
+      // Upload image
+      const formData = new FormData();
+      formData.append('file', file);
+      formData.append('folder', 'guests');
+      formData.append('isAvatar', 'true');
+      formData.append('userId', user.id);
+
+      const uploadRes = await fetch('/api/upload', {
+        method: 'POST',
+        body: formData,
+      });
+
+      if (!uploadRes.ok) {
+        throw new Error('Erro ao fazer upload da imagem');
+      }
+
+      const { url } = await uploadRes.json();
+
+      // Update profile with new avatar
+      const profileRes = await fetch('/api/user/profile', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ avatar: url }),
+      });
+
+      if (!profileRes.ok) {
+        throw new Error('Erro ao atualizar perfil');
+      }
+
+      // Update session
+      await updateSession({ ...session, user: { ...session.user, image: url } });
+      setImageError(false);
+      toast.success('Foto atualizada com sucesso!');
+    } catch (error) {
+      console.error('Erro ao atualizar foto:', error);
+      toast.error('Erro ao atualizar foto');
+    } finally {
+      setUploading(false);
+      if (fileInputRef.current) {
+        fileInputRef.current.value = '';
+      }
+    }
+  };
+
+  const handlePasswordChange = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    if (passwordForm.newPassword !== passwordForm.confirmPassword) {
+      toast.error('As senhas não coincidem');
+      return;
+    }
+
+    if (passwordForm.newPassword.length < 6) {
+      toast.error('A nova senha deve ter pelo menos 6 caracteres');
+      return;
+    }
+
+    setChangingPassword(true);
+    try {
+      const res = await fetch('/api/user/password', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          currentPassword: passwordForm.currentPassword,
+          newPassword: passwordForm.newPassword,
+        }),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        throw new Error(data.error || 'Erro ao alterar senha');
+      }
+
+      toast.success('Senha alterada com sucesso!');
+      setShowPasswordModal(false);
+      setPasswordForm({ currentPassword: '', newPassword: '', confirmPassword: '' });
+    } catch (error: any) {
+      toast.error(error.message || 'Erro ao alterar senha');
+    } finally {
+      setChangingPassword(false);
+    }
+  };
+
   return (
     <div className="max-w-2xl mx-auto space-y-6">
       {/* Header */}
@@ -60,22 +185,43 @@ export default function PerfilPage() {
         <div className="px-6 pb-6 pt-4">
           <div className="flex flex-col sm:flex-row sm:items-start gap-4">
             <div className="-mt-16">
-              {user.image && !imageError ? (
-                <Image
-                  src={user.image}
-                  alt={user.name || ''}
-                  width={96}
-                  height={96}
-                  onError={() => setImageError(true)}
-                  className="w-24 h-24 rounded-2xl border-4 border-white shadow-lg object-cover"
-                />
-              ) : (
-                <div className="w-24 h-24 rounded-2xl border-4 border-white shadow-lg bg-gradient-to-br from-emerald-400 to-teal-500 flex items-center justify-center">
-                  <span className="text-3xl font-bold text-white">
-                    {user.name?.charAt(0).toUpperCase()}
-                  </span>
+              <input
+                type="file"
+                ref={fileInputRef}
+                onChange={handleAvatarChange}
+                accept="image/*"
+                className="hidden"
+              />
+              <button
+                onClick={handleAvatarClick}
+                disabled={uploading}
+                className="relative group cursor-pointer"
+                title="Clique para alterar a foto"
+              >
+                {user.image && !imageError ? (
+                  <Image
+                    src={user.image}
+                    alt={user.name || ''}
+                    width={96}
+                    height={96}
+                    onError={() => setImageError(true)}
+                    className="w-24 h-24 rounded-2xl border-4 border-white shadow-lg object-cover"
+                  />
+                ) : (
+                  <div className="w-24 h-24 rounded-2xl border-4 border-white shadow-lg bg-gradient-to-br from-emerald-400 to-teal-500 flex items-center justify-center">
+                    <span className="text-3xl font-bold text-white">
+                      {user.name?.charAt(0).toUpperCase()}
+                    </span>
+                  </div>
+                )}
+                <div className="absolute inset-0 bg-black/50 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                  {uploading ? (
+                    <div className="w-6 h-6 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                  ) : (
+                    <CameraIcon className="h-8 w-8 text-white" />
+                  )}
                 </div>
-              )}
+              </button>
             </div>
 
             <div className="flex-1 pt-1 sm:pt-4">
@@ -198,13 +344,149 @@ export default function PerfilPage() {
         </div>
       )}
 
+      {/* Actions */}
+      <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-5">
+        <h3 className="font-semibold text-slate-800 mb-4 flex items-center gap-2">
+          <KeyIcon className="h-5 w-5 text-emerald-600" />
+          Segurança
+        </h3>
+        <button
+          onClick={() => setShowPasswordModal(true)}
+          className="flex items-center gap-2 px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl transition-colors"
+        >
+          <KeyIcon className="h-5 w-5" />
+          Alterar Senha
+        </button>
+      </div>
+
       {/* Help Text */}
       <div className="bg-blue-50 rounded-2xl border border-blue-100 p-5">
         <p className="text-blue-800 text-sm">
-          💡 Para atualizar suas informações, entre em contato com o
+          💡 Para atualizar outras informações, entre em contato com o
           administrador do sistema.
         </p>
       </div>
+
+      {/* Password Modal */}
+      {showPasswordModal && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-2xl w-full max-w-md shadow-xl">
+            <div className="p-6 border-b border-slate-100">
+              <h2 className="text-xl font-bold text-slate-800">Alterar Senha</h2>
+            </div>
+            <form onSubmit={handlePasswordChange} className="p-6 space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-slate-700 mb-1">
+                  Senha Atual
+                </label>
+                <div className="relative">
+                  <input
+                    type={showPasswords.current ? 'text' : 'password'}
+                    value={passwordForm.currentPassword}
+                    onChange={(e) =>
+                      setPasswordForm({ ...passwordForm, currentPassword: e.target.value })
+                    }
+                    required
+                    className="w-full px-4 py-2 border border-slate-300 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 pr-10"
+                    placeholder="Digite sua senha atual"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPasswords({ ...showPasswords, current: !showPasswords.current })}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600"
+                  >
+                    {showPasswords.current ? (
+                      <EyeSlashIcon className="h-5 w-5" />
+                    ) : (
+                      <EyeIcon className="h-5 w-5" />
+                    )}
+                  </button>
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-slate-700 mb-1">
+                  Nova Senha
+                </label>
+                <div className="relative">
+                  <input
+                    type={showPasswords.new ? 'text' : 'password'}
+                    value={passwordForm.newPassword}
+                    onChange={(e) =>
+                      setPasswordForm({ ...passwordForm, newPassword: e.target.value })
+                    }
+                    required
+                    minLength={6}
+                    className="w-full px-4 py-2 border border-slate-300 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 pr-10"
+                    placeholder="Mínimo 6 caracteres"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPasswords({ ...showPasswords, new: !showPasswords.new })}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600"
+                  >
+                    {showPasswords.new ? (
+                      <EyeSlashIcon className="h-5 w-5" />
+                    ) : (
+                      <EyeIcon className="h-5 w-5" />
+                    )}
+                  </button>
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-slate-700 mb-1">
+                  Confirmar Nova Senha
+                </label>
+                <div className="relative">
+                  <input
+                    type={showPasswords.confirm ? 'text' : 'password'}
+                    value={passwordForm.confirmPassword}
+                    onChange={(e) =>
+                      setPasswordForm({ ...passwordForm, confirmPassword: e.target.value })
+                    }
+                    required
+                    minLength={6}
+                    className="w-full px-4 py-2 border border-slate-300 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 pr-10"
+                    placeholder="Confirme a nova senha"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPasswords({ ...showPasswords, confirm: !showPasswords.confirm })}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600"
+                  >
+                    {showPasswords.confirm ? (
+                      <EyeSlashIcon className="h-5 w-5" />
+                    ) : (
+                      <EyeIcon className="h-5 w-5" />
+                    )}
+                  </button>
+                </div>
+              </div>
+
+              <div className="flex gap-3 pt-4">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setShowPasswordModal(false);
+                    setPasswordForm({ currentPassword: '', newPassword: '', confirmPassword: '' });
+                  }}
+                  className="flex-1 px-4 py-2 border border-slate-300 text-slate-700 rounded-xl hover:bg-slate-50 transition-colors"
+                >
+                  Cancelar
+                </button>
+                <button
+                  type="submit"
+                  disabled={changingPassword}
+                  className="flex-1 px-4 py-2 bg-emerald-600 text-white rounded-xl hover:bg-emerald-700 transition-colors disabled:opacity-50"
+                >
+                  {changingPassword ? 'Alterando...' : 'Alterar Senha'}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

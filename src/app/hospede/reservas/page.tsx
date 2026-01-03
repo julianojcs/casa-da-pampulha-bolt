@@ -256,9 +256,11 @@ export default function ReservasPage() {
                               >
                                 <span className="w-2 h-2 bg-amber-400 rounded-full" />
                                 {guest.name}{' '}
-                                <span className="text-gray-400">
-                                  ({guest.age} anos)
-                                </span>
+                                {guest.age !== undefined && (
+                                  <span className="text-gray-400">
+                                    ({guest.age} anos)
+                                  </span>
+                                )}
                               </li>
                             ))}
                           </ul>

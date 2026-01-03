@@ -54,10 +54,15 @@ const emptyForm = {
   numberOfGuests: 1,
   notes: '',
   source: 'direct' as ReservationSource,
-  confirmationCode: '',
+  reservationCode: '',
   totalAmount: 0,
   totalAmountRaw: '',
   isPaid: false,
+  temporaryMainDoorPassword: {
+    location: '',
+    password: '',
+    notes: '',
+  },
 };
 
 export default function ReservasPage() {
@@ -76,6 +81,7 @@ export default function ReservasPage() {
   const [editingItem, setEditingItem] = useState<IReservation | null>(null);
   const [formData, setFormData] = useState(emptyForm);
   const [saving, setSaving] = useState(false);
+  const [detailsModal, setDetailsModal] = useState<ReservationWithGuest | null>(null);
 
   useEffect(() => {
     if (status === 'unauthenticated') {
@@ -258,10 +264,15 @@ export default function ReservasPage() {
         numberOfGuests: item.numberOfGuests || 1,
         notes: item.notes || '',
         source: item.source || 'direct',
-        confirmationCode: item.confirmationCode || '',
+        reservationCode: item.reservationCode || '',
         totalAmount: item.totalAmount || 0,
         totalAmountRaw: item.totalAmount ? String(item.totalAmount).replace('.', ',') : '',
         isPaid: item.isPaid || false,
+        temporaryMainDoorPassword: {
+          location: item.temporaryMainDoorPassword?.location || '',
+          password: item.temporaryMainDoorPassword?.password || '',
+          notes: item.temporaryMainDoorPassword?.notes || '',
+        },
       });
     } else {
       setEditingItem(null);
@@ -328,8 +339,14 @@ export default function ReservasPage() {
   const getDaysRemaining = (date: Date | string) => {
     const now = new Date();
     now.setHours(0, 0, 0, 0); // Reset to start of day
-    const target = new Date(date);
-    target.setHours(0, 0, 0, 0); // Reset to start of day
+
+    // Extract just the date part (YYYY-MM-DD) to avoid timezone issues
+    const dateStr = typeof date === 'string' ? date : date.toISOString();
+    const datePart = dateStr.split('T')[0];
+    const [year, month, day] = datePart.split('-').map(Number);
+    const target = new Date(year, month - 1, day); // Create local date
+    target.setHours(0, 0, 0, 0);
+
     const diff = Math.round((target.getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
     return diff;
   };
@@ -581,19 +598,30 @@ export default function ReservasPage() {
                   <tr key={item._id} className="hover:bg-gray-50">
                     <td className="px-6 py-4">
                       <div className="flex items-center gap-3">
-                        {item.guest?.avatar ? (
-                          <Image
-                            src={item.guest.avatar}
-                            alt={item.guestName}
-                            width={40}
-                            height={40}
-                            className="w-10 h-10 rounded-full object-cover"
-                          />
-                        ) : (
-                          <div className="w-10 h-10 rounded-full bg-amber-100 flex items-center justify-center text-amber-700 font-medium">
-                            {item.guestName?.charAt(0).toUpperCase()}
+                        <button
+                          onClick={() => setDetailsModal(item)}
+                          className="relative group cursor-pointer"
+                          title="Ver detalhes da reserva"
+                        >
+                          {item.guest?.avatar ? (
+                            <Image
+                              src={item.guest.avatar}
+                              alt={item.guestName}
+                              width={40}
+                              height={40}
+                              className="w-10 h-10 rounded-full object-cover ring-2 ring-transparent group-hover:ring-amber-400 transition-all"
+                            />
+                          ) : (
+                            <div className="w-10 h-10 rounded-full bg-amber-100 flex items-center justify-center text-amber-700 font-medium ring-2 ring-transparent group-hover:ring-amber-400 transition-all">
+                              {item.guestName?.charAt(0).toUpperCase()}
+                            </div>
+                          )}
+                          <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                            <div className="w-10 h-10 rounded-full bg-black/40 flex items-center justify-center">
+                              <MagnifyingGlassIcon className="h-4 w-4 text-white" />
+                            </div>
                           </div>
-                        )}
+                        </button>
                         <div>
                           <div className="font-medium text-gray-900">{item.guestName}</div>
                           <div className="text-sm text-gray-500">{formatPhone(item.guestPhone)}</div>
@@ -909,15 +937,72 @@ export default function ReservasPage() {
               {/* Código de confirmação */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Código de Confirmação
+                  Código da Reserva
                 </label>
                 <input
                   type="text"
-                  value={formData.confirmationCode}
-                  onChange={(e) => setFormData({ ...formData, confirmationCode: e.target.value })}
+                  value={formData.reservationCode}
+                  onChange={(e) => setFormData({ ...formData, reservationCode: e.target.value })}
                   placeholder="Ex: HMXYZ123"
                   className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent"
                 />
+              </div>
+
+              {/* Senha Temporária da Porta Principal */}
+              <div className="border border-gray-200 rounded-lg p-4 bg-gray-50">
+                <h4 className="text-sm font-medium text-gray-700 mb-3 flex items-center gap-2">
+                  🔐 Senha Temporária da Porta Principal
+                </h4>
+                <div className="grid grid-cols-2 gap-3 mb-3">
+                  <div>
+                    <label className="block text-xs text-gray-500 mb-1">Local</label>
+                    <input
+                      type="text"
+                      value={formData.temporaryMainDoorPassword.location}
+                      onChange={(e) => setFormData({
+                        ...formData,
+                        temporaryMainDoorPassword: {
+                          ...formData.temporaryMainDoorPassword,
+                          location: e.target.value,
+                        }
+                      })}
+                      placeholder="Ex: Porta Principal"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-amber-500 focus:border-transparent"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs text-gray-500 mb-1">Senha</label>
+                    <input
+                      type="text"
+                      value={formData.temporaryMainDoorPassword.password}
+                      onChange={(e) => setFormData({
+                        ...formData,
+                        temporaryMainDoorPassword: {
+                          ...formData.temporaryMainDoorPassword,
+                          password: e.target.value,
+                        }
+                      })}
+                      placeholder="Ex: 1234#"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-amber-500 focus:border-transparent"
+                    />
+                  </div>
+                </div>
+                <div>
+                  <label className="block text-xs text-gray-500 mb-1">Observações</label>
+                  <input
+                    type="text"
+                    value={formData.temporaryMainDoorPassword.notes}
+                    onChange={(e) => setFormData({
+                      ...formData,
+                      temporaryMainDoorPassword: {
+                        ...formData.temporaryMainDoorPassword,
+                        notes: e.target.value,
+                      }
+                    })}
+                    placeholder="Ex: Válido apenas durante a estadia"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-amber-500 focus:border-transparent"
+                  />
+                </div>
               </div>
 
               {/* Valor e Pagamento */}
@@ -983,6 +1068,114 @@ export default function ReservasPage() {
               >
                 {saving ? 'Salvando...' : editingItem ? 'Atualizar' : 'Criar Reserva'}
               </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Reservation Details Modal */}
+      {detailsModal && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-2xl max-w-md w-full shadow-xl overflow-hidden">
+            <div className="relative h-32 bg-gradient-to-br from-amber-500 to-orange-600">
+              <button
+                onClick={() => setDetailsModal(null)}
+                className="absolute top-4 right-4 p-2 bg-white/20 hover:bg-white/30 rounded-full transition-colors"
+              >
+                <XMarkIcon className="h-5 w-5 text-white" />
+              </button>
+              <div className="absolute -bottom-10 left-6">
+                {detailsModal.guest?.avatar ? (
+                  <Image
+                    src={detailsModal.guest.avatar}
+                    alt={detailsModal.guestName}
+                    width={80}
+                    height={80}
+                    className="w-20 h-20 rounded-xl border-4 border-white shadow-lg object-cover"
+                  />
+                ) : (
+                  <div className="w-20 h-20 rounded-xl border-4 border-white shadow-lg bg-amber-100 flex items-center justify-center text-amber-700 text-2xl font-bold">
+                    {detailsModal.guestName?.charAt(0).toUpperCase()}
+                  </div>
+                )}
+              </div>
+            </div>
+
+            <div className="pt-14 px-6 pb-6">
+              <h3 className="text-xl font-bold text-gray-800">{detailsModal.guestName}</h3>
+              <p className="text-gray-500 text-sm">{detailsModal.guestEmail}</p>
+
+              <div className="mt-4 space-y-3">
+                <div className="flex items-center gap-3 text-gray-600">
+                  <PhoneIcon className="h-5 w-5 text-gray-400" />
+                  <span>{formatPhone(detailsModal.guestPhone)}</span>
+                </div>
+
+                <div className="flex items-center gap-3 text-gray-600">
+                  <CalendarDaysIcon className="h-5 w-5 text-gray-400" />
+                  <div>
+                    <span>{formatDate(detailsModal.checkInDate)}</span>
+                    <span className="mx-2 text-gray-400">→</span>
+                    <span>{formatDate(detailsModal.checkOutDate)}</span>
+                  </div>
+                </div>
+
+                <div className="flex items-center gap-3 text-gray-600">
+                  <ClockIcon className="h-5 w-5 text-gray-400" />
+                  <span>Check-in: {detailsModal.checkInTime} | Check-out: {detailsModal.checkOutTime}</span>
+                </div>
+
+                {((detailsModal as any).guests?.length) && (
+                  <div className="flex items-center gap-3 text-gray-600">
+                    <UserIcon className="h-5 w-5 text-gray-400" />
+                    <span>{(detailsModal as any).guests?.length} hóspede(s)</span>
+                  </div>
+                )}
+
+                {detailsModal.reservationCode && (
+                  <div className="flex items-center gap-3 text-gray-600">
+                    <span className="text-gray-400 text-sm">Código:</span>
+                    <span className="font-mono bg-gray-100 px-2 py-1 rounded text-sm">{detailsModal.reservationCode}</span>
+                  </div>
+                )}
+
+                {detailsModal.temporaryMainDoorPassword?.password && (
+                  <div className="bg-amber-50 rounded-lg p-3 border border-amber-200">
+                    <div className="flex items-center gap-2 text-amber-700 text-sm font-medium">
+                      🔐 Senha da porta: {detailsModal.temporaryMainDoorPassword.location}
+                    </div>
+                    <div className="font-mono text-lg text-amber-800 mt-1">
+                      {detailsModal.temporaryMainDoorPassword.password}
+                    </div>
+                    {detailsModal.temporaryMainDoorPassword.notes && (
+                      <div className="text-xs text-amber-600 mt-1">{detailsModal.temporaryMainDoorPassword.notes}</div>
+                    )}
+                  </div>
+                )}
+              </div>
+
+              <div className="mt-4 flex items-center justify-between">
+                {getStatusBadge(detailsModal.status)}
+                <span className="text-sm text-gray-500 capitalize">{detailsModal.source || 'Direto'}</span>
+              </div>
+
+              {detailsModal.notes && (
+                <div className="mt-4 bg-gray-50 rounded-lg p-3">
+                  <p className="text-sm text-gray-600">{detailsModal.notes}</p>
+                </div>
+              )}
+
+              <div className="mt-4 flex gap-2">
+                <button
+                  onClick={() => {
+                    setDetailsModal(null);
+                    openModal(detailsModal);
+                  }}
+                  className="flex-1 px-4 py-2 bg-amber-600 text-white rounded-lg hover:bg-amber-700 transition-colors text-sm font-medium"
+                >
+                  Editar Reserva
+                </button>
+              </div>
             </div>
           </div>
         </div>

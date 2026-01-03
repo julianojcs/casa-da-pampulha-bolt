@@ -38,6 +38,11 @@ interface Property {
   email: string;
   // Senhas
   doorPasswords: { location: string; password: string; notes?: string }[];
+  doorPasswordConfig: {
+    showToGuests: boolean;
+    addHashSuffix: boolean;
+    hashSuffixNote: string;
+  };
   wifiPasswords: { network: string; password: string }[];
   // Hero Section - textos dinâmicos
   heroTagline: string;
@@ -46,6 +51,8 @@ interface Property {
   // About Section - textos dinâmicos
   aboutTitle: string;
   aboutDescription: string[];
+  // Gallery Categories
+  galleryCategories: string[];
 }
 
 const emptyProperty: Omit<Property, '_id'> = {
@@ -80,6 +87,11 @@ const emptyProperty: Omit<Property, '_id'> = {
   email: '',
   // Senhas
   doorPasswords: [],
+  doorPasswordConfig: {
+    showToGuests: true,
+    addHashSuffix: false,
+    hashSuffixNote: 'Tecle # depois da senha',
+  },
   wifiPasswords: [],
   // Hero Section - textos dinâmicos
   heroTagline: '',
@@ -87,7 +99,9 @@ const emptyProperty: Omit<Property, '_id'> = {
   heroHighlights: [],
   // About Section - textos dinâmicos
   aboutTitle: '',
-  aboutDescription: []
+  aboutDescription: [],
+  // Gallery Categories
+  galleryCategories: ['Fachada e Entrada', 'Áreas Comuns', 'Quartos', 'Cozinha', 'Banheiros', 'Área Externa', 'Piscina', 'Comodidades', 'Vizinhança'],
 };
 
 export default function AdminPropriedadePage() {
@@ -139,6 +153,11 @@ export default function AdminPropriedadePage() {
           email: data.email || '',
           // Senhas
           doorPasswords: data.doorPasswords || [],
+          doorPasswordConfig: data.doorPasswordConfig || {
+            showToGuests: true,
+            addHashSuffix: false,
+            hashSuffixNote: 'Tecle # depois da senha',
+          },
           wifiPasswords: data.wifiPasswords || [],
           // Hero Section - textos dinâmicos
           heroTagline: data.heroTagline || '',
@@ -147,6 +166,8 @@ export default function AdminPropriedadePage() {
           // About Section - textos dinâmicos
           aboutTitle: data.aboutTitle || '',
           aboutDescription: data.aboutDescription || [],
+          // Gallery Categories
+          galleryCategories: data.galleryCategories || ['Fachada e Entrada', 'Áreas Comuns', 'Quartos', 'Cozinha', 'Banheiros', 'Área Externa', 'Piscina', 'Comodidades', 'Vizinhança'],
         });
       }
     } catch (error) {
@@ -331,6 +352,50 @@ export default function AdminPropriedadePage() {
               className="px-4 py-2 text-amber-600 border border-amber-600 rounded-lg hover:bg-amber-50"
             >
               + Adicionar Parágrafo
+            </button>
+          </div>
+        </div>
+
+        {/* Gallery Categories */}
+        <div className="border-b pb-6">
+          <h2 className="text-lg font-semibold text-gray-700 mb-4">Categorias da Galeria de Fotos</h2>
+          <p className="text-sm text-gray-500 mb-4">
+            Configure as categorias disponíveis para organizar as fotos na galeria.
+          </p>
+          <div className="space-y-3">
+            {formData.galleryCategories.map((category, index) => (
+              <div key={index} className="flex gap-2 items-center">
+                <span className="text-gray-400 text-sm w-6">{index + 1}.</span>
+                <input
+                  type="text"
+                  value={category}
+                  onChange={(e) => {
+                    const newCategories = [...formData.galleryCategories];
+                    newCategories[index] = e.target.value;
+                    setFormData({ ...formData, galleryCategories: newCategories });
+                  }}
+                  placeholder="Nome da categoria..."
+                  className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent"
+                />
+                <button
+                  type="button"
+                  onClick={() => {
+                    const newCategories = formData.galleryCategories.filter((_, i) => i !== index);
+                    setFormData({ ...formData, galleryCategories: newCategories });
+                  }}
+                  className="px-3 py-2 text-red-600 hover:bg-red-50 rounded-lg"
+                  title="Remover categoria"
+                >
+                  <XMarkIcon className="h-5 w-5" />
+                </button>
+              </div>
+            ))}
+            <button
+              type="button"
+              onClick={() => setFormData({ ...formData, galleryCategories: [...formData.galleryCategories, ''] })}
+              className="px-4 py-2 text-amber-600 border border-amber-600 rounded-lg hover:bg-amber-50"
+            >
+              + Adicionar Categoria
             </button>
           </div>
         </div>
@@ -704,6 +769,61 @@ export default function AdminPropriedadePage() {
             >
               + Adicionar senha de porta
             </button>
+          </div>
+
+          {/* Door Password Configuration */}
+          <div className="mt-4 pt-4 border-t border-gray-200 space-y-3">
+            <h4 className="text-sm font-medium text-gray-700">Configuração de exibição da senha temporária</h4>
+
+            <div className="flex items-center gap-3">
+              <input
+                type="checkbox"
+                id="showToGuests"
+                checked={formData.doorPasswordConfig.showToGuests}
+                onChange={(e) => setFormData({
+                  ...formData,
+                  doorPasswordConfig: { ...formData.doorPasswordConfig, showToGuests: e.target.checked }
+                })}
+                className="h-4 w-4 rounded border-gray-300 text-amber-600 focus:ring-amber-500"
+              />
+              <label htmlFor="showToGuests" className="text-sm text-gray-600">
+                Mostrar senha temporária para hóspedes
+              </label>
+            </div>
+
+            <div className="flex items-center gap-3">
+              <input
+                type="checkbox"
+                id="addHashSuffix"
+                checked={formData.doorPasswordConfig.addHashSuffix}
+                onChange={(e) => setFormData({
+                  ...formData,
+                  doorPasswordConfig: { ...formData.doorPasswordConfig, addHashSuffix: e.target.checked }
+                })}
+                className="h-4 w-4 rounded border-gray-300 text-amber-600 focus:ring-amber-500"
+              />
+              <label htmlFor="addHashSuffix" className="text-sm text-gray-600">
+                Exigir símbolo # depois da senha
+              </label>
+            </div>
+
+            {formData.doorPasswordConfig.addHashSuffix && (
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Mensagem sobre o símbolo #
+                </label>
+                <input
+                  type="text"
+                  value={formData.doorPasswordConfig.hashSuffixNote}
+                  onChange={(e) => setFormData({
+                    ...formData,
+                    doorPasswordConfig: { ...formData.doorPasswordConfig, hashSuffixNote: e.target.value }
+                  })}
+                  placeholder="Tecle # depois da senha"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent"
+                />
+              </div>
+            )}
           </div>
         </div>
 

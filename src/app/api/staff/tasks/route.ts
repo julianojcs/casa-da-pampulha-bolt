@@ -78,13 +78,14 @@ export async function PUT(request: NextRequest) {
 
     await connectDB();
 
+    const body = await request.json();
+
+    // Get id from body or searchParams
     const { searchParams } = new URL(request.url);
-    const id = searchParams.get('id');
+    const id = body.id || searchParams.get('id');
     if (!id) {
       return NextResponse.json({ error: 'ID é obrigatório' }, { status: 400 });
     }
-
-    const body = await request.json();
 
     // Staff só pode atualizar status de suas tarefas
     if (session.user.role === 'staff') {
@@ -92,7 +93,7 @@ export async function PUT(request: NextRequest) {
       if (!task || task.assignedTo !== session.user.id) {
         return NextResponse.json({ error: 'Não autorizado' }, { status: 401 });
       }
-      // Staff só pode mudar status
+      // Staff só pode mudar status e notes
       const allowedUpdates: any = {};
       if (body.status) {
         allowedUpdates.status = body.status;
@@ -101,7 +102,7 @@ export async function PUT(request: NextRequest) {
           allowedUpdates.completedBy = session.user.id;
         }
       }
-      if (body.notes) allowedUpdates.notes = body.notes;
+      if (body.notes !== undefined) allowedUpdates.notes = body.notes;
 
       const updated = await StaffTask.findByIdAndUpdate(id, allowedUpdates, { new: true });
       return NextResponse.json(updated);

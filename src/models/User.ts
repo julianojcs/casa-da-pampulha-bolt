@@ -84,6 +84,17 @@ const UserSchema = new Schema<UserDocument>(
     isHost: { type: Boolean, default: false }, // For guests: indicates if they are a host on Airbnb
     host: { type: HostSchema, default: null }, // For admins: host profile data
     staff: { type: StaffSchema, default: null },
+    // Guest profile fields
+    document: { type: String },
+    documentType: { type: String, enum: ['CPF', 'RG', 'Passaporte', 'Outro'], default: 'CPF' },
+    nationality: { type: String },
+    birthDate: { type: Date },
+    address: { type: String },
+    city: { type: String },
+    state: { type: String },
+    country: { type: String, default: 'Brasil' },
+    notes: { type: String },
+    agreedToRules: { type: Boolean, default: false },
   },
   { timestamps: true }
 );

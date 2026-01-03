@@ -104,9 +104,15 @@ export async function GET() {
       };
     }
 
+    // Calculate total guests: main guest (1) + additional guests from array
+    // Always calculate from guests array to ensure accuracy
+    const guestsArray = (currentReservation as any).guests || [];
+    const totalGuests = 1 + guestsArray.length;
+
     return NextResponse.json({
       current: {
         ...currentReservation,
+        numberOfGuests: totalGuests,
         guest: guest ? {
           _id: guest._id,
           name: guest.name,

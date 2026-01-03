@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState, useCallback } from 'react';
+import { Tooltip } from 'react-tooltip';
 import {
   PlusIcon,
   PencilSquareIcon,
@@ -554,7 +555,8 @@ function MessageCard({
                   ? 'text-amber-600 bg-amber-50'
                   : 'text-gray-400 hover:text-amber-600 hover:bg-amber-50'
               }`}
-              title={message.isPinned ? 'Desafixar' : 'Fixar'}
+              data-tooltip-id="recados-tooltip"
+              data-tooltip-content={message.isPinned ? 'Desafixar' : 'Fixar'}
             >
               <BellAlertIcon className="h-5 w-5" />
             </button>
@@ -565,22 +567,28 @@ function MessageCard({
                   ? 'text-green-600 bg-green-50'
                   : 'text-gray-400 hover:text-green-600 hover:bg-green-50'
               }`}
-              title={message.isActive ? 'Desativar' : 'Ativar'}
+              data-tooltip-id="recados-tooltip"
+              data-tooltip-content={message.isActive ? 'Desativar' : 'Ativar'}
             >
               <EyeIcon className="h-5 w-5" />
             </button>
             <button
               onClick={onEdit}
               className="p-1.5 text-gray-500 hover:text-amber-600 hover:bg-amber-50 rounded-lg transition-colors"
+              data-tooltip-id="recados-tooltip"
+              data-tooltip-content="Editar"
             >
               <PencilSquareIcon className="h-5 w-5" />
             </button>
             <button
               onClick={onDelete}
               className="p-1.5 text-gray-500 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+              data-tooltip-id="recados-tooltip"
+              data-tooltip-content="Excluir"
             >
               <TrashIcon className="h-5 w-5" />
             </button>
+            <Tooltip id="recados-tooltip" place="top" />
           </div>
         </div>
 

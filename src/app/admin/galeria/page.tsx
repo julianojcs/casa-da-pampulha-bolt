@@ -106,15 +106,15 @@ function SortableGalleryItem({
     <div
       ref={setNodeRef}
       style={style}
-      className={`relative group rounded-lg overflow-hidden border border-gray-200 ${isDragging ? 'ring-2 ring-purple-500 shadow-lg z-10' : ''} ${!disabled ? 'cursor-grab active:cursor-grabbing' : ''}`}
-      {...attributes}
-      {...listeners}
+      className={`relative group rounded-lg overflow-hidden border border-gray-200 ${isDragging ? 'ring-2 ring-purple-500 shadow-lg z-10' : ''}`}
     >
-      {/* Drag Handle Indicator */}
+      {/* Drag Handle - only this element is draggable */}
       <div
-        className={`absolute top-2 right-2 z-10 bg-white/90 rounded p-1.5 shadow-sm text-gray-400 transition-colors ${disabled ? 'opacity-30' : ''}`}
+        className={`absolute top-2 right-2 z-20 bg-white/90 rounded p-1.5 shadow-sm text-gray-400 hover:text-gray-600 transition-colors ${disabled ? 'opacity-30 cursor-not-allowed' : 'cursor-grab active:cursor-grabbing'}`}
         data-tooltip-id="drag-tooltip"
         data-tooltip-content="Arraste para reordenar"
+        {...attributes}
+        {...listeners}
       >
         <Bars3Icon className="h-4 w-4" />
       </div>
@@ -203,10 +203,23 @@ export default function AdminGaleriaPage() {
   const [editingItem, setEditingItem] = useState<GalleryItem | null>(null);
   const [formData, setFormData] = useState<Omit<GalleryItem, '_id'>>(emptyItem);
   const [saving, setSaving] = useState(false);
+  const [propertyCategories, setPropertyCategories] = useState<string[] | null>(null);
 
   useEffect(() => {
     fetchItems();
+    fetchPropertyConfig();
   }, []);
+
+  const fetchPropertyConfig = async () => {
+    try {
+      const res = await fetch('/api/property');
+      if (!res.ok) return;
+      const data = await res.json();
+      setPropertyCategories(data.galleryCategories || defaultCategories);
+    } catch (error) {
+      console.error('Erro ao carregar configurações da propriedade:', error);
+    }
+  };
 
   const fetchItems = async () => {
     try {
@@ -235,7 +248,11 @@ export default function AdminGaleriaPage() {
       });
     } else {
       setEditingItem(null);
-      setFormData({ ...emptyItem, order: items.length + 1 });
+      setFormData({
+        ...emptyItem,
+        order: items.length + 1,
+        category: (propertyCategories && propertyCategories[0]) || emptyItem.category,
+      });
     }
     setIsModalOpen(true);
   };
@@ -350,7 +367,7 @@ export default function AdminGaleriaPage() {
     }
   };
 
-  const categories = Array.from(new Set(items.map(i => i.category)));
+  const categories = propertyCategories ?? Array.from(new Set(items.map(i => i.category)));
 
   const filteredItems = items
     .filter(item => {
@@ -531,7 +548,7 @@ export default function AdminGaleriaPage() {
                   onChange={(e) => setFormData(prev => ({ ...prev, category: e.target.value }))}
                   className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500"
                 >
-                  {defaultCategories.map(cat => (
+                  {(categories || []).map(cat => (
                     <option key={cat} value={cat}>{cat}</option>
                   ))}
                 </select>

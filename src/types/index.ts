@@ -119,6 +119,13 @@ export interface IProperty {
     notes?: string;
   }[];
 
+  // Temporary door password display settings
+  doorPasswordConfig?: {
+    showToGuests: boolean;
+    addHashSuffix: boolean;
+    hashSuffixNote: string;
+  };
+
   // WiFi passwords
   wifiPasswords?: {
     network: string;
@@ -133,6 +140,9 @@ export interface IProperty {
   // About Section - textos dinâmicos
   aboutTitle?: string;
   aboutDescription?: string[];
+
+  // Gallery Categories
+  galleryCategories?: string[];
 
   createdAt?: Date;
   updatedAt?: Date;
@@ -247,6 +257,17 @@ export interface IUser {
   isHost?: boolean; // For guests: indicates if they are a host on Airbnb
   host?: IHost | null; // For admins: host profile data (property host)
   staff?: IStaff | null;
+  // Guest profile fields
+  document?: string;
+  documentType?: 'CPF' | 'RG' | 'Passaporte' | 'Outro';
+  nationality?: string;
+  birthDate?: Date;
+  address?: string;
+  city?: string;
+  state?: string;
+  country?: string;
+  notes?: string;
+  agreedToRules?: boolean;
   createdAt?: Date;
   updatedAt?: Date;
 }
@@ -270,7 +291,12 @@ export interface IReservation {
   notes?: string;
   status: ReservationStatus;
   source?: ReservationSource;
-  confirmationCode?: string;
+  reservationCode?: string;
+  temporaryMainDoorPassword?: {
+    location: string;
+    password: string;
+    notes?: string;
+  };
   totalAmount?: number;
   isPaid?: boolean;
   preRegistrationId?: string;

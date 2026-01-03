@@ -4,6 +4,7 @@ import { authOptions } from '@/lib/auth';
 import dbConnect from '@/lib/mongodb';
 import { PreRegistration } from '@/models/PreRegistration';
 import { Reservation } from '@/models/Reservation';
+import { User } from '@/models/User';
 import { sendEmail, emailTemplates } from '@/lib/email';
 import crypto from 'crypto';
 
@@ -151,12 +152,40 @@ export async function POST(request: NextRequest) {
       createdBy: session.user?.email || 'admin',
     });
 
+    // Criar usuário do tipo hóspede (sem senha, será definida no cadastro)
+    let guestUser = null;
+    try {
+      // Verificar se já existe usuário com este email ou telefone
+      const existingUser = await User.findOne({
+        $or: [
+          ...(email ? [{ email: email.toLowerCase() }] : []),
+          { phone },
+        ],
+      });
+
+      if (!existingUser) {
+        guestUser = await User.create({
+          name,
+          email: email || undefined,
+          phone,
+          role: 'guest',
+          isActive: false, // Será ativado quando confirmar o cadastro
+          country: originCountry,
+        });
+      } else {
+        guestUser = existingUser;
+      }
+    } catch (userError) {
+      console.error('Erro ao criar usuário hóspede:', userError);
+      // Não bloqueia a criação do pré-cadastro se o usuário falhar
+    }
+
     // Criar pré-reserva (status pending) se tiver datas de check-in e check-out
     let reservationCreated = null;
     if (checkInDate && checkOutDate) {
       try {
         reservationCreated = await Reservation.create({
-          userId: 'pending', // Será atualizado quando usuário confirmar email
+          userId: guestUser?._id?.toString() || 'pending',
           guestName: name,
           guestEmail: email,
           guestPhone: phone,

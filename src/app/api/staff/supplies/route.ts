@@ -99,20 +99,32 @@ export async function PUT(request: NextRequest) {
   }
 }
 
-// DELETE - Excluir material (apenas admin)
+// DELETE - Excluir material (admin pode excluir qualquer um, staff apenas suas próprias solicitações)
 export async function DELETE(request: NextRequest) {
   try {
     const session = await getServerSession(authOptions);
-    if (!session || session.user.role !== 'admin') {
+    if (!session || (session.user.role !== 'admin' && session.user.role !== 'staff')) {
       return NextResponse.json({ error: 'Não autorizado' }, { status: 401 });
     }
 
     await connectDB();
 
     const { searchParams } = new URL(request.url);
-    const id = searchParams.get('id');
+    const body = await request.json().catch(() => ({}));
+    const id = searchParams.get('id') || body.id;
     if (!id) {
       return NextResponse.json({ error: 'ID é obrigatório' }, { status: 400 });
+    }
+
+    // Staff can only delete their own requests
+    if (session.user.role === 'staff') {
+      const supply = await StaffSupply.findById(id);
+      if (!supply) {
+        return NextResponse.json({ error: 'Material não encontrado' }, { status: 404 });
+      }
+      if (supply.requestedBy !== session.user.id) {
+        return NextResponse.json({ error: 'Você só pode excluir suas próprias solicitações' }, { status: 403 });
+      }
     }
 
     await StaffSupply.findByIdAndDelete(id);

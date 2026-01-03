@@ -45,6 +45,13 @@ const PropertySchema = new Schema<any>(
       notes: { type: String },
     }],
 
+    // Temporary door password display settings
+    doorPasswordConfig: {
+      showToGuests: { type: Boolean, default: true },
+      addHashSuffix: { type: Boolean, default: false },
+      hashSuffixNote: { type: String, default: 'Tecle # depois da senha' },
+    },
+
     // WiFi passwords
     wifiPasswords: [{
       network: { type: String, required: true },
@@ -59,6 +66,9 @@ const PropertySchema = new Schema<any>(
     // About Section - textos dinâmicos
     aboutTitle: { type: String }, // Ex: "Sobre a Casa"
     aboutDescription: [{ type: String }], // Array de parágrafos
+
+    // Gallery Categories
+    galleryCategories: [{ type: String }],
   },
   { timestamps: true }
 );

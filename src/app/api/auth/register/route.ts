@@ -9,11 +9,25 @@ import crypto from 'crypto';
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const { name, email, phone, password, preRegistrationId } = body;
+    const { name, email, phone, password, birthDate, nationality, preRegistrationId } = body;
 
     if (!name || !email || !phone || !password) {
       return NextResponse.json(
-        { error: 'Todos os campos são obrigatórios' },
+        { error: 'Nome, email, telefone e senha são obrigatórios' },
+        { status: 400 }
+      );
+    }
+
+    if (!birthDate) {
+      return NextResponse.json(
+        { error: 'Data de nascimento é obrigatória' },
+        { status: 400 }
+      );
+    }
+
+    if (!nationality) {
+      return NextResponse.json(
+        { error: 'Nacionalidade é obrigatória' },
         { status: 400 }
       );
     }
@@ -75,6 +89,8 @@ export async function POST(request: NextRequest) {
       email: email.toLowerCase(),
       phone,
       password,
+      birthDate: new Date(birthDate),
+      nationality,
       role: 'guest',
       isActive: false, // Será ativado após verificar email
       emailVerificationToken,

@@ -87,15 +87,19 @@ export async function PUT(request: NextRequest) {
     await connectDB();
 
     const { searchParams } = new URL(request.url);
-    const id = searchParams.get('id');
-    const markAsRead = searchParams.get('markAsRead');
+    const body = await request.json().catch(() => ({}));
+
+    // Accept id from body or searchParams (support both 'id' and '_id')
+    const id = body.id || body._id || searchParams.get('id');
+    // Accept markAsRead from body or searchParams
+    const markAsRead = body.markAsRead || searchParams.get('markAsRead');
 
     if (!id) {
       return NextResponse.json({ error: 'ID é obrigatório' }, { status: 400 });
     }
 
     // Staff pode apenas marcar como lida
-    if (markAsRead === 'true') {
+    if (markAsRead === true || markAsRead === 'true') {
       const message = await StaffMessage.findByIdAndUpdate(
         id,
         { $addToSet: { readBy: session.user.id } },
@@ -109,7 +113,6 @@ export async function PUT(request: NextRequest) {
       return NextResponse.json({ error: 'Não autorizado' }, { status: 401 });
     }
 
-    const body = await request.json();
     const message = await StaffMessage.findByIdAndUpdate(id, body, { new: true });
     if (!message) {
       return NextResponse.json({ error: 'Mensagem não encontrada' }, { status: 404 });

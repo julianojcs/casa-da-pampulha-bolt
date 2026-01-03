@@ -13,6 +13,7 @@ import {
   ExclamationTriangleIcon,
 } from '@heroicons/react/24/outline';
 import { CheckCircleIcon as CheckCircleSolid } from '@heroicons/react/24/solid';
+import toast from 'react-hot-toast';
 
 interface Task {
   _id: string;
@@ -65,6 +66,7 @@ export default function TarefasPage() {
   const [showFilters, setShowFilters] = useState(false);
   const [selectedTask, setSelectedTask] = useState<Task | null>(null);
   const [notes, setNotes] = useState('');
+  const [pendingStatus, setPendingStatus] = useState<string | null>(null);
 
   useEffect(() => {
     fetchTasks();
@@ -149,30 +151,51 @@ export default function TarefasPage() {
             prev ? { ...prev, status: newStatus } : null
           );
         }
+        toast.success('Status atualizado!');
+      } else {
+        toast.error('Erro ao atualizar status');
       }
     } catch (error) {
       console.error('Erro ao atualizar tarefa:', error);
+      toast.error('Erro ao atualizar tarefa');
     }
   };
 
   const handleSaveNotes = async () => {
     if (!selectedTask) return;
     try {
+      const updateData: { id: string; notes: string; status?: string } = {
+        id: selectedTask._id,
+        notes
+      };
+
+      // Include status if it was changed
+      if (pendingStatus && pendingStatus !== selectedTask.status) {
+        updateData.status = pendingStatus;
+      }
+
       const res = await fetch('/api/staff/tasks', {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ id: selectedTask._id, notes }),
+        body: JSON.stringify(updateData),
       });
       if (res.ok) {
         setTasks((prev) =>
           prev.map((t) =>
-            t._id === selectedTask._id ? { ...t, notes } : t
+            t._id === selectedTask._id
+              ? { ...t, notes, status: pendingStatus || t.status }
+              : t
           )
         );
+        toast.success('Alterações salvas com sucesso!');
         setSelectedTask(null);
+        setPendingStatus(null);
+      } else {
+        toast.error('Erro ao salvar alterações');
       }
     } catch (error) {
-      console.error('Erro ao salvar notas:', error);
+      console.error('Erro ao salvar alterações:', error);
+      toast.error('Erro ao salvar alterações');
     }
   };
 
@@ -247,6 +270,7 @@ export default function TarefasPage() {
       onClick={() => {
         setSelectedTask(task);
         setNotes(task.notes || '');
+        setPendingStatus(task.status);
       }}
       className={`bg-white rounded-xl border p-4 hover:shadow-md transition-all cursor-pointer ${
         task.status === 'completed'
@@ -518,7 +542,7 @@ export default function TarefasPage() {
         <>
           <div
             className="fixed inset-0 bg-black/50 z-50"
-            onClick={() => setSelectedTask(null)}
+            onClick={() => { setSelectedTask(null); setPendingStatus(null); }}
           />
           <div className="fixed inset-x-4 bottom-4 top-auto md:inset-auto md:left-1/2 md:top-1/2 md:-translate-x-1/2 md:-translate-y-1/2 md:w-full md:max-w-lg bg-white rounded-2xl shadow-xl z-50 max-h-[80vh] overflow-y-auto">
             <div className="sticky top-0 bg-white px-6 py-4 border-b border-slate-100 flex items-center justify-between">
@@ -526,7 +550,7 @@ export default function TarefasPage() {
                 Detalhes da Tarefa
               </h2>
               <button
-                onClick={() => setSelectedTask(null)}
+                onClick={() => { setSelectedTask(null); setPendingStatus(null); }}
                 className="p-2 hover:bg-slate-100 rounded-lg transition-colors"
               >
                 <XMarkIcon className="h-5 w-5 text-slate-500" />
@@ -584,9 +608,9 @@ export default function TarefasPage() {
                   {['pending', 'in-progress', 'completed'].map((status) => (
                     <button
                       key={status}
-                      onClick={() => handleStatusChange(selectedTask._id, status)}
+                      onClick={() => setPendingStatus(status)}
                       className={`px-4 py-2 text-sm font-medium rounded-lg transition-colors ${
-                        selectedTask.status === status
+                        (pendingStatus || selectedTask.status) === status
                           ? status === 'completed'
                             ? 'bg-emerald-500 text-white'
                             : status === 'in-progress'
