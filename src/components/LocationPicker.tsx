@@ -145,7 +145,7 @@ export default function LocationPicker({
           </button>
         )}
       </div>
-      
+
       <div className="rounded-lg overflow-hidden border border-gray-300" style={{ height }}>
         <MapContainer
           center={position || defaultCenter}
@@ -171,7 +171,7 @@ export default function LocationPicker({
           )}
         </MapContainer>
       </div>
-      
+
       <p className="text-xs text-gray-500">
         💡 Clique no mapa ou arraste o marcador para definir a localização exata.
       </p>

@@ -62,11 +62,11 @@ async function geocodeAddress(address: string): Promise<{ lat: number; lng: numb
   if (geocodeCache[address] !== undefined) {
     return geocodeCache[address];
   }
-  
+
   try {
     // Add delay to respect Nominatim rate limits
     await new Promise(resolve => setTimeout(resolve, 100));
-    
+
     const response = await fetch(
       `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(address)}&limit=1`,
       { headers: { 'User-Agent': 'CasaDaPampulha/1.0' } }
@@ -136,11 +136,11 @@ function FitBounds({ places, residenceCoords }: { places: PlaceWithCoords[]; res
     const points: [number, number][] = places
       .filter(p => p.resolvedLat && p.resolvedLng)
       .map(p => [p.resolvedLat!, p.resolvedLng!]);
-    
+
     if (residenceCoords) {
       points.push(residenceCoords);
     }
-    
+
     if (points.length > 0) {
       const bounds = L.latLngBounds(points);
       map.fitBounds(bounds, { padding: [50, 50], maxZoom: 15 });
@@ -190,7 +190,7 @@ export default function PlacesMap({
   useEffect(() => {
     const geocodePlaces = async () => {
       setIsGeocoding(true);
-      
+
       // First pass: use existing coords or cache
       const initialResults: PlaceWithCoords[] = places.map((place) => {
         if (place.lat && place.lng) {
@@ -198,28 +198,28 @@ export default function PlacesMap({
         }
         if (place.address && geocodeCache[place.address]) {
           const cached = geocodeCache[place.address];
-          return cached 
+          return cached
             ? { ...place, resolvedLat: cached.lat, resolvedLng: cached.lng }
             : place;
         }
         return place;
       });
-      
+
       // Set initial results immediately
       setGeocodedPlaces(initialResults);
-      
+
       // Second pass: geocode missing addresses (sequentially to respect rate limits)
       const needsGeocoding = initialResults.filter(
         p => !p.resolvedLat && !p.resolvedLng && p.address && !geocodeCache[p.address]
       );
-      
+
       if (needsGeocoding.length > 0) {
         for (const place of needsGeocoding) {
           const coords = await geocodeAddress(place.address);
           if (coords) {
-            setGeocodedPlaces(prev => 
-              prev.map(p => 
-                p._id === place._id 
+            setGeocodedPlaces(prev =>
+              prev.map(p =>
+                p._id === place._id
                   ? { ...p, resolvedLat: coords.lat, resolvedLng: coords.lng }
                   : p
               )
@@ -227,10 +227,10 @@ export default function PlacesMap({
           }
         }
       }
-      
+
       setIsGeocoding(false);
     };
-    
+
     geocodePlaces();
   }, [places]);
 
@@ -383,7 +383,7 @@ export default function PlacesMap({
                       />
                     </div>
                   )}
-                  
+
                   {/* Info */}
                   <div className="flex-1 min-w-0">
                     <h3 className="font-semibold text-gray-800 text-sm leading-tight">{place.name}</h3>
@@ -403,7 +403,7 @@ export default function PlacesMap({
 
                 {/* Description */}
                 <p className="text-xs text-gray-600 line-clamp-2 mt-2">{place.description}</p>
-                
+
                 {/* Address */}
                 <div className="flex items-start gap-1 text-xs text-gray-500 mt-2">
                   <MapPinIcon className="h-3 w-3 text-amber-500 flex-shrink-0 mt-0.5" />
