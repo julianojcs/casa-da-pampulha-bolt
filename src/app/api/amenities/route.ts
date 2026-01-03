@@ -71,7 +71,14 @@ export async function PUT(request: NextRequest) {
     }
 
     const body = await request.json();
-    const amenity = await Amenity.findByIdAndUpdate(id, body, { new: true });
+    // Use $set to ensure we update provided fields explicitly and
+    // enable runValidators to enforce schema rules (and allow boolean updates)
+    const update = { ...body };
+    const amenity = await Amenity.findByIdAndUpdate(
+      id,
+      { $set: update },
+      { new: true, runValidators: true, context: 'query' }
+    );
 
     if (!amenity) {
       return NextResponse.json(

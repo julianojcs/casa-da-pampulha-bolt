@@ -4,6 +4,31 @@ import { useEffect, useState } from 'react';
 import { XMarkIcon } from '@heroicons/react/24/outline';
 import toast from 'react-hot-toast';
 import { CloudinaryUpload } from '@/components/CloudinaryUpload';
+import { TransferList } from '@/components/TransferList';
+
+// Default/suggested gallery categories
+const defaultGalleryCategories = [
+  'Fachada e Entrada',
+  'Áreas Comuns',
+  'Sala de Estar',
+  'Quartos',
+  'Suite Master',
+  'Quarto Crianças',
+  'Quarto Família',
+  'Cozinha',
+  'Área Gourmet',
+  'Banheiros',
+  'Área Externa',
+  'Jardim',
+  'Piscina/Jacuzzi',
+  'Playground',
+  'Estacionamento',
+  'Arredores',
+  'Comodidades',
+  'Vizinhança',
+  'Loft',
+  'Vídeos',
+];
 
 interface Property {
   _id: string;
@@ -360,44 +385,15 @@ export default function AdminPropriedadePage() {
         <div className="border-b pb-6">
           <h2 className="text-lg font-semibold text-gray-700 mb-4">Categorias da Galeria de Fotos</h2>
           <p className="text-sm text-gray-500 mb-4">
-            Configure as categorias disponíveis para organizar as fotos na galeria.
+            Configure as categorias disponíveis para organizar as fotos na galeria. Selecione da lista de sugestões ou adicione novas categorias.
           </p>
-          <div className="space-y-3">
-            {formData.galleryCategories.map((category, index) => (
-              <div key={index} className="flex gap-2 items-center">
-                <span className="text-gray-400 text-sm w-6">{index + 1}.</span>
-                <input
-                  type="text"
-                  value={category}
-                  onChange={(e) => {
-                    const newCategories = [...formData.galleryCategories];
-                    newCategories[index] = e.target.value;
-                    setFormData({ ...formData, galleryCategories: newCategories });
-                  }}
-                  placeholder="Nome da categoria..."
-                  className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent"
-                />
-                <button
-                  type="button"
-                  onClick={() => {
-                    const newCategories = formData.galleryCategories.filter((_, i) => i !== index);
-                    setFormData({ ...formData, galleryCategories: newCategories });
-                  }}
-                  className="px-3 py-2 text-red-600 hover:bg-red-50 rounded-lg"
-                  title="Remover categoria"
-                >
-                  <XMarkIcon className="h-5 w-5" />
-                </button>
-              </div>
-            ))}
-            <button
-              type="button"
-              onClick={() => setFormData({ ...formData, galleryCategories: [...formData.galleryCategories, ''] })}
-              className="px-4 py-2 text-amber-600 border border-amber-600 rounded-lg hover:bg-amber-50"
-            >
-              + Adicionar Categoria
-            </button>
-          </div>
+          <TransferList
+            availableItems={defaultGalleryCategories}
+            selectedItems={formData.galleryCategories}
+            onSelectedChange={(items) => setFormData({ ...formData, galleryCategories: items })}
+            availableTitle="Sugestões"
+            selectedTitle="Categorias Ativas"
+          />
         </div>
 
         {/* Endereço */}
@@ -440,7 +436,32 @@ export default function AdminPropriedadePage() {
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent"
               />
             </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Latitude</label>
+              <input
+                type="number"
+                step="any"
+                value={formData.coordinates.lat || ''}
+                onChange={(e) => setFormData({ ...formData, coordinates: { ...formData.coordinates, lat: parseFloat(e.target.value) || 0 } })}
+                placeholder="Ex: -19.8516"
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Longitude</label>
+              <input
+                type="number"
+                step="any"
+                value={formData.coordinates.lng || ''}
+                onChange={(e) => setFormData({ ...formData, coordinates: { ...formData.coordinates, lng: parseFloat(e.target.value) || 0 } })}
+                placeholder="Ex: -43.9688"
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent"
+              />
+            </div>
           </div>
+          <p className="text-xs text-gray-500 mt-2">
+            💡 Dica: Acesse o Google Maps, clique com o botão direito no local e copie as coordenadas.
+          </p>
         </div>
 
         {/* Capacidade */}

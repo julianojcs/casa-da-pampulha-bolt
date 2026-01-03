@@ -1,5 +1,6 @@
 import dbConnect from '@/lib/mongodb';
 import { Place } from '@/models/Place';
+import { Property } from '@/models/Property';
 import PlaceCard from '@/components/PlaceCard';
 
 export const metadata = {
@@ -13,8 +14,21 @@ async function getPlaces() {
   return JSON.parse(JSON.stringify(places));
 }
 
+async function getProperty() {
+  await dbConnect();
+  const property = await Property.findOne();
+  return property ? JSON.parse(JSON.stringify(property)) : null;
+}
+
 export default async function GuiaLocalPage() {
-  const places = await getPlaces();
+  const [places, property] = await Promise.all([getPlaces(), getProperty()]);
+
+  const residence = property ? {
+    name: property.name,
+    address: property.address,
+    lat: property.coordinates?.lat,
+    lng: property.coordinates?.lng,
+  } : undefined;
 
   return (
     <div className="pt-20">
@@ -30,7 +44,7 @@ export default async function GuiaLocalPage() {
 
       {/* Content */}
       <section className="container-section">
-        <PlaceCard places={places} />
+        <PlaceCard places={places} residence={residence} />
       </section>
     </div>
   );

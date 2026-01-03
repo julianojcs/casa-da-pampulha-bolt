@@ -79,12 +79,14 @@ function SortableGalleryItem({
   item,
   onEdit,
   onDelete,
-  disabled
+  disabled,
+  cardSize = 3
 }: {
   item: GalleryItem;
   onEdit: () => void;
   onDelete: () => void;
   disabled?: boolean;
+  cardSize?: number;
 }) {
   const {
     attributes,
@@ -99,7 +101,7 @@ function SortableGalleryItem({
     transform: CSS.Transform.toString(transform),
     transition,
     opacity: isDragging ? 0.5 : 1,
-    touchAction: disabled ? 'auto' : 'none',
+    // Allow touch scrolling on the card - only drag handle has touch-action: none via listeners
   };
 
   return (
@@ -147,8 +149,12 @@ function SortableGalleryItem({
         {/* Play icon overlay for videos (always visible, below actions) */}
         {item.type === 'video' && (
           <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-0">
-            <div className="bg-black/50 rounded-full p-3 group-hover:scale-110 transition-transform">
-              <PlayIcon className="h-8 w-8 text-white" />
+            <div className={`bg-black/50 rounded-full group-hover:scale-110 transition-transform ${
+              cardSize <= 2 ? 'p-1.5' : cardSize <= 3 ? 'p-2' : 'p-3'
+            }`}>
+              <PlayIcon className={`text-white ${
+                cardSize <= 1 ? 'h-4 w-4' : cardSize <= 2 ? 'h-5 w-5' : cardSize <= 3 ? 'h-6 w-6' : 'h-8 w-8'
+              }`} />
             </div>
           </div>
         )}
@@ -159,12 +165,16 @@ function SortableGalleryItem({
             <button
               onClick={onEdit}
               className="p-2 bg-white rounded-full text-gray-800 hover:bg-blue-500 hover:text-white transition-colors"
+              data-tooltip-id="gallery-tooltip"
+              data-tooltip-content="Editar"
             >
               <PencilIcon className="w-5 h-5" />
             </button>
             <button
               onClick={onDelete}
               className="p-2 bg-white rounded-full text-gray-800 hover:bg-red-500 hover:text-white transition-colors"
+              data-tooltip-id="gallery-tooltip"
+              data-tooltip-content="Excluir"
             >
               <TrashIcon className="w-5 h-5" />
             </button>
@@ -204,6 +214,7 @@ export default function AdminGaleriaPage() {
   const [formData, setFormData] = useState<Omit<GalleryItem, '_id'>>(emptyItem);
   const [saving, setSaving] = useState(false);
   const [propertyCategories, setPropertyCategories] = useState<string[] | null>(null);
+  const [cardSize, setCardSize] = useState(3); // 1=small, 2=medium, 3=default, 4=large, 5=xlarge
 
   useEffect(() => {
     fetchItems();
@@ -417,6 +428,21 @@ export default function AdminGaleriaPage() {
             ))}
           </select>
         </div>
+        {/* Card Size Slider */}
+        <div className="mt-4 flex items-center gap-4">
+          <span className="text-sm text-gray-600 whitespace-nowrap">Tamanho:</span>
+          <input
+            type="range"
+            min="1"
+            max="5"
+            value={cardSize}
+            onChange={(e) => setCardSize(Number(e.target.value))}
+            className="flex-1 h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-purple-500"
+          />
+          <span className="text-xs text-gray-500 w-16 text-right">
+            {cardSize === 1 ? 'Pequeno' : cardSize === 2 ? 'Médio' : cardSize === 3 ? 'Padrão' : cardSize === 4 ? 'Grande' : 'Extra Grande'}
+          </span>
+        </div>
       </div>
 
       {/* Grid */}
@@ -436,7 +462,13 @@ export default function AdminGaleriaPage() {
                 items={filteredItems.map((item) => item._id)}
                 strategy={rectSortingStrategy}
               >
-                <div className="grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                <div className={`grid gap-4 ${
+                  cardSize === 1 ? 'grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6' :
+                  cardSize === 2 ? 'grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5' :
+                  cardSize === 3 ? 'sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4' :
+                  cardSize === 4 ? 'sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3' :
+                  'grid-cols-1 sm:grid-cols-2 lg:grid-cols-2'
+                }`}>
                   {filteredItems.map((item) => (
                     <SortableGalleryItem
                       key={item._id}
@@ -444,12 +476,14 @@ export default function AdminGaleriaPage() {
                       onEdit={() => openModal(item)}
                       onDelete={() => handleDelete(item._id)}
                       disabled={!!categoryFilter || !!searchTerm}
+                      cardSize={cardSize}
                     />
                   ))}
                 </div>
               </SortableContext>
             </DndContext>
             <Tooltip id="drag-tooltip" place="top" />
+            <Tooltip id="gallery-tooltip" place="top" />
           </>
         ) : (
           <div className="text-center py-12">
@@ -548,7 +582,7 @@ export default function AdminGaleriaPage() {
                   onChange={(e) => setFormData(prev => ({ ...prev, category: e.target.value }))}
                   className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500"
                 >
-                  {(categories || []).map(cat => (
+                  {(propertyCategories || defaultCategories).map(cat => (
                     <option key={cat} value={cat}>{cat}</option>
                   ))}
                 </select>

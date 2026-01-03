@@ -19,6 +19,8 @@ const PlaceSchema = new Schema<PlaceDocument>(
     distance: { type: String },
     image: { type: String, required: true },
     mapUrl: { type: String },
+    lat: { type: Number },
+    lng: { type: Number },
     isActive: { type: Boolean, default: true },
   },
   { timestamps: true }

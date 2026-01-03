@@ -2,9 +2,11 @@
 
 import { useEffect, useState } from 'react';
 import * as FaIcons from 'react-icons/fa';
+import * as Fa6Icons from 'react-icons/fa6';
+import * as HeroIcons from '@heroicons/react/24/outline';
 import {
   FaWifi, FaParking, FaTv, FaSnowflake, FaSwimmingPool, FaHotTub,
-  FaUtensils, FaTree, FaChild, FaDumbbell, FaShieldAlt, FaConciergeBell
+  FaUtensils, FaChild, FaConciergeBell
 } from 'react-icons/fa';
 
 interface Amenity {
@@ -14,6 +16,9 @@ interface Amenity {
   icon: string;
   category: string;
   order: number;
+  isHighlight?: boolean;
+  highlightColor?: string;
+  highlightDescription?: string;
 }
 
 // Map for legacy icon names (lowercase)
@@ -59,17 +64,52 @@ export default function ComodidadesPage() {
     ? amenities
     : amenities.filter(a => a.category === selectedCategory);
 
-  const getIcon = (iconName: string) => {
-    // Check if it's a FaIcon name (e.g., FaSwimmingPool)
-    if (iconName && iconName.startsWith('Fa')) {
-      const IconComponent = (FaIcons as any)[iconName];
-      if (IconComponent) {
-        return <IconComponent className="w-8 h-8" />;
+  const getIcon = (iconName: string, size: 'sm' | 'lg' = 'sm') => {
+    const sizeClass = size === 'lg' ? 'w-16 h-16' : 'w-8 h-8';
+
+    // New format: prefix:icon-name (e.g., hero:wifi, fa:swimming-pool, fa6:bed)
+    if (iconName && iconName.includes(':')) {
+      const [prefix, name] = iconName.split(':');
+
+      // Convert kebab-case to PascalCase for component lookup
+      const pascalName = name
+        .split('-')
+        .map(part => part.charAt(0).toUpperCase() + part.slice(1))
+        .join('');
+
+      if (prefix === 'hero') {
+        const heroIconName = `${pascalName}Icon`;
+        const IconComponent = (HeroIcons as any)[heroIconName];
+        if (IconComponent) {
+          return <IconComponent className={sizeClass} />;
+        }
+      } else if (prefix === 'fa') {
+        const faIconName = `Fa${pascalName}`;
+        const IconComponent = (FaIcons as any)[faIconName];
+        if (IconComponent) {
+          return <IconComponent className={sizeClass} />;
+        }
+      } else if (prefix === 'fa6') {
+        const fa6IconName = `Fa${pascalName}`;
+        const IconComponent = (Fa6Icons as any)[fa6IconName];
+        if (IconComponent) {
+          return <IconComponent className={sizeClass} />;
+        }
       }
     }
+
+    // Legacy format: FaIconName (e.g., FaSwimmingPool)
+    if (iconName && iconName.startsWith('Fa')) {
+      // Try FA first, then FA6
+      const IconComponent = (FaIcons as any)[iconName] || (Fa6Icons as any)[iconName];
+      if (IconComponent) {
+        return <IconComponent className={sizeClass} />;
+      }
+    }
+
     // Fallback to legacy icon map
     const IconComponent = legacyIconMap[iconName] || legacyIconMap.default;
-    return <IconComponent className="w-8 h-8" />;
+    return <IconComponent className={sizeClass} />;
   };
 
   return (
@@ -132,24 +172,30 @@ export default function ComodidadesPage() {
               <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-teal-600"></div>
             </div>
           ) : filteredAmenities.length > 0 ? (
-            <div className="grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-              {filteredAmenities.map((amenity) => (
+            <div className="space-y-4">
+              {filteredAmenities
+                .filter(a => !a.isHighlight)
+                .map((amenity) => (
                 <div
                   key={amenity._id}
-                  className="bg-white rounded-xl p-6 shadow-md hover:shadow-lg transition-shadow"
+                  className="bg-white rounded-xl p-4 shadow-sm hover:shadow-md transition-shadow flex items-center gap-4"
                 >
-                  <div className="w-16 h-16 bg-teal-100 rounded-full flex items-center justify-center mb-4 text-teal-600">
+                  <div className="w-12 h-12 bg-teal-100 rounded-full flex items-center justify-center flex-shrink-0 text-teal-600">
                     {getIcon(amenity.icon)}
                   </div>
-                  <h3 className="text-lg font-bold text-gray-800 mb-2">
-                    {amenity.name}
-                  </h3>
-                  <p className="text-gray-600 text-sm">
-                    {amenity.description}
-                  </p>
-                  <span className="inline-block mt-3 text-xs font-medium text-teal-600 bg-teal-50 px-2 py-1 rounded">
-                    {amenity.category}
-                  </span>
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2">
+                      <h3 className="text-lg font-semibold text-gray-800">
+                        {amenity.name}
+                      </h3>
+                      <span className="text-xs font-medium text-teal-600 bg-teal-50 px-2 py-0.5 rounded">
+                        {amenity.category}
+                      </span>
+                    </div>
+                    <p className="text-gray-600 text-sm mt-0.5">
+                      {amenity.description}
+                    </p>
+                  </div>
                 </div>
               ))}
             </div>
@@ -161,40 +207,50 @@ export default function ComodidadesPage() {
         </div>
       </section>
 
-      {/* Highlights Section */}
-      <section className="bg-white py-16">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <h2 className="text-3xl font-display font-bold text-gray-800 text-center mb-12">
-            Destaques da Casa
-          </h2>
+      {/* Highlights Section - Dynamic */}
+      {amenities.filter(a => a.isHighlight).length > 0 && (
+        <section className="bg-white py-16">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <h2 className="text-3xl font-display font-bold text-gray-800 text-center mb-12">
+              Destaques da Casa
+            </h2>
 
-          <div className="grid md:grid-cols-3 gap-8">
-            <div className="text-center p-8 bg-gradient-to-br from-amber-50 to-amber-100 rounded-2xl">
-              <FaSwimmingPool className="w-16 h-16 mx-auto text-amber-500 mb-4" />
-              <h3 className="text-xl font-bold text-gray-800 mb-2">Piscina Aquecida</h3>
-              <p className="text-gray-600">
-                Piscina com aquecimento solar para você aproveitar em qualquer época do ano.
-              </p>
-            </div>
+            <div className="grid md:grid-cols-3 gap-8">
+              {amenities
+                .filter(a => a.isHighlight)
+                .map((highlight) => {
+                  const color = highlight.highlightColor || 'blue';
+                  const colorClasses: Record<string, { bg: string; text: string }> = {
+                    blue: { bg: 'from-blue-50 to-blue-100', text: 'text-blue-500' },
+                    green: { bg: 'from-green-50 to-green-100', text: 'text-green-500' },
+                    amber: { bg: 'from-amber-50 to-amber-100', text: 'text-amber-500' },
+                    purple: { bg: 'from-purple-50 to-purple-100', text: 'text-purple-500' },
+                    teal: { bg: 'from-teal-50 to-teal-100', text: 'text-teal-500' },
+                    rose: { bg: 'from-rose-50 to-rose-100', text: 'text-rose-500' },
+                  };
+                  const { bg, text } = colorClasses[color] || colorClasses.blue;
 
-            <div className="text-center p-8 bg-gradient-to-br from-teal-50 to-teal-100 rounded-2xl">
-              <FaHotTub className="w-16 h-16 mx-auto text-teal-500 mb-4" />
-              <h3 className="text-xl font-bold text-gray-800 mb-2">Jacuzzi Aquecida</h3>
-              <p className="text-gray-600">
-                Relaxe na jacuzzi com hidromassagem após um dia de passeios.
-              </p>
-            </div>
-
-            <div className="text-center p-8 bg-gradient-to-br from-green-50 to-green-100 rounded-2xl">
-              <FaChild className="w-16 h-16 mx-auto text-green-500 mb-4" />
-              <h3 className="text-xl font-bold text-gray-800 mb-2">Playground Completo</h3>
-              <p className="text-gray-600">
-                Parquinho exclusivo com brinquedos seguros para as crianças.
-              </p>
+                  return (
+                    <div
+                      key={highlight._id}
+                      className={`text-center p-8 bg-gradient-to-br ${bg} rounded-2xl`}
+                    >
+                      <div className={`w-16 h-16 mx-auto flex items-center justify-center ${text} mb-4`}>
+                        {getIcon(highlight.icon, 'lg')}
+                      </div>
+                      <h3 className="text-xl font-bold text-gray-800 mb-2">
+                        {highlight.name}
+                      </h3>
+                      <p className="text-gray-600">
+                        {highlight.highlightDescription || highlight.description}
+                      </p>
+                    </div>
+                  );
+                })}
             </div>
           </div>
-        </div>
-      </section>
+        </section>
+      )}
     </div>
   );
 }

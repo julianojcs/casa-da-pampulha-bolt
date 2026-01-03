@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import dynamic from 'next/dynamic';
 import Image from 'next/image';
 import {
   PlusIcon,
@@ -17,6 +18,16 @@ import { StarIcon } from '@heroicons/react/24/solid';
 import toast from 'react-hot-toast';
 import { CloudinaryUpload } from '@/components/CloudinaryUpload';
 
+// Dynamic import for LocationPicker to avoid SSR issues
+const LocationPicker = dynamic(() => import('@/components/LocationPicker'), {
+  ssr: false,
+  loading: () => (
+    <div className="bg-gray-100 rounded-lg h-[250px] flex items-center justify-center">
+      <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-amber-600" />
+    </div>
+  ),
+});
+
 interface Place {
   _id: string;
   name: string;
@@ -30,6 +41,8 @@ interface Place {
   image: string;
   mapUrl: string;
   isActive: boolean;
+  lat?: number;
+  lng?: number;
 }
 
 const categories = [
@@ -53,6 +66,8 @@ const emptyPlace: Omit<Place, '_id'> = {
   image: '',
   mapUrl: '',
   isActive: true,
+  lat: undefined,
+  lng: undefined,
 };
 
 export default function AdminLocaisPage() {
@@ -132,6 +147,8 @@ export default function AdminLocaisPage() {
         image: place.image || '',
         mapUrl: place.mapUrl || '',
         isActive: place.isActive,
+        lat: place.lat,
+        lng: place.lng,
       });
     } else {
       setEditingPlace(null);
@@ -493,6 +510,45 @@ export default function AdminLocaisPage() {
                     value={formData.address}
                     onChange={(e) => setFormData(prev => ({ ...prev, address: e.target.value }))}
                     className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-amber-500"
+                  />
+                </div>
+
+                {/* Coordenadas */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Latitude
+                  </label>
+                  <input
+                    type="number"
+                    step="any"
+                    value={formData.lat || ''}
+                    onChange={(e) => setFormData(prev => ({ ...prev, lat: parseFloat(e.target.value) || undefined }))}
+                    placeholder="Ex: -19.8516"
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-amber-500"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Longitude
+                  </label>
+                  <input
+                    type="number"
+                    step="any"
+                    value={formData.lng || ''}
+                    onChange={(e) => setFormData(prev => ({ ...prev, lng: parseFloat(e.target.value) || undefined }))}
+                    placeholder="Ex: -43.9688"
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-amber-500"
+                  />
+                </div>
+
+                {/* Mapa para ajustar localização */}
+                <div className="md:col-span-2">
+                  <LocationPicker
+                    lat={formData.lat}
+                    lng={formData.lng}
+                    address={formData.address}
+                    onLocationChange={(lat, lng) => setFormData(prev => ({ ...prev, lat, lng }))}
                   />
                 </div>
 

@@ -604,7 +604,7 @@ export default function CalendarioPage() {
                 <div className="p-4">
                   <div className="flex items-center gap-2 mb-3">
                     <div className="w-2 h-2 rounded-full bg-emerald-500" />
-                    <h4 className="font-medium text-emerald-700 text-sm uppercase">Check-ins</h4>
+                    <h4 className="font-medium text-emerald-700 text-sm uppercase">Check-in</h4>
                   </div>
                     {selectedDateCheckIns.map((event) => {
                     const preReg = getPreRegistrationForEvent(event);
@@ -782,16 +782,27 @@ export default function CalendarioPage() {
                 </div>
               )}
 
-              {/* Ongoing stays (not check-in or check-out) */}
-              {selectedDateEvents.length > 0 &&
-                selectedDateCheckIns.length === 0 &&
-                selectedDateCheckOuts.length === 0 && (
+              {/* Ongoing stays - only when check-in < today AND check-out > today */}
+              {(() => {
+                const today = new Date();
+                today.setHours(0, 0, 0, 0);
+                const todayKey = toDateKey(today);
+                // Filter events that are truly "ongoing" - started before today and end after today
+                const ongoingEvents = selectedDateEvents.filter((event) => {
+                  const startKey = toDateKey(event.start);
+                  const endKey = toDateKey(event.end);
+                  if (!startKey || !endKey || !todayKey) return false;
+                  return startKey < todayKey && endKey > todayKey;
+                });
+                return ongoingEvents.length > 0 &&
+                  selectedDateCheckIns.length === 0 &&
+                  selectedDateCheckOuts.length === 0 && (
                   <div className="p-4">
                     <div className="flex items-center gap-2 mb-3">
                       <div className="w-2 h-2 rounded-full bg-gray-400" />
                       <h4 className="font-medium text-gray-700 text-sm uppercase">Hospedagem em andamento</h4>
                     </div>
-                    {selectedDateEvents.map((event) => {
+                    {ongoingEvents.map((event) => {
                       const preReg = getPreRegistrationForEvent(event);
                       // Try to find reservation by registeredUserId first, then by reservationCode
                       let reservation: Reservation | null = null;
@@ -806,45 +817,271 @@ export default function CalendarioPage() {
 
                       return (
                         <div key={event.uid} className="bg-gray-50 rounded-xl p-4 mb-2">
-                          <div className="flex items-start justify-between mb-2">
-                            <div>
-                              <p className="font-semibold text-gray-800">
-                                {reservation?.guestName || preReg?.name || 'Reserva Airbnb'}
-                              </p>
-                              <p className="text-xs text-gray-500">{event.reservationCode}</p>
-                            </div>
-                            {reservation ? (
-                              <span className="text-xs bg-green-100 text-green-700 px-2 py-1 rounded-full">
-                                Cadastrado
-                              </span>
-                            ) : preReg ? (
-                              <span className="text-xs bg-amber-100 text-amber-700 px-2 py-1 rounded-full">
-                                Pré-cadastro
-                              </span>
-                            ) : (
-                              <span className="text-xs bg-red-100 text-red-700 px-2 py-1 rounded-full">
-                                Sem cadastro
-                              </span>
-                            )}
-                          </div>
-                          <div className="flex items-center gap-2 text-sm text-gray-600">
-                            <ClockIcon className="h-4 w-4 text-gray-400" />
-                            {formatDate(event.start)} → {formatDate(event.end)}
-                          </div>
-                          {!preReg && event.summary !== 'Airbnb (Not available)' && (
-                            <button
-                              onClick={() => handleCreatePreRegistration(event)}
-                              className="mt-3 flex items-center gap-2 text-sm text-amber-600 hover:text-amber-700 font-medium"
-                            >
-                              <UserPlusIcon className="h-4 w-4" />
-                              Criar Pré-cadastro
-                            </button>
+                          {reservation ? (
+                            // Show reservation data (same as check-in, without tag and create button)
+                            <>
+                              <div className="flex items-start justify-between mb-2">
+                                <div>
+                                  <p className="font-semibold text-gray-800">{reservation.guestName}</p>
+                                  <p className="text-xs text-gray-500">{event.reservationCode}</p>
+                                </div>
+                                <span className="text-xs bg-green-100 text-green-700 px-2 py-1 rounded-full">
+                                  Cadastrado
+                                </span>
+                              </div>
+                              <div className="space-y-1 text-sm text-gray-600">
+                                {reservation.guestPhone && (
+                                  <div className="flex items-center gap-2">
+                                    <PhoneIcon className="h-4 w-4 text-gray-400" />
+                                    {reservation.guestPhone}
+                                  </div>
+                                )}
+                                {reservation.guestEmail && (
+                                  <div className="flex items-center gap-2">
+                                    <EnvelopeIcon className="h-4 w-4 text-gray-400" />
+                                    {reservation.guestEmail}
+                                  </div>
+                                )}
+                                <div className="flex items-center gap-2">
+                                  <UserGroupIcon className="h-4 w-4 text-gray-400" />
+                                  {reservation.guests?.length || reservation.numberOfGuests} hóspede(s)
+                                </div>
+                                <div className="flex items-center gap-2">
+                                  <ClockIcon className="h-4 w-4 text-gray-400" />
+                                  {formatDate(event.start)} → {formatDate(event.end)}
+                                </div>
+                              </div>
+                              <Link
+                                href={`/admin/reservas/${reservation._id}`}
+                                className="mt-3 flex items-center gap-1 text-sm text-gray-600 hover:text-gray-700 font-medium"
+                              >
+                                Ver reserva completa
+                                <ArrowRightIcon className="h-4 w-4" />
+                              </Link>
+                            </>
+                          ) : preReg ? (
+                            // Show pre-registration data (same as check-in, without tag and create button)
+                            <>
+                              <div className="flex items-start justify-between mb-2">
+                                <div>
+                                  <p className="font-semibold text-gray-800">{preReg.name}</p>
+                                  <p className="text-xs text-gray-500">{preReg.reservationCode || event.reservationCode}</p>
+                                </div>
+                                <span className="text-xs bg-amber-100 text-amber-700 px-2 py-1 rounded-full">
+                                  Pré-cadastro
+                                </span>
+                              </div>
+                              <div className="space-y-1 text-sm text-gray-600">
+                                <div className="flex items-center gap-2">
+                                  <PhoneIcon className="h-4 w-4 text-gray-400" />
+                                  {preReg.phone}
+                                </div>
+                                {preReg.email && (
+                                  <div className="flex items-center gap-2">
+                                    <EnvelopeIcon className="h-4 w-4 text-gray-400" />
+                                    {preReg.email}
+                                  </div>
+                                )}
+                                <div className="flex items-center gap-2">
+                                  <UserGroupIcon className="h-4 w-4 text-gray-400" />
+                                  {(preReg.adultsCount || 1) + (preReg.childrenCount || 0)} hóspede(s)
+                                </div>
+                                <div className="flex items-center gap-2">
+                                  <ClockIcon className="h-4 w-4 text-gray-400" />
+                                  {formatDate(preReg.checkInDate)} → {formatDate(preReg.checkOutDate)}
+                                </div>
+                              </div>
+                              <Link
+                                href={`/admin/pre-cadastros?id=${preReg._id}`}
+                                className="mt-3 flex items-center gap-1 text-sm text-gray-600 hover:text-gray-700 font-medium"
+                              >
+                                Ver pré-cadastro
+                                <ArrowRightIcon className="h-4 w-4" />
+                              </Link>
+                            </>
+                          ) : (
+                            // No pre-registration (same as check-in, without create button)
+                            <>
+                              <div className="flex items-start justify-between mb-2">
+                                <div>
+                                  <p className="font-semibold text-gray-800">
+                                    {event.summary === 'Reserved' || event.summary === 'Reservado'
+                                      ? 'Reserva Airbnb'
+                                      : event.summary}
+                                  </p>
+                                  <p className="text-xs text-gray-500">{event.reservationCode}</p>
+                                </div>
+                                <span className="text-xs bg-red-100 text-red-700 px-2 py-1 rounded-full">
+                                  Sem cadastro
+                                </span>
+                              </div>
+                              <div className="flex items-center gap-2 text-sm text-gray-600">
+                                <ClockIcon className="h-4 w-4 text-gray-400" />
+                                {formatDate(event.start)} → {formatDate(event.end)}
+                              </div>
+                            </>
                           )}
                         </div>
                       );
                     })}
                   </div>
-                )}
+                );
+              })()}
+
+              {/* Mid-stay days (not check-in, not check-out, not ongoing) - show reservation info */}
+              {(() => {
+                const today = new Date();
+                today.setHours(0, 0, 0, 0);
+                const todayKey = toDateKey(today);
+                const selectedKey = selectedDate ? toDateKey(selectedDate) : null;
+
+                // Filter events where selected date is in the middle (not check-in, not check-out)
+                const midStayEvents = selectedDateEvents.filter((event) => {
+                  const startKey = toDateKey(event.start);
+                  const endKey = toDateKey(event.end);
+                  if (!startKey || !endKey || !selectedKey) return false;
+                  // Not check-in day, not check-out day
+                  return selectedKey > startKey && selectedKey < endKey;
+                });
+
+                // Only show if no check-ins, no check-outs, and not ongoing (ongoing requires start < today)
+                const hasOngoing = midStayEvents.some((event) => {
+                  const startKey = toDateKey(event.start);
+                  const endKey = toDateKey(event.end);
+                  if (!startKey || !endKey || !todayKey) return false;
+                  return startKey < todayKey && endKey > todayKey;
+                });
+
+                return midStayEvents.length > 0 &&
+                  selectedDateCheckIns.length === 0 &&
+                  selectedDateCheckOuts.length === 0 &&
+                  !hasOngoing && (
+                  <div className="p-4">
+                    <div className="flex items-center gap-2 mb-3">
+                      <div className="w-2 h-2 rounded-full bg-blue-400" />
+                      <h4 className="font-medium text-blue-700 text-sm uppercase">Período de hospedagem</h4>
+                    </div>
+                    {midStayEvents.map((event) => {
+                      const preReg = getPreRegistrationForEvent(event);
+                      let reservation: Reservation | null = null;
+                      if (preReg?.registeredUserId) {
+                        const uid = String(preReg.registeredUserId).trim();
+                        reservation = reservations.find((r) => String(r.userId || '').trim() === uid) || null;
+                      }
+                      if (!reservation && (preReg?.reservationCode || event.reservationCode)) {
+                        const code = String(preReg?.reservationCode || event.reservationCode || '').trim();
+                        reservation = reservations.find((r) => String(r.reservationCode || '').trim() === code) || null;
+                      }
+
+                      return (
+                        <div key={event.uid} className="bg-blue-50 rounded-xl p-4 mb-2">
+                          {reservation ? (
+                            <>
+                              <div className="flex items-start justify-between mb-2">
+                                <div>
+                                  <p className="font-semibold text-gray-800">{reservation.guestName}</p>
+                                  <p className="text-xs text-gray-500">{event.reservationCode}</p>
+                                </div>
+                                <span className="text-xs bg-green-100 text-green-700 px-2 py-1 rounded-full">
+                                  Cadastrado
+                                </span>
+                              </div>
+                              <div className="space-y-1 text-sm text-gray-600">
+                                {reservation.guestPhone && (
+                                  <div className="flex items-center gap-2">
+                                    <PhoneIcon className="h-4 w-4 text-gray-400" />
+                                    {reservation.guestPhone}
+                                  </div>
+                                )}
+                                {reservation.guestEmail && (
+                                  <div className="flex items-center gap-2">
+                                    <EnvelopeIcon className="h-4 w-4 text-gray-400" />
+                                    {reservation.guestEmail}
+                                  </div>
+                                )}
+                                <div className="flex items-center gap-2">
+                                  <UserGroupIcon className="h-4 w-4 text-gray-400" />
+                                  {reservation.guests?.length || reservation.numberOfGuests} hóspede(s)
+                                </div>
+                                <div className="flex items-center gap-2">
+                                  <ClockIcon className="h-4 w-4 text-gray-400" />
+                                  {formatDate(event.start)} → {formatDate(event.end)}
+                                </div>
+                              </div>
+                              <Link
+                                href={`/admin/reservas/${reservation._id}`}
+                                className="mt-3 flex items-center gap-1 text-sm text-rose-600 hover:text-rose-700 font-medium"
+                              >
+                                Ver reserva completa
+                                <ArrowRightIcon className="h-4 w-4" />
+                              </Link>
+                            </>
+                          ) : preReg ? (
+                            <>
+                              <div className="flex items-start justify-between mb-2">
+                                <div>
+                                  <p className="font-semibold text-gray-800">{preReg.name}</p>
+                                  <p className="text-xs text-gray-500">{preReg.reservationCode || event.reservationCode}</p>
+                                </div>
+                                <span className="text-xs bg-amber-100 text-amber-700 px-2 py-1 rounded-full">
+                                  Pré-cadastro
+                                </span>
+                              </div>
+                              <div className="space-y-1 text-sm text-gray-600">
+                                <div className="flex items-center gap-2">
+                                  <PhoneIcon className="h-4 w-4 text-gray-400" />
+                                  {preReg.phone}
+                                </div>
+                                {preReg.email && (
+                                  <div className="flex items-center gap-2">
+                                    <EnvelopeIcon className="h-4 w-4 text-gray-400" />
+                                    {preReg.email}
+                                  </div>
+                                )}
+                                <div className="flex items-center gap-2">
+                                  <UserGroupIcon className="h-4 w-4 text-gray-400" />
+                                  {(preReg.adultsCount || 1) + (preReg.childrenCount || 0)} hóspede(s)
+                                </div>
+                                <div className="flex items-center gap-2">
+                                  <ClockIcon className="h-4 w-4 text-gray-400" />
+                                  {formatDate(preReg.checkInDate)} → {formatDate(preReg.checkOutDate)}
+                                </div>
+                              </div>
+                              <Link
+                                href={`/admin/pre-cadastros?id=${preReg._id}`}
+                                className="mt-3 flex items-center gap-1 text-sm text-rose-600 hover:text-rose-700 font-medium"
+                              >
+                                Ver pré-cadastro
+                                <ArrowRightIcon className="h-4 w-4" />
+                              </Link>
+                            </>
+                          ) : (
+                            <>
+                              <div className="flex items-start justify-between mb-2">
+                                <div>
+                                  <p className="font-semibold text-gray-800">
+                                    {event.summary === 'Reserved' || event.summary === 'Reservado'
+                                      ? 'Reserva Airbnb'
+                                      : event.summary}
+                                  </p>
+                                  <p className="text-xs text-gray-500">{event.reservationCode}</p>
+                                </div>
+                                <span className="text-xs bg-red-100 text-red-700 px-2 py-1 rounded-full">
+                                  Sem cadastro
+                                </span>
+                              </div>
+                              <div className="flex items-center gap-2 text-sm text-gray-600">
+                                <ClockIcon className="h-4 w-4 text-gray-400" />
+                                {formatDate(event.start)} → {formatDate(event.end)}
+                              </div>
+                            </>
+                          )}
+                        </div>
+                      );
+                    })}
+                  </div>
+                );
+              })()}
             </div>
           )}
         </div>

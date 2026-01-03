@@ -80,7 +80,6 @@ const menuStructure: MenuNode[] = [
     name: 'Propriedade',
     icon: BuildingOfficeIcon,
     items: [
-      { name: 'Propriedade', href: '/admin/propriedade', icon: HomeIcon },
       { name: 'Galeria', href: '/admin/galeria', icon: PhotoIcon, countKey: 'gallery' },
       { name: 'Locais', href: '/admin/locais', icon: MapPinIcon, countKey: 'places' },
       { name: 'Comodidades', href: '/admin/comodidades', icon: SquaresPlusIcon, countKey: 'amenities' },
@@ -88,6 +87,7 @@ const menuStructure: MenuNode[] = [
       { name: 'Área Kids', href: '/admin/kids', icon: SparklesIcon },
       { name: 'FAQs', href: '/admin/faqs', icon: QuestionMarkCircleIcon, countKey: 'faqs' },
       { name: 'Informações', href: '/admin/guest-info', icon: InformationCircleIcon },
+      { name: 'Configurações', href: '/admin/propriedade', icon: CogIcon },
     ],
   },
   {
@@ -113,7 +113,7 @@ const menuStructure: MenuNode[] = [
   },
   { name: 'Produtos', href: '/admin/produtos', icon: CubeIcon, countKey: 'products' },
   { name: 'Reservas', href: '/admin/reservas', icon: DocumentCheckIcon, countKey: 'totalReservations' },
-  { name: 'Configurações', href: '/admin/configuracoes', icon: CogIcon },
+  { name: 'Conf. Sistema', href: '/admin/configuracoes', icon: CogIcon },
 ];
 
 function AdminLayoutContent({

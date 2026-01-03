@@ -15,6 +15,8 @@ export interface IPlace {
   distance?: string;
   image: string;
   mapUrl?: string;
+  lat?: number;
+  lng?: number;
   isActive: boolean;
   createdAt?: Date;
   updatedAt?: Date;
@@ -60,6 +62,10 @@ export interface IAmenity {
   category: string;
   isActive: boolean;
   order: number;
+  // Highlight fields
+  isHighlight: boolean;
+  highlightColor?: string; // Tailwind color class (e.g., 'blue', 'green', 'amber')
+  highlightDescription?: string; // Extended description for highlight display
   createdAt?: Date;
   updatedAt?: Date;
 }

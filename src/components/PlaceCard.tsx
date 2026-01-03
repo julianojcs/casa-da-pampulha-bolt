@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import dynamic from 'next/dynamic';
 import Image from 'next/image';
 import { StarIcon, MapPinIcon, ClockIcon, MapIcon } from '@heroicons/react/24/solid';
 import { IPlace, Category, placeCategories } from '@/types';
@@ -13,8 +14,26 @@ import {
   Baby
 } from 'lucide-react';
 
+// Dynamic import do mapa para evitar SSR issues
+const PlacesMap = dynamic(() => import('@/components/PlacesMap'), {
+  ssr: false,
+  loading: () => (
+    <div className="w-full h-[400px] bg-gray-100 rounded-xl flex items-center justify-center">
+      <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-amber-600" />
+    </div>
+  ),
+});
+
+interface ResidenceInfo {
+  name: string;
+  address: string;
+  lat?: number;
+  lng?: number;
+}
+
 interface PlaceCardProps {
   places: IPlace[];
+  residence?: ResidenceInfo;
 }
 
 const categoryIcons: Record<string, React.ElementType> = {
@@ -27,7 +46,7 @@ const categoryIcons: Record<string, React.ElementType> = {
   kids: Baby,
 };
 
-export default function PlaceCard({ places }: PlaceCardProps) {
+export default function PlaceCard({ places, residence }: PlaceCardProps) {
   const [selectedCategory, setSelectedCategory] = useState<Category>('all');
   const [minRating, setMinRating] = useState(0);
   const [maxDistance, setMaxDistance] = useState<number | null>(null);
@@ -179,6 +198,21 @@ export default function PlaceCard({ places }: PlaceCardProps) {
           display: none;
         }
       `}</style>
+
+      {/* Map Section */}
+      {(places.some(p => p.lat && p.lng) || places.some(p => p.address) || residence) && (
+        <div className="mb-8">
+          <h3 className="text-lg font-semibold text-gray-800 mb-4 flex items-center gap-2">
+            <MapIcon className="h-5 w-5 text-amber-500" />
+            Mapa dos Locais
+          </h3>
+          <PlacesMap
+            places={filteredPlaces}
+            selectedCategory={selectedCategory}
+            residence={residence}
+          />
+        </div>
+      )}
 
       {/* Results Count */}
       <p className="text-gray-600 mb-4">

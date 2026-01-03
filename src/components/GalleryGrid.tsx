@@ -41,6 +41,11 @@ export default function GalleryGrid({ items, categories }: GalleryGridProps) {
   const [showLeftArrow, setShowLeftArrow] = useState(false);
   const [showRightArrow, setShowRightArrow] = useState(false);
 
+  // Touch/Swipe states
+  const touchStartRef = useRef<{ x: number; y: number } | null>(null);
+  const touchEndRef = useRef<{ x: number; y: number } | null>(null);
+  const minSwipeDistance = 50;
+
   // Verificar se precisa mostrar setas de navegação
   const checkFilterScroll = useCallback(() => {
     const container = filterScrollRef.current;
@@ -184,6 +189,46 @@ export default function GalleryGrid({ items, categories }: GalleryGridProps) {
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [selectedItem, goToPrevious, goToNext]);
 
+  // Touch/Swipe handlers for lightbox
+  const handleTouchStart = useCallback((e: React.TouchEvent) => {
+    touchEndRef.current = null;
+    touchStartRef.current = {
+      x: e.targetTouches[0].clientX,
+      y: e.targetTouches[0].clientY,
+    };
+  }, []);
+
+  const handleTouchMove = useCallback((e: React.TouchEvent) => {
+    touchEndRef.current = {
+      x: e.targetTouches[0].clientX,
+      y: e.targetTouches[0].clientY,
+    };
+  }, []);
+
+  const handleTouchEnd = useCallback(() => {
+    if (!touchStartRef.current || !touchEndRef.current) return;
+
+    const distanceX = touchStartRef.current.x - touchEndRef.current.x;
+    const distanceY = touchStartRef.current.y - touchEndRef.current.y;
+    const isHorizontalSwipe = Math.abs(distanceX) > Math.abs(distanceY);
+
+    if (isHorizontalSwipe && Math.abs(distanceX) > minSwipeDistance) {
+      if (distanceX > 0) {
+        // Swipe left -> next image
+        goToNext();
+      } else {
+        // Swipe right -> previous image
+        goToPrevious();
+      }
+    } else if (!isHorizontalSwipe && Math.abs(distanceY) > minSwipeDistance) {
+      // Vertical swipe -> close lightbox
+      closeLightbox();
+    }
+
+    touchStartRef.current = null;
+    touchEndRef.current = null;
+  }, [goToNext, goToPrevious]);
+
   // Get adjacent items for preloading in the DOM
   const getAdjacentItems = () => {
     if (!selectedItem || filteredItems.length <= 1) return { prev: null, next: null };
@@ -322,7 +367,13 @@ export default function GalleryGrid({ items, categories }: GalleryGridProps) {
 
       {/* Lightbox */}
       {selectedItem && (
-        <div className="gallery-modal" onClick={closeLightbox}>
+        <div
+          className="gallery-modal"
+          onClick={closeLightbox}
+          onTouchStart={handleTouchStart}
+          onTouchMove={handleTouchMove}
+          onTouchEnd={handleTouchEnd}
+        >
           <div
             className={`relative mx-4 ${selectedItem.type === 'video' ? 'w-[90vw] md:w-[80vw] max-w-6xl' : 'max-w-5xl max-h-[90vh]'}`}
             onClick={(e) => e.stopPropagation()}

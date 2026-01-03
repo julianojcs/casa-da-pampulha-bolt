@@ -44,3 +44,70 @@ export async function POST(request: NextRequest) {
     );
   }
 }
+
+export async function PUT(request: NextRequest) {
+  try {
+    await dbConnect();
+
+    const { searchParams } = new URL(request.url);
+    const id = searchParams.get('id');
+
+    if (!id) {
+      return NextResponse.json(
+        { error: 'ID é obrigatório' },
+        { status: 400 }
+      );
+    }
+
+    const body = await request.json();
+    const item = await GalleryItem.findByIdAndUpdate(id, body, { new: true });
+
+    if (!item) {
+      return NextResponse.json(
+        { error: 'Item não encontrado' },
+        { status: 404 }
+      );
+    }
+
+    return NextResponse.json(item);
+  } catch (error) {
+    console.error('Error updating gallery item:', error);
+    return NextResponse.json(
+      { error: 'Erro ao atualizar item da galeria' },
+      { status: 500 }
+    );
+  }
+}
+
+export async function DELETE(request: NextRequest) {
+  try {
+    await dbConnect();
+
+    const { searchParams } = new URL(request.url);
+    const id = searchParams.get('id');
+
+    if (!id) {
+      return NextResponse.json(
+        { error: 'ID é obrigatório' },
+        { status: 400 }
+      );
+    }
+
+    const item = await GalleryItem.findByIdAndDelete(id);
+
+    if (!item) {
+      return NextResponse.json(
+        { error: 'Item não encontrado' },
+        { status: 404 }
+      );
+    }
+
+    return NextResponse.json({ message: 'Item excluído com sucesso' });
+  } catch (error) {
+    console.error('Error deleting gallery item:', error);
+    return NextResponse.json(
+      { error: 'Erro ao excluir item da galeria' },
+      { status: 500 }
+    );
+  }
+}
