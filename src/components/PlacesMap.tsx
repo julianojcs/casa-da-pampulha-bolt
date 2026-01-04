@@ -168,6 +168,42 @@ export default function PlacesMap({
   const [routeLoading, setRouteLoading] = useState(false);
   const [isGeocoding, setIsGeocoding] = useState(false);
   const mapContainerRef = useRef<HTMLDivElement>(null);
+  const leafletMapRef = useRef<L.Map | null>(null);
+  const [propertyLogo, setPropertyLogo] = useState<string | null>(null);
+
+  // Fetch property info to get logo for residence marker
+  useEffect(() => {
+    let mounted = true;
+    (async () => {
+      try {
+        const res = await fetch('/api/property');
+        if (!mounted) return;
+        if (res.ok) {
+          const data = await res.json();
+          if (data?.logo) setPropertyLogo(data.logo);
+        }
+      } catch (err) {
+        console.error('Failed to fetch property for logo:', err);
+      }
+    })();
+    return () => { mounted = false; };
+  }, []);
+
+  // Create a DivIcon for the property logo (circular image)
+  const logoIcon = useMemo(() => {
+    if (!propertyLogo) return homeIcon;
+    try {
+      const html = `
+        <div style="width:36px;height:36px;border-radius:9999px;overflow:hidden;border:2px solid transparent;background:transparent;display:inline-block">
+          <img src="${propertyLogo}" style="width:100%;height:100%;object-fit:cover;display:block;background:transparent" alt="logo" />
+        </div>
+      `;
+      return new L.DivIcon({ html, className: '', iconSize: [36, 36], iconAnchor: [18, 18], popupAnchor: [0, -20] }) as unknown as L.Icon;
+    } catch (err) {
+      console.error('Error creating logo icon:', err);
+      return homeIcon;
+    }
+  }, [propertyLogo]);
 
   useEffect(() => {
     setIsClient(true);
@@ -261,10 +297,20 @@ export default function PlacesMap({
   // Show route on map
   const showRouteOnMap = useCallback(async (placeCoords: [number, number]) => {
     if (!residenceCoords) return;
+    // Close any open popup for better route view
+    leafletMapRef.current?.closePopup();
     setRouteLoading(true);
     const route = await fetchRoute(residenceCoords, placeCoords);
     setRouteLoading(false);
-    if (route) {
+    if (route && leafletMapRef.current) {
+      setActiveRoute(route);
+      try {
+        const bounds = L.latLngBounds(route as any);
+        leafletMapRef.current.fitBounds(bounds, { padding: [50, 50], maxZoom: 15 });
+      } catch (err) {
+        console.error('Error fitting bounds to route:', err);
+      }
+    } else if (route) {
       setActiveRoute(route);
     }
   }, [residenceCoords]);
@@ -321,6 +367,7 @@ export default function PlacesMap({
         zoom={zoom}
         style={{ height: '100%', width: '100%' }}
         scrollWheelZoom={true}
+        ref={(m: any) => { leafletMapRef.current = m; }}
       >
         <TileLayer
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
@@ -330,7 +377,7 @@ export default function PlacesMap({
 
         {/* Residence Marker */}
         {residenceCoords && (
-          <Marker position={residenceCoords} icon={homeIcon}>
+          <Marker position={residenceCoords} icon={logoIcon}>
             <Popup>
               <div className="min-w-[180px] text-center">
                 <div className="flex items-center justify-center gap-2 mb-2">

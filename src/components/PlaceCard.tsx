@@ -14,8 +14,8 @@ import {
   Baby
 } from 'lucide-react';
 
-// Dynamic import do mapa para evitar SSR issues
-const PlacesMap = dynamic(() => import('@/components/PlacesMap'), {
+// Dynamic import do mapa para evitar SSR issues (use relative path to satisfy TS resolver)
+const PlacesMap = dynamic(() => import('./PlacesMap'), {
   ssr: false,
   loading: () => (
     <div className="w-full h-[400px] bg-gray-100 rounded-xl flex items-center justify-center">

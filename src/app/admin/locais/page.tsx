@@ -157,6 +157,21 @@ export default function AdminLocaisPage() {
     setIsModalOpen(true);
   };
 
+  // Allow pasting combined coordinates ("lat, lng") into either coord input
+  const handleCoordsPaste = (text: string) => {
+    if (!text) return false;
+    const matches = Array.from(text.matchAll(/(-?\d+(?:[\.,]\d+)?)/g)).map(m => m[1].replace(',', '.'));
+    if (matches.length >= 2) {
+      const lat = parseFloat(matches[0]);
+      const lng = parseFloat(matches[1]);
+      if (!Number.isNaN(lat) && !Number.isNaN(lng)) {
+        setFormData(prev => ({ ...prev, lat, lng }));
+        return true;
+      }
+    }
+    return false;
+  };
+
   const closeModal = () => {
     setIsModalOpen(false);
     setEditingPlace(null);
@@ -523,6 +538,11 @@ export default function AdminLocaisPage() {
                     step="any"
                     value={formData.lat || ''}
                     onChange={(e) => setFormData(prev => ({ ...prev, lat: parseFloat(e.target.value) || undefined }))}
+                    onPaste={(e) => {
+                      const text = e.clipboardData?.getData('text') || '';
+                      const handled = handleCoordsPaste(text);
+                      if (handled) e.preventDefault();
+                    }}
                     placeholder="Ex: -19.8516"
                     className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-amber-500"
                   />
@@ -537,6 +557,11 @@ export default function AdminLocaisPage() {
                     step="any"
                     value={formData.lng || ''}
                     onChange={(e) => setFormData(prev => ({ ...prev, lng: parseFloat(e.target.value) || undefined }))}
+                    onPaste={(e) => {
+                      const text = e.clipboardData?.getData('text') || '';
+                      const handled = handleCoordsPaste(text);
+                      if (handled) e.preventDefault();
+                    }}
                     placeholder="Ex: -43.9688"
                     className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-amber-500"
                   />
