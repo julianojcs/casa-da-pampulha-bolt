@@ -30,6 +30,7 @@ export interface IReservation {
   checkOutDate: Date;
   checkOutTime: string;
   numberOfGuests?: number;
+  pets?: number;
   notes?: string;
   status: ReservationStatus;
   source?: 'airbnb' | 'booking' | 'vrbo' | 'direct' | 'other';
@@ -85,6 +86,8 @@ const ReservationSchema = new Schema<ReservationDocument>(
     checkOutDate: { type: Date, required: true },
     checkOutTime: { type: String, default: '11:00' },
     numberOfGuests: { type: Number },
+    pets: { type: Number, default: 0 },
+    guests: [ReservationGuestSchema],
     notes: { type: String },
     status: {
       type: String,
@@ -105,7 +108,6 @@ const ReservationSchema = new Schema<ReservationDocument>(
     totalAmount: { type: Number },
     isPaid: { type: Boolean, default: false },
     preRegistrationId: { type: String, index: true },
-    guests: [ReservationGuestSchema],
     vehicles: [ReservationVehicleSchema],
     createdBy: { type: String, required: true },
   },
@@ -117,6 +119,32 @@ ReservationSchema.index({ checkInDate: 1 });
 ReservationSchema.index({ checkOutDate: 1 });
 ReservationSchema.index({ status: 1 });
 ReservationSchema.index({ userId: 1, checkInDate: -1 });
+
+// Virtual fields for guest counts by age category
+// Adults: age > 12
+// Children: age > 2 and <= 12
+// Babies: age <= 2
+ReservationSchema.virtual('adultsCount').get(function() {
+  if (!this.guests || this.guests.length === 0) return 0;
+  return this.guests.filter((g: IReservationGuest) => (g.age ?? 18) > 12).length;
+});
+
+ReservationSchema.virtual('childrenCount').get(function() {
+  if (!this.guests || this.guests.length === 0) return 0;
+  return this.guests.filter((g: IReservationGuest) => {
+    const age = g.age ?? 18;
+    return age > 2 && age <= 12;
+  }).length;
+});
+
+ReservationSchema.virtual('babiesCount').get(function() {
+  if (!this.guests || this.guests.length === 0) return 0;
+  return this.guests.filter((g: IReservationGuest) => (g.age ?? 18) <= 2).length;
+});
+
+// Ensure virtuals are included when converting to JSON/Object
+ReservationSchema.set('toJSON', { virtuals: true });
+ReservationSchema.set('toObject', { virtuals: true });
 
 // Método estático para atualizar status baseado nas datas
 ReservationSchema.statics.updateStatuses = async function() {

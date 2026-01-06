@@ -48,13 +48,22 @@ export async function PUT(
       );
     }
 
+    // Build update object
+    const updateData: Partial<IReservation> = {
+      guests: guests || [],
+      vehicles: vehicles || [],
+    };
+
+    // If guests array is populated, clear numberOfGuests field
+    // as the actual guest list takes precedence
+    if (guests && guests.length > 0) {
+      updateData.numberOfGuests = undefined;
+    }
+
     // Update reservation with guests and vehicles
     const updatedReservation = await Reservation.findByIdAndUpdate(
       id,
-      {
-        guests: guests || [],
-        vehicles: vehicles || [],
-      },
+      updateData,
       { new: true }
     );
 

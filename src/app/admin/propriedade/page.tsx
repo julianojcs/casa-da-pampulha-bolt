@@ -390,7 +390,7 @@ export default function AdminPropriedadePage() {
           <TransferList
             availableItems={defaultGalleryCategories}
             selectedItems={formData.galleryCategories}
-            onSelectedChange={(items) => setFormData({ ...formData, galleryCategories: items })}
+            onSelectedChange={(items: string[]) => setFormData({ ...formData, galleryCategories: items })}
             availableTitle="Sugestões"
             selectedTitle="Categorias Ativas"
           />

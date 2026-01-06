@@ -18,6 +18,7 @@ import {
   IdentificationIcon,
 } from '@heroicons/react/24/outline';
 import toast from 'react-hot-toast';
+import { isCurrentReservation, isUpcomingReservation } from '@/utils/dateUtils';
 
 interface Guest {
   _id?: string;
@@ -106,8 +107,14 @@ export default function ConvidadosPage() {
       const res = await fetch('/api/user/reservations');
       const data = await res.json();
       if (res.ok && data.reservations) {
+        // Use dateUtils for timezone-aware filtering
         const activeReservations = data.reservations.filter(
-          (r: Reservation) => r.status === 'current' || r.status === 'upcoming' || r.status === 'pending'
+          (r: Reservation) => {
+            // Check if reservation is current or upcoming using proper date handling
+            const isCurrent = isCurrentReservation(r.checkInDate, r.checkOutDate);
+            const isUpcoming = isUpcomingReservation(r.checkInDate);
+            return isCurrent || isUpcoming || r.status === 'pending';
+          }
         );
         setReservations(activeReservations);
 

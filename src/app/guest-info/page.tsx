@@ -30,6 +30,7 @@ async function getGuestInfo() {
 }
 
 export default async function CheckinPage() {
+  const session = await getServerSession(authOptions);
   const items = await getGuestInfo();
 
   const checkinItems = items.filter((item: { type: string }) => item.type === 'checkin');
@@ -272,21 +273,23 @@ export default async function CheckinPage() {
         </section>
       )}
 
-      {/* Login CTA */}
-      <section className="container-section bg-amber-50">
-        <div className="text-center max-w-2xl mx-auto">
-          <h2 className="text-2xl font-bold text-gray-800 mb-4">
-            Informações Restritas
-          </h2>
-          <p className="text-gray-600 mb-6">
-            Senhas de WiFi, códigos de acesso e outras informações importantes
-            estão disponíveis apenas para hóspedes com reserva confirmada.
-          </p>
-          <Link href="/login" className="btn-primary">
-            Fazer Login
-          </Link>
-        </div>
-      </section>
+      {/* Login CTA - only show when not logged in */}
+      {!session && (
+        <section className="container-section bg-amber-50">
+          <div className="text-center max-w-2xl mx-auto">
+            <h2 className="text-2xl font-bold text-gray-800 mb-4">
+              Informações Restritas
+            </h2>
+            <p className="text-gray-600 mb-6">
+              Senhas de WiFi, códigos de acesso e outras informações importantes
+              estão disponíveis apenas para hóspedes com reserva confirmada.
+            </p>
+            <Link href="/login" className="btn-primary">
+              Fazer Login
+            </Link>
+          </div>
+        </section>
+      )}
     </div>
   );
 }

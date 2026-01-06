@@ -22,6 +22,7 @@ import {
 import toast from 'react-hot-toast';
 import { formatPhone } from '@/lib/helpers';
 import { IPreRegistration } from '@/models/PreRegistration';
+import { formatLocalDate, toLocalDateInputValue } from '@/utils/dateUtils';
 
 interface CalendarEvent {
   uid: string;
@@ -116,9 +117,9 @@ export default function PreCadastrosPage() {
       const data = await response.json();
       if (response.ok && data.events) {
         // Filter only future events that have a reservationCode
-        const today = new Date().toISOString().split('T')[0];
+        const today = toLocalDateInputValue(new Date());
         const futureEvents = data.events.filter(
-          (e: CalendarEvent) => e.start >= today && e.reservationCode
+          (e: CalendarEvent) => toLocalDateInputValue(e.start) >= today && e.reservationCode
         );
 
         // Also fetch pre-registrations to filter out already registered events
@@ -127,13 +128,13 @@ export default function PreCadastrosPage() {
 
         // Filter out events that already have a pre-registration with matching dates
         const unregisteredEvents = futureEvents.filter((event: CalendarEvent) => {
-          const eventStart = new Date(event.start).toISOString().split('T')[0];
-          const eventEnd = new Date(event.end).toISOString().split('T')[0];
+          const eventStart = toLocalDateInputValue(event.start);
+          const eventEnd = toLocalDateInputValue(event.end);
 
           // Check if any pre-registration matches these dates
           const hasPreReg = preRegData.some((pr: any) => {
-            const prStart = new Date(pr.checkInDate).toISOString().split('T')[0];
-            const prEnd = new Date(pr.checkOutDate).toISOString().split('T')[0];
+            const prStart = toLocalDateInputValue(pr.checkInDate);
+            const prEnd = toLocalDateInputValue(pr.checkOutDate);
             return prStart === eventStart && prEnd === eventEnd;
           });
 
@@ -302,9 +303,9 @@ export default function PreCadastrosPage() {
         phone: item.phone,
         notes: item.notes || '',
         expirationDays: 30,
-        checkInDate: item.checkInDate ? new Date(item.checkInDate).toISOString().split('T')[0] : '',
+        checkInDate: item.checkInDate ? toLocalDateInputValue(item.checkInDate) : '',
         checkInTime: item.checkInTime || '15:00',
-        checkOutDate: item.checkOutDate ? new Date(item.checkOutDate).toISOString().split('T')[0] : '',
+        checkOutDate: item.checkOutDate ? toLocalDateInputValue(item.checkOutDate) : '',
         checkOutTime: item.checkOutTime || '11:00',
         adultsCount: item.adultsCount || 1,
         childrenCount: item.childrenCount || 0,
@@ -549,12 +550,12 @@ export default function PreCadastrosPage() {
                             <>
                               <div>
                                 <span className="text-xs text-gray-500">In: </span>
-                                {new Date(item.checkInDate).toLocaleDateString('pt-BR')} {item.checkInTime}
+                                {formatLocalDate(item.checkInDate, { day: '2-digit', month: '2-digit', year: 'numeric' })} {item.checkInTime}
                               </div>
                               {item.checkOutDate && (
                                 <div>
                                   <span className="text-xs text-gray-500">Out: </span>
-                                  {new Date(item.checkOutDate).toLocaleDateString('pt-BR')} {item.checkOutTime}
+                                  {formatLocalDate(item.checkOutDate, { day: '2-digit', month: '2-digit', year: 'numeric' })} {item.checkOutTime}
                                 </div>
                               )}
                             </>
@@ -567,7 +568,7 @@ export default function PreCadastrosPage() {
                       <td className="py-4 px-6">
                         {item.status === 'pending' ? (
                           <span className="text-sm text-gray-600">
-                            {new Date(item.expiresAt).toLocaleDateString('pt-BR')}
+                            {formatLocalDate(item.expiresAt, { day: '2-digit', month: '2-digit', year: 'numeric' })}
                           </span>
                         ) : (
                           <span className="text-sm text-gray-400">-</span>
@@ -643,15 +644,15 @@ export default function PreCadastrosPage() {
                           <div className="flex items-center gap-2 text-gray-600">
                             <CalendarIcon className="h-4 w-4 flex-shrink-0" />
                             <span>
-                              {new Date(item.checkInDate).toLocaleDateString('pt-BR')} {item.checkInTime}
-                              {item.checkOutDate && ` → ${new Date(item.checkOutDate).toLocaleDateString('pt-BR')} ${item.checkOutTime}`}
+                              {formatLocalDate(item.checkInDate, { day: '2-digit', month: '2-digit', year: 'numeric' })} {item.checkInTime}
+                              {item.checkOutDate && ` → ${formatLocalDate(item.checkOutDate, { day: '2-digit', month: '2-digit', year: 'numeric' })} ${item.checkOutTime}`}
                             </span>
                           </div>
                         )}
                         {item.status === 'pending' && (
                           <div className="flex items-center gap-2 text-gray-500">
                             <ClockIcon className="h-4 w-4 flex-shrink-0" />
-                            <span>Expira: {new Date(item.expiresAt).toLocaleDateString('pt-BR')}</span>
+                            <span>Expira: {formatLocalDate(item.expiresAt, { day: '2-digit', month: '2-digit', year: 'numeric' })}</span>
                           </div>
                         )}
                         {item.notes && (
@@ -738,7 +739,7 @@ export default function PreCadastrosPage() {
                       <option value="">Selecione uma reserva para preencher automaticamente...</option>
                       {calendarEvents.map((event) => (
                         <option key={event.uid} value={event.uid}>
-                          {new Date(event.start).toLocaleDateString('pt-BR')} - {new Date(event.end).toLocaleDateString('pt-BR')}
+                          {formatLocalDate(event.start, { day: '2-digit', month: '2-digit', year: 'numeric' })} - {formatLocalDate(event.end, { day: '2-digit', month: '2-digit', year: 'numeric' })}
                           {event.summary !== 'Reserved' && event.summary !== 'Reservado' ? ` • ${event.summary}` : ''}
                           {event.reservationCode ? ` (${event.reservationCode})` : ''}
                         </option>

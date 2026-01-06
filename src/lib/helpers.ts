@@ -24,20 +24,24 @@ export const validateCPF = (cpf: string) => {
 };
 
 // Formatar telefone com suporte a DDI internacional
-// Permite apagar todo o conteúdo e digitar telefones de outros países
-// Formato sem espaços: +55(27)9XXXX-XXXX
+// Permite apagar todo o conteúdo e digitar telefones de qualquer país
+// Formato brasileiro: +55(27)99999-9999
+// Outros países: +{código}({área}){número} ou formato livre
 export const formatPhone = (value: string): string => {
   // Se estiver vazio ou apenas espaços, retorna vazio
   if (!value || value.trim() === '') {
     return '';
   }
 
+  // Preserva o sinal de + no início se existir
+  const hasPlus = value.startsWith('+');
+
   // Extrai apenas dígitos
   const digits = value.replace(/\D/g, '');
 
-  // Se não há dígitos, retorna vazio
+  // Se não há dígitos, retorna apenas + se havia antes, ou vazio
   if (!digits) {
-    return '';
+    return hasPlus ? '+' : '';
   }
 
   // Se começa com 55 (Brasil), formata como brasileiro
@@ -64,31 +68,63 @@ export const formatPhone = (value: string): string => {
     return formatted;
   }
 
-  // Outros países ou número sem código de país
-  // Se tem 10-11 dígitos, assume brasileiro
-  if (digits.length >= 10 && digits.length <= 11) {
-    const dd = digits.slice(0, 2);
-    const rest = digits.slice(2);
+  // Para outros países, formato mais flexível
+  // Tenta identificar código de país (1-3 dígitos) e formatar adequadamente
+  // Formatos comuns:
+  // +1 (EUA/Canadá): +1 (XXX) XXX-XXXX
+  // +44 (UK): +44 XXXX XXXXXX
+  // +351 (Portugal): +351 XXX XXX XXX
+  // etc.
 
-    let formatted = '+55';
-    formatted += `(${dd})`;
+  // Por padrão, apenas adiciona + no início e preserva os dígitos
+  // Isso permite que o usuário digite qualquer formato internacional
 
-    if (rest.length <= 5) {
-      formatted += rest;
-    } else {
-      formatted += `${rest.slice(0, 5)}-${rest.slice(5, 9)}`;
-    }
-
-    return formatted;
-  }
-
-  // Para outros formatos, apenas agrupa os dígitos sem espaços
-  if (digits.length <= 2) {
+  // Se tem apenas o código de país (1-3 dígitos)
+  if (digits.length <= 3) {
     return `+${digits}`;
   }
 
-  const chunks = digits.match(/.{1,4}/g) || [];
-  return '+' + chunks.join('');
+  // Para números com mais de 3 dígitos, tenta formatar de forma legível
+  // Assumindo que os primeiros 1-3 dígitos são o código do país
+
+  // EUA/Canadá (+1)
+  if (digits.startsWith('1') && digits.length <= 11) {
+    const country = '1';
+    const rest = digits.slice(1);
+    if (rest.length === 0) return '+1';
+    if (rest.length <= 3) return `+1(${rest}`;
+    if (rest.length <= 6) return `+1(${rest.slice(0, 3)})${rest.slice(3)}`;
+    return `+1(${rest.slice(0, 3)})${rest.slice(3, 6)}-${rest.slice(6, 10)}`;
+  }
+
+  // Portugal (+351) ou outros com 3 dígitos de código
+  if (digits.length > 10) {
+    // Assume código de 2-3 dígitos para países com números longos
+    const countryCodeLen = digits.length > 12 ? 3 : 2;
+    const country = digits.slice(0, countryCodeLen);
+    const rest = digits.slice(countryCodeLen);
+
+    // Formata em grupos de 3 dígitos
+    const groups = rest.match(/.{1,3}/g) || [];
+    return `+${country} ${groups.join(' ')}`;
+  }
+
+  // Para números entre 4-10 dígitos, formato simples
+  // Assume código de 2 dígitos e resto é o número
+  if (digits.length >= 4) {
+    const country = digits.slice(0, 2);
+    const rest = digits.slice(2);
+
+    // Formata em grupos de 3-4 dígitos
+    if (rest.length <= 4) {
+      return `+${country} ${rest}`;
+    }
+    const groups = rest.match(/.{1,4}/g) || [];
+    return `+${country} ${groups.join(' ')}`;
+  }
+
+  // Fallback: apenas adiciona + e retorna os dígitos
+  return `+${digits}`;
 };
 
 export const validateEmail = (email: string) => {

@@ -294,6 +294,7 @@ export interface IReservation {
   checkOutDate: Date;
   checkOutTime: string;
   numberOfGuests?: number;
+  pets?: number;
   notes?: string;
   status: ReservationStatus;
   source?: ReservationSource;

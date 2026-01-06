@@ -6,6 +6,13 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
 import {
+  formatLocalDate,
+  daysUntil,
+  isCurrentReservation,
+  isUpcomingReservation,
+  parseLocalDate,
+} from '@/utils/dateUtils';
+import {
   UserCircleIcon,
   CalendarIcon,
   UsersIcon,
@@ -116,23 +123,21 @@ export default function HospedeDashboardPage() {
       const data = await response.json();
 
       if (response.ok && data.reservations) {
-        const now = new Date();
         const reservations = data.reservations as Reservation[];
 
-        // Encontrar reserva atual (em andamento)
+        // Encontrar reserva atual (em andamento) - usando funções com timezone correto
         const current = reservations.find(r => {
-          const checkIn = new Date(r.checkInDate);
-          const checkOut = new Date(r.checkOutDate);
-          return r.status === 'current' || (now >= checkIn && now <= checkOut && r.status !== 'cancelled');
+          return r.status === 'current' ||
+            (isCurrentReservation(r.checkInDate, r.checkOutDate) && r.status !== 'cancelled');
         });
 
         // Encontrar próxima reserva
         const upcoming = reservations
           .filter(r => {
-            const checkIn = new Date(r.checkInDate);
-            return checkIn > now && (r.status === 'upcoming' || r.status === 'pending');
+            return isUpcomingReservation(r.checkInDate) &&
+              (r.status === 'upcoming' || r.status === 'pending');
           })
-          .sort((a, b) => new Date(a.checkInDate).getTime() - new Date(b.checkInDate).getTime())[0];
+          .sort((a, b) => parseLocalDate(a.checkInDate).getTime() - parseLocalDate(b.checkInDate).getTime())[0];
 
         setCurrentReservation(current || null);
         setNextReservation(upcoming || null);
@@ -150,20 +155,9 @@ export default function HospedeDashboardPage() {
     return `https://wa.me/${digits}`;
   };
 
-  const formatDate = (dateStr: string) => {
-    return new Date(dateStr).toLocaleDateString('pt-BR', {
-      day: '2-digit',
-      month: 'short',
-      year: 'numeric',
-    });
-  };
-
-  const getDaysUntil = (dateStr: string) => {
-    const now = new Date();
-    const target = new Date(dateStr);
-    const diff = Math.ceil((target.getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
-    return diff;
-  };
+  // Use imported formatLocalDate and daysUntil from dateUtils
+  const formatDate = (dateStr: string) => formatLocalDate(dateStr);
+  const getDaysUntil = (dateStr: string) => daysUntil(dateStr);
 
   const getReservationDisplay = () => {
     if (loadingReservations) {

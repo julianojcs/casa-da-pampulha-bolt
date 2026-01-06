@@ -189,21 +189,32 @@ export default function PlacesMap({
     return () => { mounted = false; };
   }, []);
 
-  // Create a DivIcon for the property logo (circular image)
+  // Create star icon as fallback when no logo
+  const starIcon = useMemo(() => {
+    const starSvg = `
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="#f59e0b" stroke="#92400e" stroke-width="1">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M11.48 3.499a.562.562 0 011.04 0l2.125 5.111a.563.563 0 00.475.345l5.518.442c.499.04.701.663.321.988l-4.204 3.602a.563.563 0 00-.182.557l1.285 5.385a.562.562 0 01-.84.61l-4.725-2.885a.563.563 0 00-.586 0L6.982 20.54a.562.562 0 01-.84-.61l1.285-5.386a.562.562 0 00-.182-.557l-4.204-3.602a.563.563 0 01.321-.988l5.518-.442a.563.563 0 00.475-.345L11.48 3.5z" />
+      </svg>
+    `;
+    const html = `<div style="width:36px;height:36px;filter:drop-shadow(0 2px 3px rgba(0,0,0,0.3))">${starSvg}</div>`;
+    return new L.DivIcon({ html, className: '', iconSize: [36, 36], iconAnchor: [18, 18], popupAnchor: [0, -18] }) as unknown as L.Icon;
+  }, []);
+
+  // Create a DivIcon for the property logo (circular image) or use star fallback
   const logoIcon = useMemo(() => {
-    if (!propertyLogo) return homeIcon;
+    if (!propertyLogo) return starIcon;
     try {
       const html = `
-        <div style="width:36px;height:36px;border-radius:9999px;overflow:hidden;border:2px solid transparent;background:transparent;display:inline-block">
+        <div style="width:36px;height:36px;border-radius:9999px;overflow:hidden;border:2px solid transparent;background:transparent;display:inline-block;filter:drop-shadow(0 2px 3px rgba(0,0,0,0.3))">
           <img src="${propertyLogo}" style="width:100%;height:100%;object-fit:cover;display:block;background:transparent" alt="logo" />
         </div>
       `;
       return new L.DivIcon({ html, className: '', iconSize: [36, 36], iconAnchor: [18, 18], popupAnchor: [0, -20] }) as unknown as L.Icon;
     } catch (err) {
       console.error('Error creating logo icon:', err);
-      return homeIcon;
+      return starIcon;
     }
-  }, [propertyLogo]);
+  }, [propertyLogo, starIcon]);
 
   useEffect(() => {
     setIsClient(true);
@@ -375,9 +386,9 @@ export default function PlacesMap({
         />
         <FitBounds places={filteredPlaces} residenceCoords={residenceCoords} />
 
-        {/* Residence Marker */}
+        {/* Residence Marker - zIndexOffset keeps it on top */}
         {residenceCoords && (
-          <Marker position={residenceCoords} icon={logoIcon}>
+          <Marker position={residenceCoords} icon={logoIcon} zIndexOffset={1000}>
             <Popup>
               <div className="min-w-[180px] text-center">
                 <div className="flex items-center justify-center gap-2 mb-2">

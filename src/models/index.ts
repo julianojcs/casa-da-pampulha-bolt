@@ -10,7 +10,6 @@ export { KidsArea } from './KidsArea';
 export { SocialLink } from './SocialLink';
 export { User } from './User';
 export { GuestRegistration } from './GuestRegistration';
-export { WelcomeGuide } from './WelcomeGuide';
 export { Reservation } from './Reservation';
 export { PreRegistration } from './PreRegistration';
 export { StaffTask } from './StaffTask';

@@ -35,6 +35,12 @@ export async function GET(request: NextRequest) {
     user.emailVerified = true;
     user.emailVerificationToken = undefined;
     user.emailVerificationExpires = undefined;
+
+    // Clear temporary check-in/check-out dates from User model
+    // These were used for pre-registration and are now moved to Reservation model
+    user.checkInDate = undefined;
+    user.checkOutDate = undefined;
+
     await user.save();
 
     // Buscar pré-cadastro associado ao usuário e confirmar reservas pendentes

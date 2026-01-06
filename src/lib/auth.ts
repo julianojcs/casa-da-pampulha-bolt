@@ -50,9 +50,9 @@ export const authOptions: NextAuthOptions = {
           // Add 24 hours to checkout date for access
           checkOut.setHours(checkOut.getHours() + 24);
 
-          if (now > checkOut) {
-            throw new Error('Seu acesso expirou. Entre em contato com o anfitrião.');
-          }
+          // if (now > checkOut) {
+          //   throw new Error('Seu acesso expirou. Entre em contato com o anfitrião.');
+          // }
         }
 
         return {

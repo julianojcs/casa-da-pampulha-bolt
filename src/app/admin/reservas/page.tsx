@@ -52,6 +52,7 @@ const emptyForm = {
   checkOutDate: '',
   checkOutTime: '11:00',
   numberOfGuests: 1,
+  pets: 0,
   notes: '',
   source: 'direct' as ReservationSource,
   reservationCode: '',
@@ -262,6 +263,7 @@ export default function ReservasPage() {
         checkOutDate: item.checkOutDate ? new Date(item.checkOutDate).toISOString().split('T')[0] : '',
         checkOutTime: item.checkOutTime || '11:00',
         numberOfGuests: item.numberOfGuests || 1,
+        pets: item.pets || 0,
         notes: item.notes || '',
         source: item.source || 'direct',
         reservationCode: item.reservationCode || '',
@@ -321,6 +323,44 @@ export default function ReservasPage() {
         {labels[status]}
       </span>
     );
+  };
+
+  /**
+   * Format guest count with age breakdown.
+   * Prefers virtual fields (adultsCount, childrenCount, babiesCount) when available,
+   * falls back to guests array length, then numberOfGuests.
+   */
+  const formatGuestCountLabel = (reservation: ReservationWithGuest): string => {
+    const res = reservation as any;
+    const hasVirtuals =
+      res.adultsCount !== undefined ||
+      res.childrenCount !== undefined ||
+      res.babiesCount !== undefined;
+
+    if (hasVirtuals) {
+      const adults = res.adultsCount || 0;
+      const children = res.childrenCount || 0;
+      const babies = res.babiesCount || 0;
+      const parts: string[] = [];
+      if (adults > 0) parts.push(`${adults} adulto${adults !== 1 ? 's' : ''}`);
+      if (children > 0) parts.push(`${children} criança${children !== 1 ? 's' : ''}`);
+      if (babies > 0) parts.push(`${babies} bebê${babies !== 1 ? 's' : ''}`);
+      return parts.join(', ') || '0 hóspedes';
+    }
+
+    // Fallback to guests array length
+    if (res.guests && res.guests.length > 0) {
+      const total = res.guests.length;
+      return `${total} hóspede${total !== 1 ? 's' : ''}`;
+    }
+
+    // Final fallback to numberOfGuests
+    if (res.numberOfGuests) {
+      const total = res.numberOfGuests;
+      return `${total} hóspede${total !== 1 ? 's' : ''}`;
+    }
+
+    return '1 hóspede';
   };
 
   const formatDate = (date: Date | string) => {
@@ -427,11 +467,9 @@ export default function ReservasPage() {
                   Check-out: {formatDate(currentReservation.checkOutDate)} às {currentReservation.checkOutTime}
                 </span>
               </div>
-              {currentReservation.numberOfGuests && (
-                <p className="text-amber-100">
-                  {currentReservation.numberOfGuests} hóspede(s)
-                </p>
-              )}
+              <p className="text-amber-100">
+                {formatGuestCountLabel(currentReservation)}
+              </p>
             </div>
           </div>
           {getDaysRemaining(currentReservation.checkOutDate) <= 1 && (
@@ -904,8 +942,8 @@ export default function ReservasPage() {
                 </div>
               </div>
 
-              {/* Número de hóspedes e Origem */}
-              <div className="grid grid-cols-2 gap-3">
+              {/* Número de hóspedes, Pets e Origem */}
+              <div className="grid grid-cols-3 gap-3">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
                     Nº de Hóspedes
@@ -915,6 +953,18 @@ export default function ReservasPage() {
                     min="1"
                     value={formData.numberOfGuests}
                     onChange={(e) => setFormData({ ...formData, numberOfGuests: parseInt(e.target.value) || 1 })}
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Pets
+                  </label>
+                  <input
+                    type="number"
+                    min="0"
+                    value={formData.pets}
+                    onChange={(e) => setFormData({ ...formData, pets: parseInt(e.target.value) || 0 })}
                     className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent"
                   />
                 </div>
@@ -982,7 +1032,7 @@ export default function ReservasPage() {
                           password: e.target.value,
                         }
                       })}
-                      placeholder="Ex: 1234#"
+                      placeholder="Ex: 123456"
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-amber-500 focus:border-transparent"
                     />
                   </div>
@@ -1125,12 +1175,10 @@ export default function ReservasPage() {
                   <span>Check-in: {detailsModal.checkInTime} | Check-out: {detailsModal.checkOutTime}</span>
                 </div>
 
-                {((detailsModal as any).guests?.length) && (
-                  <div className="flex items-center gap-3 text-gray-600">
-                    <UserIcon className="h-5 w-5 text-gray-400" />
-                    <span>{(detailsModal as any).guests?.length} hóspede(s)</span>
-                  </div>
-                )}
+                <div className="flex items-center gap-3 text-gray-600">
+                  <UserIcon className="h-5 w-5 text-gray-400" />
+                  <span>{formatGuestCountLabel(detailsModal)}</span>
+                </div>
 
                 {detailsModal.reservationCode && (
                   <div className="flex items-center gap-3 text-gray-600">

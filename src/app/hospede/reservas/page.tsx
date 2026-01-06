@@ -5,6 +5,14 @@ import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import {
+  formatLocalDate,
+  isCurrentReservation,
+  isUpcomingReservation,
+  parseLocalDate,
+  calculateNights,
+  getLocalToday,
+} from '@/utils/dateUtils';
+import {
   CalendarIcon,
   ArrowLeftIcon,
   UsersIcon,
@@ -90,19 +98,9 @@ export default function ReservasPage() {
     }
   };
 
-  const formatDate = (dateStr: string) => {
-    return new Date(dateStr).toLocaleDateString('pt-BR', {
-      day: '2-digit',
-      month: 'short',
-      year: 'numeric',
-    });
-  };
+  const formatDate = (dateStr: string) => formatLocalDate(dateStr);
 
   const getStatusInfo = (reservation: Reservation) => {
-    const now = new Date();
-    const checkIn = new Date(reservation.checkInDate);
-    const checkOut = new Date(reservation.checkOutDate);
-
     if (reservation.status === 'cancelled') {
       return {
         label: 'Cancelada',
@@ -119,7 +117,8 @@ export default function ReservasPage() {
       };
     }
 
-    if (now >= checkIn && now <= checkOut) {
+    // Use timezone-aware functions
+    if (isCurrentReservation(reservation.checkInDate, reservation.checkOutDate)) {
       return {
         label: 'Em andamento',
         color: 'bg-green-100 text-green-800',
@@ -127,7 +126,7 @@ export default function ReservasPage() {
       };
     }
 
-    if (now < checkIn) {
+    if (isUpcomingReservation(reservation.checkInDate)) {
       return {
         label: 'Confirmada',
         color: 'bg-blue-100 text-blue-800',
@@ -140,13 +139,6 @@ export default function ReservasPage() {
       color: 'bg-gray-100 text-gray-800',
       icon: CheckCircleIcon,
     };
-  };
-
-  const calculateNights = (checkIn: string, checkOut: string) => {
-    const start = new Date(checkIn);
-    const end = new Date(checkOut);
-    const diff = end.getTime() - start.getTime();
-    return Math.ceil(diff / (1000 * 60 * 60 * 24));
   };
 
   if (status === 'loading' || loading) {

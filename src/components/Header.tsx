@@ -13,7 +13,8 @@ import {
   Cog6ToothIcon,
   UserIcon,
   CalendarDaysIcon,
-  ChevronDownIcon
+  ChevronDownIcon,
+  HomeModernIcon
 } from '@heroicons/react/24/outline';
 
 const navigation = [
@@ -238,6 +239,14 @@ export default function Header() {
                         <>
                           <Link
                             href="/hospede"
+                            onClick={() => setIsUserMenuOpen(false)}
+                            className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-amber-50 hover:text-amber-600"
+                          >
+                            <HomeModernIcon className="h-5 w-5 mr-3" />
+                            Meu Painel
+                          </Link>
+                          <Link
+                            href="/hospede/perfil"
                             onClick={() => setIsUserMenuOpen(false)}
                             className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-amber-50 hover:text-amber-600"
                           >

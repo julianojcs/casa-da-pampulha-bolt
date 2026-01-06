@@ -10,22 +10,27 @@ import {
   ChevronDownIcon,
   PlusIcon,
   XMarkIcon,
+  TrashIcon,
 } from '@heroicons/react/24/outline';
 
 interface TransferListProps {
   availableItems: string[];
   selectedItems: string[];
   onSelectedChange: (items: string[]) => void;
+  onDeleteItem?: (item: string, list: 'available' | 'selected') => void;
   availableTitle?: string;
   selectedTitle?: string;
+  allowDelete?: boolean;
 }
 
 export function TransferList({
   availableItems,
   selectedItems,
   onSelectedChange,
+  onDeleteItem,
   availableTitle = 'Disponíveis',
   selectedTitle = 'Selecionados',
+  allowDelete = false,
 }: TransferListProps) {
   const [leftSelected, setLeftSelected] = useState<Set<string>>(new Set());
   const [rightSelected, setRightSelected] = useState<Set<string>>(new Set());
@@ -113,6 +118,22 @@ export function TransferList({
     onSelectedChange(selectedItems.filter((i) => i !== item));
   };
 
+  const handleDeleteItem = (item: string, list: 'available' | 'selected') => {
+    if (onDeleteItem) {
+      onDeleteItem(item, list);
+    }
+    // Also remove from local selection
+    if (list === 'available') {
+      const newSet = new Set(leftSelected);
+      newSet.delete(item);
+      setLeftSelected(newSet);
+    } else {
+      const newSet = new Set(rightSelected);
+      newSet.delete(item);
+      setRightSelected(newSet);
+    }
+  };
+
   return (
     <div className="space-y-4">
       {/* Add new category input */}
@@ -154,21 +175,35 @@ export function TransferList({
                 <div
                   key={item}
                   onClick={() => toggleLeftSelection(item)}
-                  className={`px-3 py-2 rounded cursor-pointer text-sm transition-colors ${
+                  className={`px-3 py-2 rounded cursor-pointer text-sm transition-colors flex items-center justify-between group ${
                     leftSelected.has(item)
                       ? 'bg-amber-100 text-amber-800 border border-amber-300'
                       : 'hover:bg-gray-100 text-gray-700'
                   }`}
                 >
-                  {item}
+                  <span>{item}</span>
+                  {allowDelete && onDeleteItem && (
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleDeleteItem(item, 'available');
+                      }}
+                      className="opacity-0 group-hover:opacity-100 p-1 hover:bg-red-100 rounded transition-opacity"
+                      title="Excluir permanentemente"
+                    >
+                      <TrashIcon className="h-4 w-4 text-red-500" />
+                    </button>
+                  )}
                 </div>
               ))
             )}
           </div>
         </div>
 
-        {/* Transfer Buttons */}
+        {/* Transfer Buttons - horizontal on mobile (down/up), vertical on desktop (left/right) */}
         <div className="flex md:flex-col justify-center items-center gap-2 py-2">
+          {/* Mobile: Down arrows (to lower list) / Desktop: Right arrows */}
           <button
             type="button"
             onClick={moveAllToRight}
@@ -176,7 +211,9 @@ export function TransferList({
             className="p-2 border border-gray-300 rounded-lg hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
             title="Mover todos para selecionados"
           >
-            <ChevronDoubleRightIcon className="h-4 w-4 text-gray-600" />
+            {/* Down on mobile, Right on desktop */}
+            <ChevronDoubleDownIcon className="h-4 w-4 text-gray-600 md:hidden" />
+            <ChevronDoubleRightIcon className="h-4 w-4 text-gray-600 hidden md:block" />
           </button>
           <button
             type="button"
@@ -185,7 +222,8 @@ export function TransferList({
             className="p-2 border border-gray-300 rounded-lg hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
             title="Mover selecionados"
           >
-            <ChevronRightIcon className="h-4 w-4 text-gray-600" />
+            <ChevronDownIcon className="h-4 w-4 text-gray-600 md:hidden" />
+            <ChevronRightIcon className="h-4 w-4 text-gray-600 hidden md:block" />
           </button>
           <button
             type="button"
@@ -194,7 +232,8 @@ export function TransferList({
             className="p-2 border border-gray-300 rounded-lg hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
             title="Remover selecionados"
           >
-            <ChevronLeftIcon className="h-4 w-4 text-gray-600" />
+            <ChevronUpIcon className="h-4 w-4 text-gray-600 md:hidden" />
+            <ChevronLeftIcon className="h-4 w-4 text-gray-600 hidden md:block" />
           </button>
           <button
             type="button"
@@ -203,7 +242,8 @@ export function TransferList({
             className="p-2 border border-gray-300 rounded-lg hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
             title="Remover todos"
           >
-            <ChevronDoubleLeftIcon className="h-4 w-4 text-gray-600" />
+            <ChevronDoubleUpIcon className="h-4 w-4 text-gray-600 md:hidden" />
+            <ChevronDoubleLeftIcon className="h-4 w-4 text-gray-600 hidden md:block" />
           </button>
         </div>
 
@@ -253,17 +293,32 @@ export function TransferList({
                     <span className="text-gray-400 mr-2">{index + 1}.</span>
                     {item}
                   </span>
-                  <button
-                    type="button"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      removeFromSelected(item);
-                    }}
-                    className="opacity-0 group-hover:opacity-100 p-1 hover:bg-red-100 rounded transition-opacity"
-                    title="Remover"
-                  >
-                    <XMarkIcon className="h-4 w-4 text-red-500" />
-                  </button>
+                  <div className="flex items-center gap-1">
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        removeFromSelected(item);
+                      }}
+                      className="opacity-0 group-hover:opacity-100 p-1 hover:bg-gray-200 rounded transition-opacity"
+                      title="Remover da lista"
+                    >
+                      <XMarkIcon className="h-4 w-4 text-gray-500" />
+                    </button>
+                    {allowDelete && onDeleteItem && (
+                      <button
+                        type="button"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleDeleteItem(item, 'selected');
+                        }}
+                        className="opacity-0 group-hover:opacity-100 p-1 hover:bg-red-100 rounded transition-opacity"
+                        title="Excluir permanentemente"
+                      >
+                        <TrashIcon className="h-4 w-4 text-red-500" />
+                      </button>
+                    )}
+                  </div>
                 </div>
               ))
             )}
@@ -271,5 +326,22 @@ export function TransferList({
         </div>
       </div>
     </div>
+  );
+}
+
+// Custom icon components for mobile view (vertical arrows)
+function ChevronDoubleDownIcon({ className }: { className?: string }) {
+  return (
+    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className={className}>
+      <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 5.25l-7.5 7.5-7.5-7.5m15 6l-7.5 7.5-7.5-7.5" />
+    </svg>
+  );
+}
+
+function ChevronDoubleUpIcon({ className }: { className?: string }) {
+  return (
+    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className={className}>
+      <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 18.75l7.5-7.5 7.5 7.5m-15-6l7.5-7.5 7.5 7.5" />
+    </svg>
   );
 }
