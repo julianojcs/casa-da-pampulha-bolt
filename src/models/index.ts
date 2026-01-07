@@ -1,6 +1,7 @@
 // Export all models
 export { Place } from './Place';
 export { GalleryItem } from './GalleryItem';
+export { GalleryCategory } from './GalleryCategory';
 export { Room } from './Room';
 export { Amenity } from './Amenity';
 export { Property } from './Property';

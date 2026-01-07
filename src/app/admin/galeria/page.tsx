@@ -218,17 +218,31 @@ export default function AdminGaleriaPage() {
 
   useEffect(() => {
     fetchItems();
-    fetchPropertyConfig();
+    fetchCategories();
   }, []);
 
-  const fetchPropertyConfig = async () => {
+  const fetchCategories = async () => {
     try {
+      // First try to get active categories from gallery-categories API
+      const catRes = await fetch('/api/gallery-categories');
+      if (catRes.ok) {
+        const categories = await catRes.json();
+        const activeCategories = categories
+          .filter((c: { isActive: boolean }) => c.isActive !== false)
+          .map((c: { name: string }) => c.name);
+        if (activeCategories.length > 0) {
+          setPropertyCategories(activeCategories);
+          return;
+        }
+      }
+
+      // Fallback to property config
       const res = await fetch('/api/property');
       if (!res.ok) return;
       const data = await res.json();
       setPropertyCategories(data.galleryCategories || defaultCategories);
     } catch (error) {
-      console.error('Erro ao carregar configurações da propriedade:', error);
+      console.error('Erro ao carregar categorias:', error);
     }
   };
 

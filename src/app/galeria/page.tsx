@@ -1,5 +1,6 @@
 import dbConnect from '@/lib/mongodb';
 import { GalleryItem } from '@/models/GalleryItem';
+import { GalleryCategory } from '@/models/GalleryCategory';
 import { Property } from '@/models/Property';
 import GalleryGrid from '@/components/GalleryGrid';
 import { Suspense } from 'react';
@@ -15,16 +16,28 @@ async function getGalleryItems() {
   return JSON.parse(JSON.stringify(items));
 }
 
-async function getPropertyConfig() {
+async function getCategories() {
   await dbConnect();
-  const prop = await Property.findOne({}).lean();
-  return prop ? JSON.parse(JSON.stringify(prop)) : null;
+
+  // Try to get categories from GalleryCategory collection first
+  const categories = await GalleryCategory.find({ isActive: { $ne: false } }).sort({ order: 1, name: 1 });
+  if (categories.length > 0) {
+    return categories.map(c => c.name);
+  }
+
+  // Fallback to property config
+  const prop = await Property.findOne({}).lean() as { galleryCategories?: string[] } | null;
+  if (prop?.galleryCategories?.length) {
+    return prop.galleryCategories;
+  }
+
+  return null;
 }
 
 export default async function GaleriaPage() {
   const items = await getGalleryItems();
-  const property = await getPropertyConfig();
-  const categories = property?.galleryCategories || Array.from(new Set(items.map((i: any) => i.category)));
+  const configCategories = await getCategories();
+  const categories = configCategories || Array.from(new Set(items.map((i: { category: string }) => i.category)));
 
   return (
     <div className="pt-20">
